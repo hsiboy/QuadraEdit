@@ -1,0 +1,237 @@
+# ---------------------------------------------------------------------------
+#
+# ---------------------------------------------------------------------------
+!if !$d(BCB)
+BCB = $(MAKEDIR)\..
+!endif
+
+# Define a shell so that everything runs the same, no matter which shell the user is running
+SHELL = cmd /c
+
+# Define commands so as to be independent of the shell the user is running
+ECHO = ${SHELL} echo
+DEL = ${SHELL} del
+
+# ---------------------------------------------------------------------------
+# IDE SECTION
+# ---------------------------------------------------------------------------
+# The following section of the project makefile is managed by the BCB IDE.
+# It is recommended to use the IDE to change any of the values in this
+# section.
+# ---------------------------------------------------------------------------
+
+VERSION = BCB.03
+# ---------------------------------------------------------------------------
+PROJECT = quadedit.exe
+OBJFILES = obj\quadedit.obj obj\main.obj obj\about.obj obj\midi.obj obj\error.obj
+RESFILES = quadedit.res
+DEFFILE =
+RESDEPEN = $(RESFILES) main.dfm about.dfm error.dfm
+LIBFILES =
+LIBRARIES = IcsBcb30.lib VCL35.lib
+SPARELIBS = VCL35.lib IcsBcb30.lib
+PACKAGES = vclx35.bpi VCL35.bpi vcldb35.bpi vcldbx35.bpi bcbsmp35.bpi dclocx35.bpi \
+  Qrpt35.bpi
+# ---------------------------------------------------------------------------
+PATHCPP = .;
+PATHASM = .;
+PATHPAS = .;
+PATHRC = .;
+DEBUGLIBPATH = $(BCB)\lib\debug
+RELEASELIBPATH = $(BCB)\lib\release
+# ---------------------------------------------------------------------------
+CFLAG1 = -Od -w-par -w-inl -Ve -r- -k -y -v -vi- -c -b- -Vx -tW
+CFLAG2 = -I"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
+CFLAG3 = -Tkh30000
+PFLAGS = -U"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj;$(DEBUGLIBPATH) \
+  -I"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32 \
+  -N2obj -N0obj -$Y -$W -$O- -v -JPHN -M
+RFLAGS = -i"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
+AFLAGS = /i..\..\i2c_new\pc-test /i$(BCB)\include /i$(BCB)\include\vcl \
+  /i..\..\libs\ics\Delphi\Vc32 /mx /w2 /zd /dUSEPACKAGES
+LFLAGS = -L"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj;$(DEBUGLIBPATH) \
+  -aa -Tpe -s -Gn -M -w -v
+IFLAGS =
+# ---------------------------------------------------------------------------
+ALLOBJ = c0w32.obj sysinit.obj $(OBJFILES)
+ALLRES = $(RESFILES)
+ALLLIB = $(LIBFILES) $(LIBRARIES) import32.lib cp32mt.lib
+# ---------------------------------------------------------------------------
+!ifdef IDEOPTIONS
+
+[Version Info]
+IncludeVerInfo=1
+AutoIncBuild=0
+MajorVer=0
+MinorVer=1
+Release=0
+Build=1
+Debug=0
+PreRelease=0
+Special=0
+Private=0
+DLL=0
+Locale=5129
+CodePage=1252
+
+[Version Info Keys]
+CompanyName=---
+FileDescription=Quadraverb GT Patch Editor
+FileVersion=0.1.0.1
+InternalName=QuadEdit
+LegalCopyright=Rob Alley 2010
+LegalTrademarks=
+OriginalFilename=
+ProductName=QuadEdit
+ProductVersion=
+Comments=
+
+[HistoryLists\hlIncludePath]
+Count=13
+Item0=..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
+Item1=haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item2=..\..\mobile data\pc apps\haloconfig;.\haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item3=.\haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item4=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item5=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\components\ics\Delphi\Vc32
+Item6=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\dev\ics\delphi\vc32
+Item7=..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\dev\ics\delphi\vc32
+Item8=$(BCB)\include;$(BCB)\include\vcl;c:\dev\ics\delphi\vc32
+Item9=$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\..\dev\ics\delphi\vc32
+Item10=$(BCB)\include;$(BCB)\include\vcl
+Item11=..\..\..\..\mobile data\cgps\sw\cgps apn tool;..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\include;$(BCB)\include\vcl
+Item12=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\include;$(BCB)\include\vcl
+
+[HistoryLists\hlLibraryPath]
+Count=14
+Item0=..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
+Item1=haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
+Item2=haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
+Item3=..\..\mobile data\pc apps\haloconfig;.\haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
+Item4=.\haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
+Item5=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item6=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;C:\WDD\components\ics\Delphi\Vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item7=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item8=..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item9=c:\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item10=..\..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item11=$(BCB)\lib\obj;$(BCB)\lib
+Item12=..\..\..\..\mobile data\cgps\sw\cgps apn tool;..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\lib\obj;$(BCB)\lib
+Item13=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\lib\obj;$(BCB)\lib
+
+[HistoryLists\hlDebugSourcePath]
+Count=1
+Item0=$(BCB)\source\vcl
+
+[HistoryLists\hlIntOutputDir]
+Count=3
+Item0=obj
+Item1=C:\QVCS Project Files\Mobile Data\CGPS\Sw\CGPS APN Tool\obj
+Item2=C:\Dev\Mobile Data\CGPS\Sw\CGPS APN Tool\obj
+
+[Debugging]
+DebugSourceDirs=$(BCB)\source\vcl
+
+[Parameters]
+RunParams=
+HostApplication=
+
+!endif
+
+# ---------------------------------------------------------------------------
+# MAKE SECTION
+# ---------------------------------------------------------------------------
+# This section of the project file is not used by the BCB IDE.  It is for
+# the benefit of building from the command-line using the MAKE utility.
+# ---------------------------------------------------------------------------
+
+.autodepend
+# ---------------------------------------------------------------------------
+!if !$d(BCC32)
+BCC32 = bcc32
+!endif
+
+!if !$d(DCC32)
+DCC32 = dcc32
+!endif
+
+!if !$d(TASM32)
+TASM32 = tasm32
+!endif
+
+!if !$d(LINKER)
+LINKER = ilink32
+!endif
+
+!if !$d(BRCC32)
+BRCC32 = brcc32
+!endif
+# ---------------------------------------------------------------------------
+!if $d(PATHCPP)
+.PATH.CPP = $(PATHCPP)
+.PATH.C   = $(PATHCPP)
+!endif
+
+!if $d(PATHPAS)
+.PATH.PAS = $(PATHPAS)
+!endif
+
+!if $d(PATHASM)
+.PATH.ASM = $(PATHASM)
+!endif
+
+!if $d(PATHRC)
+.PATH.RC  = $(PATHRC)
+!endif
+# ---------------------------------------------------------------------------
+$(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
+    $(BCB)\BIN\$(LINKER) @&&!
+    $(LFLAGS) +
+    $(ALLOBJ), +
+    $(PROJECT),, +
+    $(ALLLIB), +
+    $(DEFFILE), +
+    $(ALLRES)
+!
+# ---------------------------------------------------------------------------
+.pas.hpp:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.pas.obj:
+    $(BCB)\BIN\$(DCC32) $(PFLAGS) {$< }
+
+.cpp.obj:
+    @${ECHO} Compiling $<
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.c.obj:
+    @${ECHO} Compiling $<
+    $(BCB)\BIN\$(BCC32) $(CFLAG1) $(CFLAG2) $(CFLAG3) -n$(@D) {$< }
+
+.asm.obj:
+    @${ECHO} Assembling $<
+    $(BCB)\BIN\$(TASM32) $(AFLAGS) $<, $@
+
+.rc.res:
+    @${ECHO} Compiling resource file $<
+    $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
+
+# ---------------------------------------------------------------------------
+# EXTENDED SECTION
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# This section of the project file is for hand done extensions to the makefile
+all: version.nsh executable
+
+# clean - removes all generated files
+clean:
+       @${ECHO} ${LINE}
+       @${ECHO} Cleaning up generated files...
+       @${DEL} obj\*.obj
+       @${ECHO} ${LINE}
+
+# Open the project in the Borland IDE
+ide: Modem.dfm About.dfm releasenotes.dfm CannedMessageProperties.dfm version.h runide txtform
+
+run:
+      HaloConfig.exe
