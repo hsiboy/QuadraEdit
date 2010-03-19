@@ -18,7 +18,7 @@
 #include "about.h"
 #include "midi.h"
 #include "error.h"
-#include <mmsystem.h>                       // we need this
+#include <mmsystem.h>                       // MultiMedia System headers
 
 #define QUAD_PATCH_MIN (0)
 #define QUAD_PATCH_MAX (9)
