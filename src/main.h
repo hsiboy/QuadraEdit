@@ -135,6 +135,8 @@ __published:	// IDE-managed Components
     void __fastcall RadioPitchClick(TObject *Sender);
     void __fastcall RadioReverbClick(TObject *Sender);
     void __fastcall QuadPatchReadClick(TObject *Sender);
+    void __fastcall ButtonMidiDevCloseClick(TObject *Sender);
+    void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

@@ -23,7 +23,7 @@ DEL = ${SHELL} del
 VERSION = BCB.03
 # ---------------------------------------------------------------------------
 PROJECT = quadedit.exe
-OBJFILES = obj\quadedit.obj obj\main.obj obj\about.obj obj\midi.obj obj\error.obj
+OBJFILES = obj\quadedit.obj obj\main.obj obj\about.obj obj\error.obj obj\midi.obj
 RESFILES = quadedit.res
 DEFFILE =
 RESDEPEN = $(RESFILES) main.dfm about.dfm error.dfm

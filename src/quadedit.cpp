@@ -8,8 +8,8 @@
 USERES("quadedit.res");
 USEFORM("main.cpp", MainForm);
 USEFORM("about.cpp", FormAbout);
-USEUNIT("midi.cpp");
 USEFORM("error.cpp", FormError);
+USEUNIT("midi.cpp");
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {

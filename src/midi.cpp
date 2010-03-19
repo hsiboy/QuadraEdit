@@ -1,17 +1,22 @@
-//---------------------------------------------------------------------------
 #include <vcl.h>
 #include <mmsystem.h>                       // we need this
 #pragma hdrstop
 
 #include "types.h"
 #include "midi.h"
-
+#include "error.h"
 
 #define MIDI_IN_BUF_SIZE  (2048)
-
-
+          
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
+//#pragma resource "*.dfm"
+Tmidiform *midiform;
+//---------------------------------------------------------------------------
+__fastcall Tmidiform::Tmidiform(TComponent* Owner)
+    : TForm(Owner)
+{
+}
 
 const UInt8 Sysex_Hdr[]={0xF0,              // SysEx
                          0x00,0x00,0x0E,    // Alesis Manufacturer Id
@@ -33,7 +38,8 @@ static UInt8 Midi_In_1_Buffer[MIDI_IN_BUF_SIZE];
 
 // Rx message counters
 static int rx_sysex=0;
-static int rx_msg=0;
+static int rx_msg=100;
+static int rx_other=0;
 
 void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_text)
 {
@@ -111,11 +117,12 @@ UInt8 Midi_Out_Open(int device)
 
 }
 
-void Midi_Out_Dump_Req(UInt8 program)
+unsigned int Midi_Out_Dump_Req(UInt8 program)
 {
   MIDIHDR out;
   UInt8 buffer[100];
   UInt8 buf_len=0;
+  long int status;
 
   // Build message in buffer
   memcpy(buffer, Sysex_Hdr, sizeof(Sysex_Hdr));
@@ -134,11 +141,14 @@ void Midi_Out_Dump_Req(UInt8 program)
   out.lpData = buffer;
   out.dwBufferLength = buf_len;
   out.dwBytesRecorded = buf_len;
+  out.dwFlags = 0;
 
   // Prepare and send the MIDI message
   midiOutPrepareHeader(Midi_Out_Handle, &out, sizeof(out));
-  midiOutLongMsg(Midi_Out_Handle, &out, sizeof(out));
+  status=midiOutLongMsg(Midi_Out_Handle, &out, sizeof(out));
   midiOutUnprepareHeader(Midi_Out_Handle, &out, sizeof(out));
+
+  return(status);
 
 }
 
@@ -162,7 +172,8 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
 
       // Make the buffer free for next lot of SysEx data
       header_ptr->dwBytesRecorded = 0;
-      midiInAddBuffer(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
+      //midiInAddBuffer(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
+      midiInPrepareHeader(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
       // TBD: Is this Ok?  (Should not be calling system fucntions in a callback)
       break;
 
@@ -172,13 +183,15 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
 
     case MIM_ERROR:
     case MIM_CLOSE:
+    default:
+      rx_other++;
       break;
   }
 
 
 }
 
-UInt8 Midi_In_Open(int device)
+unsigned int Midi_In_Open(int device)
 {
   MMRESULT status;
 
@@ -186,20 +199,21 @@ UInt8 Midi_In_Open(int device)
   if (status != MMSYSERR_NOERROR)
   {
     // TBD: Report open error details
-    return 1;
+    return status;
   }
 
   // TBD: Setup more than one MIDI in header/buffer
-  
+
   // Setup MIDI in header
   Midi_In_1.lpData = Midi_In_1_Buffer;
   Midi_In_1.dwBufferLength = sizeof(Midi_In_1_Buffer);
+  Midi_In_1.dwBytesRecorded = 0;
   Midi_In_1.dwFlags = 0;
   status = midiInPrepareHeader(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
   if (status != MMSYSERR_NOERROR)
   {
     // TBD: Report header error details
-    return 1;
+    return status;
   }
 
   // Add a buffer to the MIDI in header
@@ -207,14 +221,33 @@ UInt8 Midi_In_Open(int device)
   if (status != MMSYSERR_NOERROR)
   {
     // TBD: Report buffer error details
-    return 1;
+    return status;
   }
 
-  return 0;
+  midiInStart(Midi_In_Handle);
+
+  return MMSYSERR_NOERROR;
 }
 
-void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr)
+void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_ptr)
 {
   *msg_count_ptr=rx_msg;
   *sysex_count_ptr=rx_sysex;
+  *other_count_ptr=rx_other;
+}
+
+unsigned int Midi_In_Close(void)
+{
+  unsigned int status;
+  midiInStop(Midi_In_Handle);
+  //status=midiInReset(Midi_In_Handle);
+  //if (status != MMSYSERR_NOERROR) return(status);
+  status=midiInClose(Midi_In_Handle);
+  return(status);
+}
+unsigned int Midi_Out_Close(void)
+{
+  unsigned int status;
+  status=midiOutClose(Midi_Out_Handle);
+  return(status);
 }

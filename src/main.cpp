@@ -94,7 +94,7 @@ void __fastcall TMainForm::ButtonPlayClick(TObject *Sender)
 
 void __fastcall TMainForm::MenuHelpAboutClick(TObject *Sender)
 {
-  // Display the about form    
+  // Display the about form
   FormAbout->FormShow(Sender);
 }
 
@@ -103,7 +103,7 @@ void __fastcall TMainForm::MenuHelpAboutClick(TObject *Sender)
 void __fastcall TMainForm::QuadPatchNumChange(TObject *Sender)
 {
    // TBD: Check it is numeric and in range
-   
+
    PanelQuad->Caption = "Quad Patch " + QuadPatchNum->Text + " selected";
 
   // TBD: User changed the patch number, update display
@@ -124,11 +124,11 @@ void __fastcall TMainForm::UpDownQuadPatchClick(TObject *Sender,
 
 void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 {
-  int msg, sysex;
+  int msg, sysex,other;
   static int count=0;
 
-  Midi_Get_Counts(&msg, &sysex);
-  Debug->Caption=AnsiString(count++)+"  Msg Count: "+AnsiString(msg)+"  Sysex Count: "+AnsiString(sysex);
+  Midi_Get_Counts(&msg, &sysex, &other);
+  Debug->Caption=AnsiString(count++)+"  Msg Count: "+AnsiString(msg)+"  Sysex Count: "+AnsiString(sysex)+"  Other Count: "+AnsiString(other);
 
 }
 //---------------------------------------------------------------------------
@@ -137,22 +137,29 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 
 void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
 {
-   UInt8 status;
+   unsigned int status;
 
-   if (Midi_Out_Open(ComboBoxOutDevs->ItemIndex))
+   status=Midi_Out_Open(ComboBoxOutDevs->ItemIndex);
+   if (status != MMSYSERR_NOERROR)
    {
-     FormError->LabelError->Caption="Error opening Midi output device";
+     FormError->LabelError->Caption="Error ["+AnsiString(status)+"] opening Midi output device";
      FormError->FormShow(Sender);
    }
-   else if (Midi_In_Open(ComboBoxOutDevs->ItemIndex))
+   else
    {
-     FormError->LabelError->Caption="Error opening Midi input device";
-     FormError->FormShow(Sender);
+     status=Midi_In_Open(ComboBoxInDevs->ItemIndex);
+     if (status != MMSYSERR_NOERROR)
+     {
+       FormError->LabelError->Caption="Error ["+AnsiString(status)+"] opening Midi input device";
+       FormError->FormShow(Sender);
+     }
+     else
+     {
+       Debug->Caption="Midi devices succesfully opened";
+       ButtonMidiDevOpen->Enabled=false;
+       ButtonMidiDevClose->Enabled=true;
+     }
    }
-   //else
-   //{
-   //  Debug->Caption="Midi devices succesfully opened";
-   //{
 }
 //---------------------------------------------------------------------------
 
@@ -191,6 +198,8 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
     PanelQuadReverb->Enabled=true;
 
     DelayMultiTap->Enabled=false;
+        FormError->LabelError->Caption="Config 2";
+    FormError->FormShow(NULL);
   }
 
   // 2: Graphic Eq-Delay
@@ -285,9 +294,47 @@ void __fastcall TMainForm::RadioReverbClick(TObject *Sender)
 
 void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
 {
-UInt8 patch;
+  UInt8 patch;
+  long int status;
 
   patch = (UInt8) StrToInt(QuadPatchNum->Text);
-  Midi_Out_Dump_Req(patch);
+  status=Midi_Out_Dump_Req(patch);
+
+  if (status != MMSYSERR_NOERROR)
+  {
+     FormError->LabelError->Caption="Error ["+AnsiString(status)+"] sending SYSEX to Midi output device";
+     FormError->FormShow(Sender);
+  }
+
 }
 //---------------------------------------------------------------------------
+void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
+{
+  unsigned int status;
+
+  status=Midi_In_Close();
+  if (status != MMSYSERR_NOERROR)
+  {
+    FormError->LabelError->Caption="Error ["+AnsiString(status)+"] closing Midi input device";
+    FormError->FormShow(Sender);
+  }
+
+  status=Midi_Out_Close();
+  if (status != MMSYSERR_NOERROR)
+  {
+    FormError->LabelError->Caption="Error ["+AnsiString(status)+"] closing Midi output device";
+    FormError->FormShow(Sender);
+  }
+
+  ButtonMidiDevOpen->Enabled=true;
+  ButtonMidiDevClose->Enabled=false;
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
+{
+  Application->Terminate();
+}
+//---------------------------------------------------------------------------
+
