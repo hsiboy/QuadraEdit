@@ -18,6 +18,7 @@
 #include "about.h"
 #include "midi.h"
 #include "error.h"
+#include "debug.h"
 #include <mmsystem.h>                       // MultiMedia System headers
 
 #define QUAD_PATCH_MIN (0)
@@ -31,13 +32,22 @@ TMainForm *MainForm;
 __fastcall TMainForm::TMainForm(TComponent* Owner)
    : TForm(Owner)
 {
+  Left=Screen->Width/2- Width/2;
+  Top =Screen->Height/2 - Height/2;
+}
+
+void __fastcall TMainForm::Init(void)
+{
+  FormDebug->Log(MainForm, "Starting...");
+
   UpDownQuadPatch->Min=QUAD_PATCH_MIN;
   UpDownQuadPatch->Max=QUAD_PATCH_MAX;
   EditQuadPatchName->Text="---";
 
   Midi_Get_Dev_Lists(ComboBoxInDevs,ComboBoxOutDevs,LabelMidiDevError);
 
-  RadioConfigClick(Owner);
+  RadioConfigClick(MainForm);
+
 
 }
 //---------------------------------------------------------------------------
@@ -128,7 +138,7 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
   static int count=0;
 
   Midi_Get_Counts(&msg, &sysex, &other);
-  Debug->Caption=AnsiString(count++)+"  Msg Count: "+AnsiString(msg)+"  Sysex Count: "+AnsiString(sysex)+"  Other Count: "+AnsiString(other);
+  FormDebug->Counter(Sender,AnsiString(count++)+"  Msg Count: "+AnsiString(msg)+"  Sysex Count: "+AnsiString(sysex)+"  Other Count: "+AnsiString(other));
 
 }
 //---------------------------------------------------------------------------
@@ -155,7 +165,7 @@ void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
      }
      else
      {
-       Debug->Caption="Midi devices succesfully opened";
+       FormDebug->Log(Sender,"Midi devices succesfully opened");
        ButtonMidiDevOpen->Enabled=false;
        ButtonMidiDevClose->Enabled=true;
      }
@@ -175,15 +185,15 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // Handler for the Config radio buttons
  
   // TBD: How to set it up so enabling/disabling a panel causes it's children to also be enabled/disabled
-  
+
   // 0: EQ-Pitch-Delay-Reverb;
   if (Config0->Checked == TRUE)
   {
-    Debug2->Caption="0";
-    PanelQuadEq->Enabled=true;
-    PanelQuadPitch->Enabled=true;
-    PanelQuadDelay->Enabled=true;
-    PanelQuadReverb->Enabled=true;
+    FormDebug->Log(Sender,"Config 0");
+    PanelQuadEq->Visible=true;
+    PanelQuadPitch->Visible=true;
+    PanelQuadDelay->Visible=true;
+    PanelQuadReverb->Visible=true;
 
     DelayMultiTap->Enabled=false;
   }
@@ -191,24 +201,22 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 1: Leslie-Delay-Reverb;
   else if (Config1->Checked == TRUE)
   {
-    Debug2->Caption="1";
-    PanelQuadEq->Enabled=false;
-    PanelQuadPitch->Enabled=false;
-    PanelQuadDelay->Enabled=true;
-    PanelQuadReverb->Enabled=true;
+    FormDebug->Log(Sender,"Config 1");
+    PanelQuadEq->Visible=false;
+    PanelQuadPitch->Visible=false;
+    PanelQuadDelay->Visible=true;
+    PanelQuadReverb->Visible=true;
 
     DelayMultiTap->Enabled=false;
-        FormError->LabelError->Caption="Config 2";
-    FormError->FormShow(NULL);
   }
 
   // 2: Graphic Eq-Delay
   else if (Config2->Checked == TRUE)
   {
-    PanelQuadEq->Enabled=true;
-    PanelQuadPitch->Enabled=false;
-    PanelQuadDelay->Enabled=true;
-    PanelQuadReverb->Enabled=false;
+    PanelQuadEq->Visible=true;
+    PanelQuadPitch->Visible=false;
+    PanelQuadDelay->Visible=true;
+    PanelQuadReverb->Visible=false;
 
     DelayMultiTap->Enabled=false;
   }
@@ -216,10 +224,10 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 3: 5 Band Eq-Pitch-Delay
   else if (Config3->Checked == TRUE)
   {
-    PanelQuadEq->Enabled=true;
-    PanelQuadPitch->Enabled=true;
-    PanelQuadDelay->Enabled=true;
-    PanelQuadReverb->Enabled=false;
+    PanelQuadEq->Visible=true;
+    PanelQuadPitch->Visible=true;
+    PanelQuadDelay->Visible=true;
+    PanelQuadReverb->Visible=false;
 
     DelayMultiTap->Enabled=true;
   }
@@ -227,21 +235,21 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 4: 3 Band Eq-Reverb
   else if (Config4->Checked == TRUE)
   {
-    PanelQuadEq->Enabled=true;
-    PanelQuadPitch->Enabled=false;
-    PanelQuadDelay->Enabled=false;
-    PanelQuadReverb->Enabled=true;
+    PanelQuadEq->Visible=true;
+    PanelQuadPitch->Visible=false;
+    PanelQuadDelay->Visible=false;
+    PanelQuadReverb->Visible=true;
 
     DelayMultiTap->Enabled=false;
   }
 
-  // 5: Ring MMod-Delay-Reverb
+  // 5: Ring Mod-Delay-Reverb
   else if (Config5->Checked == TRUE)
   {
-    PanelQuadEq->Enabled=false;
-    PanelQuadPitch->Enabled=false;
-    PanelQuadDelay->Enabled=true;
-    PanelQuadReverb->Enabled=true;
+    PanelQuadEq->Visible=false;
+    PanelQuadPitch->Visible=false;
+    PanelQuadDelay->Visible=true;
+    PanelQuadReverb->Visible=true;
 
     DelayMultiTap->Enabled=false;
   }

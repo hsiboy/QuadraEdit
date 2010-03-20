@@ -5,9 +5,11 @@
 #include "types.h"
 #include "midi.h"
 #include "error.h"
+#include "debug.h"
 
 #define MIDI_IN_BUF_SIZE  (2048)
-          
+#define MIDI_IN_NUM_BUF    (5)
+
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 //#pragma resource "*.dfm"
@@ -33,8 +35,13 @@ static HMIDIOUT Midi_Out_Handle;
 static HMIDIIN Midi_In_Handle;
 
 // Headers and associated buffers for Midi Input SYSEX messages
-static MIDIHDR Midi_In_1;
-static UInt8 Midi_In_1_Buffer[MIDI_IN_BUF_SIZE];
+typedef struct tMidi_In
+{
+  MIDIHDR Hdr;
+  UInt8   Buffer[MIDI_IN_BUF_SIZE];
+} tMidi_In;
+
+static tMidi_In Midi_In[MIDI_IN_NUM_BUF];
 
 // Rx message counters
 static int rx_sysex=0;
@@ -137,6 +144,8 @@ unsigned int Midi_Out_Dump_Req(UInt8 program)
   memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
   buf_len+=sizeof(Sysex_End);
 
+  FormDebug->LogHex(NULL, "TX", buffer, buf_len);
+
   // Prepare header
   out.lpData = buffer;
   out.dwBufferLength = buf_len;
@@ -172,8 +181,8 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
 
       // Make the buffer free for next lot of SysEx data
       header_ptr->dwBytesRecorded = 0;
-      //midiInAddBuffer(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
-      midiInPrepareHeader(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
+      //midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
+      midiInPrepareHeader(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
       // TBD: Is this Ok?  (Should not be calling system fucntions in a callback)
       break;
 
@@ -193,6 +202,7 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
 
 unsigned int Midi_In_Open(int device)
 {
+  UInt8 i;
   MMRESULT status;
 
   status=midiInOpen(&Midi_In_Handle, device, (DWORD) Midi_In_Proc, 0, CALLBACK_FUNCTION);
@@ -205,19 +215,22 @@ unsigned int Midi_In_Open(int device)
   // TBD: Setup more than one MIDI in header/buffer
 
   // Setup MIDI in header
-  Midi_In_1.lpData = Midi_In_1_Buffer;
-  Midi_In_1.dwBufferLength = sizeof(Midi_In_1_Buffer);
-  Midi_In_1.dwBytesRecorded = 0;
-  Midi_In_1.dwFlags = 0;
-  status = midiInPrepareHeader(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
-  if (status != MMSYSERR_NOERROR)
+  for (i=0; i<MIDI_IN_NUM_BUF; i++)
   {
-    // TBD: Report header error details
-    return status;
+    Midi_In[i].Hdr.lpData = Midi_In[0].Buffer;
+    Midi_In[i].Hdr.dwBufferLength = sizeof(Midi_In[0].Buffer);
+    Midi_In[i].Hdr.dwBytesRecorded = 0;
+    Midi_In[i].Hdr.dwFlags = 0;
+    status = midiInPrepareHeader(Midi_In_Handle, &Midi_In[i].Hdr, sizeof(Midi_In[i].Hdr));
+    if (status != MMSYSERR_NOERROR)
+    {
+     // TBD: Report header error details
+      return status;
+    }
   }
 
   // Add a buffer to the MIDI in header
-  status=midiInAddBuffer(Midi_In_Handle, &Midi_In_1, sizeof(Midi_In_1));
+  status=midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
   if (status != MMSYSERR_NOERROR)
   {
     // TBD: Report buffer error details

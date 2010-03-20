@@ -53,9 +53,6 @@ __published:	// IDE-managed Components
     TLabel *LabelInDevName;
     TComboBox *ComboBoxInDevs;
     TTimer *TimerMidiCounts;
-    TLabel *Debug;
-    TLabel *Debug2;
-
     TRadioGroup *RadioGroupConfig;
     TRadioButton *Config0;
     TRadioButton *Config1;
@@ -118,6 +115,7 @@ __published:	// IDE-managed Components
     TTrackBar *TrackBar22;
     TTrackBar *PreGate;
     TTrackBar *PreOutLevel;
+
     void __fastcall ButtonPlayClick(TObject *Sender);
     void __fastcall ButtonSilenceClick(TObject *Sender);
     void __fastcall ButtonInstrumentClick(TObject *Sender);
@@ -140,9 +138,10 @@ __published:	// IDE-managed Components
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
+    void __fastcall Init(void);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TMainForm *MainForm;
 //---------------------------------------------------------------------------
 #endif
- 
+

@@ -3,6 +3,8 @@
 
 #include <vcl.h>
 #include <stdio.h>
+#include "main.h"
+#include "debug.h"
 #pragma hdrstop
 
 USERES("quadedit.res");
@@ -10,6 +12,7 @@ USEFORM("main.cpp", MainForm);
 USEFORM("about.cpp", FormAbout);
 USEFORM("error.cpp", FormError);
 USEUNIT("midi.cpp");
+USEFORM("debug.cpp", FormDebug);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -17,9 +20,14 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
    {
       Application->Initialize();
       Application->Title = "QuadraEdit";
+
         Application->CreateForm(__classid(TMainForm), &MainForm);
         Application->CreateForm(__classid(TFormAbout), &FormAbout);
         Application->CreateForm(__classid(TFormError), &FormError);
+        Application->CreateForm(__classid(TFormDebug), &FormDebug);
+        FormDebug->Show();
+        MainForm->Init();
+
         Application->Run();
    }
    catch (Exception &exception)
