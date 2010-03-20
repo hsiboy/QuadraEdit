@@ -44,11 +44,13 @@ RELEASELIBPATH = $(BCB)\lib\release
 CFLAG1 = -Od -w-par -w-inl -Ve -r- -k -y -v -vi- -c -b- -Vx -tW
 CFLAG2 = -I"..\..\..\..\..\program files\borland\cbuilder3\projects";"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
 CFLAG3 = -Tkh30000
-PFLAGS = -U"..\..\..\..\..\program files\borland\cbuilder3\projects";"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj;$(DEBUGLIBPATH) \
+PFLAGS = -N2obj -N0obj \
+  -U"..\..\..\..\..\program files\borland\cbuilder3\projects";"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj;$(DEBUGLIBPATH) \
   -I"..\..\..\..\..\program files\borland\cbuilder3\projects";"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32 \
-  -N2obj -N0obj -$Y -$W -$O- -v -JPHN -M
+  -$Y -$W -$O- -v -JPHN -M
 RFLAGS = -i"..\..\..\..\..\program files\borland\cbuilder3\projects";"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
-AFLAGS = /i"..\..\..\program files\borland\cbuilder3\projects" /i..\..\i2c_new\pc-test \
+AFLAGS = /i"..\..\..\..\..\program files\borland\cbuilder3\projects" \
+  /i"..\..\..\program files\borland\cbuilder3\projects" /i..\..\i2c_new\pc-test \
   /i$(BCB)\include /i$(BCB)\include\vcl /i..\..\libs\ics\Delphi\Vc32 /mx /w2 /zd \
   /dUSEPACKAGES
 LFLAGS = -L"..\..\..\..\..\program files\borland\cbuilder3\projects";"..\..\..\program files\borland\cbuilder3\projects";..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj;$(DEBUGLIBPATH) \
@@ -89,39 +91,41 @@ ProductVersion=1.0.0.0
 Comments=
 
 [HistoryLists\hlIncludePath]
-Count=14
-Item0=..\..\..\program files\borland\cbuilder3\projects;..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
-Item1=..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
-Item2=haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
-Item3=..\..\mobile data\pc apps\haloconfig;.\haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
-Item4=.\haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
-Item5=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
-Item6=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\components\ics\Delphi\Vc32
-Item7=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\dev\ics\delphi\vc32
-Item8=..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\dev\ics\delphi\vc32
-Item9=$(BCB)\include;$(BCB)\include\vcl;c:\dev\ics\delphi\vc32
-Item10=$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\..\dev\ics\delphi\vc32
-Item11=$(BCB)\include;$(BCB)\include\vcl
-Item12=..\..\..\..\mobile data\cgps\sw\cgps apn tool;..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\include;$(BCB)\include\vcl
-Item13=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\include;$(BCB)\include\vcl
+Count=15
+Item0=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\program files\borland\cbuilder3\projects;..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
+Item1=..\..\..\program files\borland\cbuilder3\projects;..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
+Item2=..\..\i2c_new\pc-test;$(BCB)\include;$(BCB)\include\vcl;..\..\libs\ics\Delphi\Vc32
+Item3=haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item4=..\..\mobile data\pc apps\haloconfig;.\haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item5=.\haloconfig;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item6=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\libs\ics\Delphi\Vc32
+Item7=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;C:\WDD\components\ics\Delphi\Vc32
+Item8=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\dev\ics\delphi\vc32
+Item9=..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\dev\ics\delphi\vc32
+Item10=$(BCB)\include;$(BCB)\include\vcl;c:\dev\ics\delphi\vc32
+Item11=$(BCB)\include;$(BCB)\include\vcl;..\..\..\..\..\dev\ics\delphi\vc32
+Item12=$(BCB)\include;$(BCB)\include\vcl
+Item13=..\..\..\..\mobile data\cgps\sw\cgps apn tool;..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\include;$(BCB)\include\vcl
+Item14=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\include;$(BCB)\include\vcl
 
 [HistoryLists\hlLibraryPath]
-Count=15
-Item0=..\..\..\program files\borland\cbuilder3\projects;..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
-Item1=..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
-Item2=haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
-Item3=haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
-Item4=..\..\mobile data\pc apps\haloconfig;.\haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
-Item5=.\haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
-Item6=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib\obj;$(BCB)\lib
-Item7=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;C:\WDD\components\ics\Delphi\Vc32;$(BCB)\lib\obj;$(BCB)\lib
-Item8=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
-Item9=..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
-Item10=c:\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
-Item11=..\..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
-Item12=$(BCB)\lib\obj;$(BCB)\lib
-Item13=..\..\..\..\mobile data\cgps\sw\cgps apn tool;..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\lib\obj;$(BCB)\lib
-Item14=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\lib\obj;$(BCB)\lib
+Count=16
+Item0=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\program files\borland\cbuilder3\projects;..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
+Item1=..\..\..\program files\borland\cbuilder3\projects;..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
+Item2=..\..\i2c_new\pc-test;..\..\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
+Item3=haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib;$(BCB)\lib\obj
+Item4=haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
+Item5=..\..\mobile data\pc apps\haloconfig;.\haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
+Item6=.\haloconfig;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib
+Item7=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;C:\WDD\libs\ics\Delphi\Vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item8=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;C:\WDD\components\ics\Delphi\Vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item9=..\..\..\mobile data\pc apps\haloconfig;..\..\..\..\qvcspr~1\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\pcapps~1\haloco~2;..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item10=..\..\..\..\qvcs\mobile~1\cgps\sw\cgpsap~1;..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item11=c:\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item12=..\..\..\..\..\dev\ics\delphi\vc32;$(BCB)\lib\obj;$(BCB)\lib
+Item13=$(BCB)\lib\obj;$(BCB)\lib
+Item14=..\..\..\..\mobile data\cgps\sw\cgps apn tool;..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\lib\obj;$(BCB)\lib
+Item15=..\..\..\..\..\program files\borland\cbuilder3\projects;..\..\..\..\program files\borland\cbuilder3\projects;$(BCB)\lib\obj;$(BCB)\lib
 
 [HistoryLists\hlDebugSourcePath]
 Count=1
