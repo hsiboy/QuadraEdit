@@ -40,15 +40,24 @@ void __fastcall TMainForm::Init(void)
 {
   FormDebug->Log(MainForm, "Starting...");
 
+  // Set up Quadraverb specific values
   UpDownQuadPatch->Min=QUAD_PATCH_MIN;
   UpDownQuadPatch->Max=QUAD_PATCH_MAX;
   EditQuadPatchName->Text="---";
 
+  // Get list of Midi devices
   Midi_Get_Dev_Lists(ComboBoxInDevs,ComboBoxOutDevs,LabelMidiDevError);
 
+  // Set GUI elements to default state
   RadioConfigClick(MainForm);
 
-
+  FormDebug->Log(MainForm, "Sizes:");
+  FormDebug->Log(MainForm, "UInt8 "+AnsiString(sizeof(UInt8)));
+  FormDebug->Log(MainForm, "UInt16 "+AnsiString(sizeof(UInt16)));
+  FormDebug->Log(MainForm, "UInt32 "+AnsiString(sizeof(UInt32)));
+  
+  FormDebug->Log(MainForm, "WORD "+AnsiString(sizeof(WORD)));
+  FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
 }
 //---------------------------------------------------------------------------
 

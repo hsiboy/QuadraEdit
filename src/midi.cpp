@@ -170,6 +170,7 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
                            DWORD *instance, DWORD *p1, DWORD *p2)
 {
   MIDIHDR *header_ptr;
+  UInt32 status;
 
 
   switch (msg)
@@ -180,10 +181,20 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
       rx_sysex++;
 
       // Make the buffer free for next lot of SysEx data
+      FormDebug->LogHex(NULL, "RX: ",  header_ptr->lpData, header_ptr->dwBytesRecorded);
+
+      midiInUnprepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+
+      header_ptr->lpData = Midi_In[0].Buffer;
+      header_ptr->dwBufferLength = sizeof(Midi_In[0].Buffer);
       header_ptr->dwBytesRecorded = 0;
-      //midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
-      midiInPrepareHeader(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
-      // TBD: Is this Ok?  (Should not be calling system fucntions in a callback)
+      header_ptr->dwFlags = 0;
+      status = midiInPrepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+      if (status != 0) FormDebug->Log(NULL,"Proc prepare error");
+      status=midiInAddBuffer(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+      if (status != 0) FormDebug->Log(NULL,"Proc buffer error");
+
+
       break;
 
     case MIM_DATA:
@@ -208,11 +219,8 @@ unsigned int Midi_In_Open(int device)
   status=midiInOpen(&Midi_In_Handle, device, (DWORD) Midi_In_Proc, 0, CALLBACK_FUNCTION);
   if (status != MMSYSERR_NOERROR)
   {
-    // TBD: Report open error details
     return status;
   }
-
-  // TBD: Setup more than one MIDI in header/buffer
 
   // Setup MIDI in header
   for (i=0; i<MIDI_IN_NUM_BUF; i++)
@@ -224,7 +232,6 @@ unsigned int Midi_In_Open(int device)
     status = midiInPrepareHeader(Midi_In_Handle, &Midi_In[i].Hdr, sizeof(Midi_In[i].Hdr));
     if (status != MMSYSERR_NOERROR)
     {
-     // TBD: Report header error details
       return status;
     }
   }

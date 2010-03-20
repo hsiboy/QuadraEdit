@@ -14,7 +14,9 @@ __published:	// IDE-managed Components
     TPanel *PanelAbout;
     TLabel *LabelAbout1;
     TLabel *LabelAbout2;
-    TButton *ButtonAboutOk;void __fastcall ButtonAboutOkClick(TObject *Sender);
+    TButton *ButtonAboutOk;
+    TImage *Image1;
+    void __fastcall ButtonAboutOkClick(TObject *Sender);
     void __fastcall PanelAboutExit(TObject *Sender);
     void __fastcall FormShow(TObject *Sender);
     void __fastcall FormHide(TObject *Sender);
