@@ -58,6 +58,9 @@ void __fastcall TMainForm::Init(void)
   
   FormDebug->Log(MainForm, "WORD "+AnsiString(sizeof(WORD)));
   FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
+
+  UInt8 buffer[]={0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+  decode_quad(buffer, sizeof(buffer));
 }
 //---------------------------------------------------------------------------
 
@@ -184,6 +187,7 @@ void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
 
 void __fastcall TMainForm::MenuFileExitClick(TObject *Sender)
 {
+  Midi_In_Close();
   Application->Terminate();
 }
 //---------------------------------------------------------------------------
@@ -351,6 +355,7 @@ void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
 
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
+  Midi_In_Close();
   Application->Terminate();
 }
 //---------------------------------------------------------------------------

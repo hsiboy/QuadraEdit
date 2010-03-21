@@ -32,4 +32,5 @@ unsigned int Midi_In_Open(int device);
 void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_ptr);
 unsigned int Midi_Out_Close(void);
 unsigned int Midi_In_Close(void);
+void decode_quad(UInt8 *buffer, UInt32 length);
 #endif

@@ -8,12 +8,14 @@
 #include "debug.h"
 
 #define MIDI_IN_BUF_SIZE  (2048)
-#define MIDI_IN_NUM_BUF    (5)
+#define MIDI_IN_NUM_BUF    (1)
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 //#pragma resource "*.dfm"
 Tmidiform *midiform;
+
+static boolean Midi_Open=FALSE;
 //---------------------------------------------------------------------------
 __fastcall Tmidiform::Tmidiform(TComponent* Owner)
     : TForm(Owner)
@@ -172,19 +174,24 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
   MIDIHDR *header_ptr;
   UInt32 status;
 
-
   switch (msg)
   {
     case MIM_LONGDATA:
-      // TBD: Handle SYSEX data input
+      // Handle SYSEX data input
       header_ptr = (MIDIHDR *)p1;
       rx_sysex++;
 
-      // Make the buffer free for next lot of SysEx data
-      FormDebug->LogHex(NULL, "RX: ",  header_ptr->lpData, header_ptr->dwBytesRecorded);
+      FormDebug->Log(NULL,"RX: "+AnsiString((UInt32)header_ptr->dwBytesRecorded));
 
-      midiInUnprepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+      if (Midi_Open == TRUE)
+      {
+        // Process the data
+        FormDebug->LogHex(NULL, "RX: ",  header_ptr->lpData, header_ptr->dwBytesRecorded);
 
+        // Make the buffer free for next lot of SysEx data
+        midiInUnprepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+      }
+      // TBD: use proper index on Midi_In or only use a single buffer
       header_ptr->lpData = Midi_In[0].Buffer;
       header_ptr->dwBufferLength = sizeof(Midi_In[0].Buffer);
       header_ptr->dwBytesRecorded = 0;
@@ -193,7 +200,6 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
       if (status != 0) FormDebug->Log(NULL,"Proc prepare error");
       status=midiInAddBuffer(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
       if (status != 0) FormDebug->Log(NULL,"Proc buffer error");
-
 
       break;
 
@@ -246,6 +252,7 @@ unsigned int Midi_In_Open(int device)
 
   midiInStart(Midi_In_Handle);
 
+  Midi_Open=TRUE;
   return MMSYSERR_NOERROR;
 }
 
@@ -259,10 +266,23 @@ void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_
 unsigned int Midi_In_Close(void)
 {
   unsigned int status;
-  midiInStop(Midi_In_Handle);
-  //status=midiInReset(Midi_In_Handle);
-  //if (status != MMSYSERR_NOERROR) return(status);
-  status=midiInClose(Midi_In_Handle);
+
+  if (Midi_Open == TRUE)
+  {
+    Midi_Open=FALSE;
+    midiInUnprepareHeader(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
+
+    status=midiInStop(Midi_In_Handle);
+    if (status != MMSYSERR_NOERROR) return(status);
+
+    status=midiInReset(Midi_In_Handle);
+    if (status != MMSYSERR_NOERROR) return(status);
+
+    status=midiInClose(Midi_In_Handle);
+    if (status != MMSYSERR_NOERROR) return(status);
+
+
+  }
   return(status);
 }
 unsigned int Midi_Out_Close(void)
@@ -270,4 +290,25 @@ unsigned int Midi_Out_Close(void)
   unsigned int status;
   status=midiOutClose(Midi_Out_Handle);
   return(status);
+}
+
+// Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
+void decode_quad(UInt8 *buffer, UInt32 length)
+{
+  UInt8 oc;
+  UInt8 out[1000];
+  UInt32 i,j;
+  UInt8 shift;
+
+  FormDebug->LogHex(NULL,"To Decode :",buffer,length);
+  j=0;
+  oc = 0;
+  for (i=0; i<length; i++) {
+     if (shift = i % 8) {
+        oc = (oc << shift) + (buffer[i] >> (7-shift));
+        out[j++]=oc;
+     }
+     oc = buffer[i];
+  }
+  FormDebug->LogHex(NULL,"Decoded :",out,j);
 }
