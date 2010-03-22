@@ -116,6 +116,7 @@ __published:	// IDE-managed Components
     TTrackBar *PreGate;
     TTrackBar *PreOutLevel;
 
+    TTimer *TimerProcess;
     void __fastcall ButtonPlayClick(TObject *Sender);
     void __fastcall ButtonSilenceClick(TObject *Sender);
     void __fastcall ButtonInstrumentClick(TObject *Sender);
@@ -135,6 +136,9 @@ __published:	// IDE-managed Components
     void __fastcall QuadPatchReadClick(TObject *Sender);
     void __fastcall ButtonMidiDevCloseClick(TObject *Sender);
     void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
+    
+    void __fastcall TimerProcessTimer(TObject *Sender);
+    void __fastcall QuadBankReadClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

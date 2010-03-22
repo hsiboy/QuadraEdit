@@ -11,13 +11,11 @@
 class TFormAbout : public TForm
 {
 __published:	// IDE-managed Components
-    TPanel *PanelAbout;
+    TImage *Image1;
     TLabel *LabelAbout1;
     TLabel *LabelAbout2;
     TButton *ButtonAboutOk;
-    TImage *Image1;
     void __fastcall ButtonAboutOkClick(TObject *Sender);
-    void __fastcall PanelAboutExit(TObject *Sender);
     void __fastcall FormShow(TObject *Sender);
     void __fastcall FormHide(TObject *Sender);
 private:	// User declarations

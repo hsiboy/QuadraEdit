@@ -11,7 +11,6 @@
 class TFormError : public TForm
 {
 __published:	// IDE-managed Components
-    TPanel *Panel1;
     TLabel *LabelError;
     TButton *ButtonOk;
     void __fastcall FormShow(TObject *Sender);

@@ -20,6 +20,7 @@
 #include "error.h"
 #include "debug.h"
 #include <mmsystem.h>                       // MultiMedia System headers
+#include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
 #define QUAD_PATCH_MAX (9)
@@ -36,6 +37,12 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
   Top =Screen->Height/2 - Height/2;
 }
 
+//---------------------------------------------------------------------------
+// Name       : TMainForm::Init
+// Desc.      : Initialises the GUI main form
+// Params.    : NONE.
+// Returns    : NONE.
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::Init(void)
 {
   FormDebug->Log(MainForm, "Starting...");
@@ -61,6 +68,8 @@ void __fastcall TMainForm::Init(void)
 
   UInt8 buffer[]={0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
   decode_quad(buffer, sizeof(buffer));
+
+  Midi_Init();
 }
 //---------------------------------------------------------------------------
 
@@ -117,7 +126,10 @@ void __fastcall TMainForm::ButtonPlayClick(TObject *Sender)
 void __fastcall TMainForm::MenuHelpAboutClick(TObject *Sender)
 {
   // Display the about form
-  FormAbout->FormShow(Sender);
+  //FormAbout->FormShow(Sender);
+
+  FormAbout= new TFormAbout(Application);
+  FormAbout->ShowModal();
 }
 
 //---------------------------------------------------------------------------
@@ -357,6 +369,35 @@ void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
   Midi_In_Close();
   Application->Terminate();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::TimerProcessTimer(TObject *Sender)
+{
+   tBuffer buffer;
+
+   buffer = Queue_Pop();
+   if (buffer.buffer != NULL)
+   {
+     FormDebug->LogHex(NULL, "RX: ",  buffer.buffer, buffer.length );
+     free(buffer.buffer);
+   }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
+{
+  UInt8 status;
+
+  status=Midi_Out_Dump_Req(QUADGT_ALL);
+
+  if (status != MMSYSERR_NOERROR)
+  {
+     FormError->LabelError->Caption="Error ["+AnsiString(status)+"] sending SYSEX to Midi output device";
+     FormError->FormShow(Sender);
+  }
+
+    
 }
 //---------------------------------------------------------------------------
 

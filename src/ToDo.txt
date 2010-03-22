@@ -1,0 +1,23 @@
+
+ARCHITECTURE
+- Seperate Quadraverb code into gui_quad_gt and midi_quad_gt modules
+- Put queue routines into queue module
+
+GUI
+- Rescan for MIDI devices when user clicks on device lists?
+- Make error and about forms modal                                           -> Done for ABOUT
+- Provide titles for various quadraverb forms
+- Disable/enable send/get buttons based on MIDI open status
+
+MIDI
+- Resolve code for closing MIDI channels
+- Queue up rx'd messages for processing                                      -> Dummy queue done
+- Process rx'd messages in a seperate thread
+
+QUADRAVERB
+- Check message is from a Quadraverb
+- Decode patch number
+- Decode contents of message
+- Message encoder
+- Request all patches (handy for testing callback routine)                   -> Done, Test
+

@@ -16,14 +16,9 @@ __fastcall TFormAbout::TFormAbout(TComponent* Owner)
 
 void __fastcall TFormAbout::ButtonAboutOkClick(TObject *Sender)
 {
-    PanelAboutExit(Sender);
+    ModalResult=1;
 }
-//---------------------------------------------------------------------------
 
-void __fastcall TFormAbout::PanelAboutExit(TObject *Sender)
-{
-  FormHide(Sender);
-}
 //---------------------------------------------------------------------------
 void __fastcall TFormAbout::FormShow(TObject *Sender)
 {

@@ -8,11 +8,29 @@
 #include <Forms.hpp>
 #include <ExtCtrls.hpp>
 //---------------------------------------------------------------------------
+// Literal defintions
+
+#define QUADGT_SCRATCH (100)    // Patch used as a scratch buffer
+#define QUADGT_ALL     (101)    // All patches
 
 //---------------------------------------------------------------------------
+// Type definitions
+
+typedef struct tBuffer
+{
+    UInt8 * buffer;
+    UInt32 length;
+} tBuffer;
 
 //---------------------------------------------------------------------------
+// Variable definitions
+
+//---------------------------------------------------------------------------
+// Prototype definitions
 void Midi_Init(void);
+void Queue_Push(tBuffer buffer);
+tBuffer Queue_Pop(void);
+
 void Midi_Get_Dev_Lists(TComboBox *in_list,TComboBox *out_list, TLabel * error_text);
 
 UInt8 Midi_Out_Open(int device);

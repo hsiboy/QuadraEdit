@@ -2,6 +2,7 @@
 #include <mmsystem.h>                       // we need this
 
 #include <stdlib.h>
+#include <stdio.h>
 
 #pragma hdrstop
 
@@ -13,6 +14,7 @@
 #define MIDI_IN_BUF_SIZE  (2048)
 #define MIDI_IN_NUM_BUF    (1)
 
+
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 
@@ -20,7 +22,7 @@ static boolean Midi_Open=FALSE;
 
 typedef struct tQueue_Entry
 {
-    UInt8 * data_ptr;
+    tBuffer payload;
     tQueue_Entry *next_ptr;
 } tQueue_Entry;
 
@@ -62,10 +64,31 @@ static int rx_other=0;
 
 void Midi_Init(void)
 {
+  int i,j;
+  tBuffer dummy;
+  tBuffer * ptr;
+
   Rx_Msg_Queue.ptr=NULL;
+
+
+  for (i=0; i<12; i++)
+  {
+    dummy.buffer = (UInt8 *)malloc(i+1);
+    if (dummy.buffer == NULL) return;
+    for (j=0; j<=i; j++)
+    {
+      *(dummy.buffer+j)=i+(2*j);
+    }
+    dummy.length=i+1;
+    Queue_Push(dummy);
+  }
+  FormDebug->Log(NULL, "Queue push test done");
+
+  FormDebug->Log(NULL, "MIDI Init done");
+
 }
 
-void Queue_Push(UInt8 *buffer, UInt32 length)
+void Queue_Push(tBuffer buffer)
 {
   tQueue_Entry *entry;
   tQueue_Entry *tail;
@@ -75,23 +98,28 @@ void Queue_Push(UInt8 *buffer, UInt32 length)
   if (entry == NULL)
   {
     //tbd
+    return;
   }
 
-  // Create space for data
-  entry->data_ptr= (UInt8 *) malloc(length);
-  if (entry->data_ptr == NULL)
+  // Create space for payload buffer
+  entry->payload.buffer = (UInt8 *) malloc(buffer.length);
+  if (entry->payload.buffer == NULL)
   {
     // TBD
     free(entry);
+    return;
   }
 
-  // Copy data
-  memcpy(entry->data_ptr, buffer, length);
+  // Copy buffer into queue entry payload
+  memcpy(entry->payload.buffer, \
+         buffer.buffer,  \
+         buffer.length);
+  entry->payload.length=buffer.length;
 
   entry->next_ptr=NULL;
 
 
-
+  // Push entry onto tail of queue
   if (Rx_Msg_Queue.ptr == NULL)
   {
     Rx_Msg_Queue.ptr = entry;
@@ -104,6 +132,35 @@ void Queue_Push(UInt8 *buffer, UInt32 length)
   }
 
 }
+
+// Pop entry from head of queue
+tBuffer Queue_Pop(void)
+{
+  tQueue_Entry * head;
+  tBuffer payload;
+
+  // Is queue empty?
+  if (Rx_Msg_Queue.ptr == NULL) 
+  {
+    payload.buffer = NULL;
+    payload.length = 0;
+  }
+  else
+  {
+    head = Rx_Msg_Queue.ptr;
+    payload = head->payload;
+
+    Rx_Msg_Queue.ptr = head->next_ptr;
+
+    // Free the queue entry
+    free(head);
+
+  }
+
+  // Return the payload, the caller must free payload.buffer when done
+  return(payload);
+}
+
 
 void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_text)
 {
@@ -228,6 +285,7 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
 {
   MIDIHDR *header_ptr;
   UInt32 status;
+  tBuffer entry;
 
   switch (msg)
   {
@@ -240,12 +298,15 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
 
       if (Midi_Open == TRUE)
       {
+        entry.buffer=header_ptr->lpData;
+        entry.length=header_ptr->dwBytesRecorded;
+        Queue_Push(entry);
         // Process the data
-        FormDebug->LogHex(NULL, "RX: ",  header_ptr->lpData, header_ptr->dwBytesRecorded);
 
-        // Make the buffer free for next lot of SysEx data
-        midiInUnprepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
       }
+      // Make the buffer free for next lot of SysEx data
+      midiInUnprepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+
       // TBD: use proper index on Midi_In or only use a single buffer
       header_ptr->lpData = Midi_In[0].Buffer;
       header_ptr->dwBufferLength = sizeof(Midi_In[0].Buffer);
@@ -366,4 +427,16 @@ void decode_quad(UInt8 *buffer, UInt32 length)
      oc = buffer[i];
   }
   FormDebug->LogHex(NULL,"Decoded :",out,j);
+}
+
+void process(void)
+{
+   tBuffer buffer;
+
+   buffer = Queue_Pop();
+   if (buffer.buffer != NULL)
+   {
+     FormDebug->LogHex(NULL, "RX: ",  buffer.buffer, buffer.length );
+     free(buffer.buffer);
+   }
 }
