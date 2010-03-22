@@ -393,7 +393,7 @@ unsigned int Midi_Out_Close(void)
 void decode_quad(UInt8 *buffer, UInt32 length)
 {
   UInt8 oc;
-  UInt8 out[1000];
+  UInt8 out[1000];  // TBD determine proper size
   UInt32 i,j;
   UInt8 shift;
 
@@ -408,6 +408,30 @@ void decode_quad(UInt8 *buffer, UInt32 length)
      oc = buffer[i];
   }
   FormDebug->LogHex(NULL,"Decoded :",out,j);
+  // TBD: Return the decoded buffer
+}
+
+// Encode 8bit quadraverb data into low 7 bits for SysEx
+void encode_quad(UInt8 *buffer, UInt32 length)
+{
+  UInt8 oc;
+  UInt8 out[1000];  // TBD determine proper size
+  UInt32 i,j;
+
+  FormDebug->LogHex(NULL,"To Encode :",buffer,length);
+  j=0;
+  oc=0;
+  for (i=0; i<length; i++)
+  {
+    if (buffer[i] & 1) oc=0x80 | oc;
+    out[j++]=buffer[i]>>1;
+    oc=oc>>1;
+    if ((i!=0)&&(i%8)==0){
+	    out[j++]=oc;
+	    oc=0;
+    }
+  }
+  FormDebug->LogHex(NULL,"Encoded :",out,j);
 }
 
 void process(void)

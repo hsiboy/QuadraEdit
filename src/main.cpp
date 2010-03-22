@@ -66,8 +66,10 @@ void __fastcall TMainForm::Init(void)
   FormDebug->Log(MainForm, "WORD "+AnsiString(sizeof(WORD)));
   FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
 
-  UInt8 buffer[]={0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
+  UInt8 buffer[]={0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
   decode_quad(buffer, sizeof(buffer));
+  UInt8 buffer2[]={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+  encode_quad(buffer2, sizeof(buffer2));
 
   Midi_Init();
 }
