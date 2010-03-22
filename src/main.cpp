@@ -62,7 +62,7 @@ void __fastcall TMainForm::Init(void)
   FormDebug->Log(MainForm, "UInt8 "+AnsiString(sizeof(UInt8)));
   FormDebug->Log(MainForm, "UInt16 "+AnsiString(sizeof(UInt16)));
   FormDebug->Log(MainForm, "UInt32 "+AnsiString(sizeof(UInt32)));
-  
+
   FormDebug->Log(MainForm, "WORD "+AnsiString(sizeof(WORD)));
   FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
 
@@ -125,10 +125,6 @@ void __fastcall TMainForm::ButtonPlayClick(TObject *Sender)
 
 void __fastcall TMainForm::MenuHelpAboutClick(TObject *Sender)
 {
-  // Display the about form
-  //FormAbout->FormShow(Sender);
-
-  FormAbout= new TFormAbout(Application);
   FormAbout->ShowModal();
 }
 
@@ -176,16 +172,14 @@ void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
    status=Midi_Out_Open(ComboBoxOutDevs->ItemIndex);
    if (status != MMSYSERR_NOERROR)
    {
-     FormError->LabelError->Caption="Error ["+AnsiString(status)+"] opening Midi output device";
-     FormError->FormShow(Sender);
+     FormError->ShowError("Error ["+AnsiString(status)+"] opening Midi output device");
    }
    else
    {
      status=Midi_In_Open(ComboBoxInDevs->ItemIndex);
      if (status != MMSYSERR_NOERROR)
      {
-       FormError->LabelError->Caption="Error ["+AnsiString(status)+"] opening Midi input device";
-       FormError->FormShow(Sender);
+       FormError->ShowError("Error ["+AnsiString(status)+"] opening Midi input device");
      }
      else
      {
@@ -335,8 +329,7 @@ void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
 
   if (status != MMSYSERR_NOERROR)
   {
-     FormError->LabelError->Caption="Error ["+AnsiString(status)+"] sending SYSEX to Midi output device";
-     FormError->FormShow(Sender);
+     FormError->ShowError("Error ["+AnsiString(status)+"] sending SYSEX to Midi output device");
   }
 
 }
@@ -348,15 +341,13 @@ void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
   status=Midi_In_Close();
   if (status != MMSYSERR_NOERROR)
   {
-    FormError->LabelError->Caption="Error ["+AnsiString(status)+"] closing Midi input device";
-    FormError->FormShow(Sender);
+    FormError->ShowError("Error ["+AnsiString(status)+"] closing Midi input device");
   }
 
   status=Midi_Out_Close();
   if (status != MMSYSERR_NOERROR)
   {
-    FormError->LabelError->Caption="Error ["+AnsiString(status)+"] closing Midi output device";
-    FormError->FormShow(Sender);
+    FormError->ShowError("Error ["+AnsiString(status)+"] closing Midi output device");
   }
 
   ButtonMidiDevOpen->Enabled=true;
@@ -393,8 +384,7 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
 
   if (status != MMSYSERR_NOERROR)
   {
-     FormError->LabelError->Caption="Error ["+AnsiString(status)+"] sending SYSEX to Midi output device";
-     FormError->FormShow(Sender);
+     FormError->ShowError("Error ["+AnsiString(status)+"] sending SYSEX to Midi output device");
   }
 
     

@@ -22,9 +22,10 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
       Application->Title = "QuadraEdit";
 
         Application->CreateForm(__classid(TMainForm), &MainForm);
+        Application->CreateForm(__classid(TFormDebug), &FormDebug);
         Application->CreateForm(__classid(TFormAbout), &FormAbout);
         Application->CreateForm(__classid(TFormError), &FormError);
-        Application->CreateForm(__classid(TFormDebug), &FormDebug);
+
         FormDebug->Show();
         MainForm->Init();
 

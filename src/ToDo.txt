@@ -5,7 +5,6 @@ ARCHITECTURE
 
 GUI
 - Rescan for MIDI devices when user clicks on device lists?
-- Make error and about forms modal                                           -> Done for ABOUT
 - Provide titles for various quadraverb forms
 - Disable/enable send/get buttons based on MIDI open status
 

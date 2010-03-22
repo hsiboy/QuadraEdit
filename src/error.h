@@ -12,13 +12,12 @@ class TFormError : public TForm
 {
 __published:	// IDE-managed Components
     TLabel *LabelError;
-    TButton *ButtonOk;
-    void __fastcall FormShow(TObject *Sender);
-    void __fastcall FormHide(TObject *Sender);
+    TButton *ButtonOk;void __fastcall FormHide(TObject *Sender);
     void __fastcall ButtonOkClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TFormError(TComponent* Owner);
+    void __fastcall ShowError(AnsiString string);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormError *FormError;

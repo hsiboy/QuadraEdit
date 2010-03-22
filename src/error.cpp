@@ -3,6 +3,7 @@
 #pragma hdrstop
 
 #include "error.h"
+#include "debug.h"
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 #pragma resource "*.dfm"
@@ -11,16 +12,12 @@ TFormError *FormError;
 __fastcall TFormError::TFormError(TComponent* Owner)
     : TForm(Owner)
 {
-}
-//---------------------------------------------------------------------------
-void __fastcall TFormError::FormShow(TObject *Sender)
-{
- Show();
+   FormDebug->Log(NULL,"FormError create");
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormError::FormHide(TObject *Sender)
 {
- Hide();
+ ModalResult=1;
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormError::ButtonOkClick(TObject *Sender)
@@ -28,3 +25,9 @@ void __fastcall TFormError::ButtonOkClick(TObject *Sender)
   FormHide(Sender);
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TFormError::ShowError(AnsiString string)
+{
+  LabelError->Caption=string;
+  ShowModal();
+}
