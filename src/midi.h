@@ -8,19 +8,11 @@
 #include <Forms.hpp>
 #include <ExtCtrls.hpp>
 //---------------------------------------------------------------------------
-class Tmidiform : public TForm
-{
-__published:	// IDE-managed Components
-    TPanel *Midi;
-    TButton *Ok;
-    TLabel *LabelMidi;
-private:	// User declarations
-public:		// User declarations
-    __fastcall Tmidiform(TComponent* Owner);
-};
+
 //---------------------------------------------------------------------------
-extern PACKAGE Tmidiform *midiform;
+
 //---------------------------------------------------------------------------
+void Midi_Init(void);
 void Midi_Get_Dev_Lists(TComboBox *in_list,TComboBox *out_list, TLabel * error_text);
 
 UInt8 Midi_Out_Open(int device);

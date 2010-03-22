@@ -1,5 +1,8 @@
 #include <vcl.h>
 #include <mmsystem.h>                       // we need this
+
+#include <stdlib.h>
+
 #pragma hdrstop
 
 #include "types.h"
@@ -12,15 +15,20 @@
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
-//#pragma resource "*.dfm"
-Tmidiform *midiform;
 
 static boolean Midi_Open=FALSE;
-//---------------------------------------------------------------------------
-__fastcall Tmidiform::Tmidiform(TComponent* Owner)
-    : TForm(Owner)
+
+typedef struct tQueue_Entry
 {
-}
+    UInt8 * data_ptr;
+    tQueue_Entry *next_ptr;
+} tQueue_Entry;
+
+typedef struct tQueue
+{
+    tQueue_Entry *ptr;
+} tQueue;
+
 
 const UInt8 Sysex_Hdr[]={0xF0,              // SysEx
                          0x00,0x00,0x0E,    // Alesis Manufacturer Id
@@ -45,10 +53,57 @@ typedef struct tMidi_In
 
 static tMidi_In Midi_In[MIDI_IN_NUM_BUF];
 
+static tQueue Rx_Msg_Queue;
+
 // Rx message counters
 static int rx_sysex=0;
 static int rx_msg=100;
 static int rx_other=0;
+
+void Midi_Init(void)
+{
+  Rx_Msg_Queue.ptr=NULL;
+}
+
+void Queue_Push(UInt8 *buffer, UInt32 length)
+{
+  tQueue_Entry *entry;
+  tQueue_Entry *tail;
+
+  // Create new queue entry
+  entry = (tQueue_Entry *)malloc(sizeof(tQueue_Entry));
+  if (entry == NULL)
+  {
+    //tbd
+  }
+
+  // Create space for data
+  entry->data_ptr= (UInt8 *) malloc(length);
+  if (entry->data_ptr == NULL)
+  {
+    // TBD
+    free(entry);
+  }
+
+  // Copy data
+  memcpy(entry->data_ptr, buffer, length);
+
+  entry->next_ptr=NULL;
+
+
+
+  if (Rx_Msg_Queue.ptr == NULL)
+  {
+    Rx_Msg_Queue.ptr = entry;
+  }
+  else
+  {
+    tail = Rx_Msg_Queue.ptr;
+    while (tail->next_ptr != NULL) tail=tail->next_ptr;
+    tail->next_ptr = entry;
+  }
+
+}
 
 void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_text)
 {
