@@ -64,28 +64,9 @@ static int rx_other=0;
 
 void Midi_Init(void)
 {
-  int i,j;
-  tBuffer dummy;
-  tBuffer * ptr;
-
   Rx_Msg_Queue.ptr=NULL;
 
-
-  for (i=0; i<12; i++)
-  {
-    dummy.buffer = (UInt8 *)malloc(i+1);
-    if (dummy.buffer == NULL) return;
-    for (j=0; j<=i; j++)
-    {
-      *(dummy.buffer+j)=i+(2*j);
-    }
-    dummy.length=i+1;
-    Queue_Push(dummy);
-  }
-  FormDebug->Log(NULL, "Queue push test done");
-
   FormDebug->Log(NULL, "MIDI Init done");
-
 }
 
 void Queue_Push(tBuffer buffer)
