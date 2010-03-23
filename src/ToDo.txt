@@ -2,6 +2,7 @@
 ARCHITECTURE
 - Seperate Quadraverb code into gui_quad_gt and midi_quad_gt modules
 - Put queue routines into queue module
+- Clean up return codes and error handling
 
 GUI
 - Rescan for MIDI devices when user clicks on device lists?
@@ -18,7 +19,7 @@ QUADRAVERB
 - Decode patch number                                                        -> Done
 - Decode contents of message
 - Message encoder                                                            -> Done, use it
-- Request all patches (handy for testing callback routine)                   -> Done, interpret
+- Request all patches (handy for testing callback routine)                   -> Done
 
 Problems:
 - MIDI close gets continuous MM_LONGMSG messages

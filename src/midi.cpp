@@ -1,5 +1,5 @@
 #include <vcl.h>
-#include <mmsystem.h>                       // we need this
+#include <mmsystem.h>                       // MultiMedia System headers
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -14,7 +14,6 @@
 #define MIDI_IN_BUF_SIZE  (20480)
 #define MIDI_IN_NUM_BUF    (1)
 
-
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 
@@ -22,25 +21,26 @@ static boolean Midi_Open=FALSE;
 
 typedef struct tQueue_Entry
 {
-    tBuffer payload;
-    tQueue_Entry *next_ptr;
+  tBuffer payload;
+  tQueue_Entry *next_ptr;
 } tQueue_Entry;
 
 typedef struct tQueue
 {
-    tQueue_Entry *ptr;
+  tQueue_Entry *ptr;
 } tQueue;
 
 
 const UInt8 Sysex_Start[]={0xF0};              // SysEx start 
-const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};    // Manufacturer Id: Alesis
+
+const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};   // Manufacturer Id: Alesis
 const UInt8 Sysex_QuadGT[]={0x07};             // Device Id: Quadraverb GT
 
-const UInt8 Sysex_Edit[]={0x01};                // Command to edit a Quadraverb function
-const UInt8 Sysex_Data_Dump[]={0x02};           // Command to send a program data dump
-const UInt8 Sysex_Dump_Req[]={0x03};            // Command to request a dump
+const UInt8 Sysex_Edit[]={0x01};               // Command to edit a Quadraverb function
+const UInt8 Sysex_Data_Dump[]={0x02};          // Command to send a program data dump
+const UInt8 Sysex_Dump_Req[]={0x03};           // Command to request a dump
 
-const UInt8 Sysex_End[]={0xF7};             // SysEx End
+const UInt8 Sysex_End[]={0xF7};                // SysEx End
 
 // Midi handles
 static HMIDIOUT Midi_Out_Handle;
@@ -59,7 +59,7 @@ static tQueue Rx_Msg_Queue;
 
 // Rx message counters
 static int rx_sysex=0;
-static int rx_msg=100;
+static int rx_msg=0;
 static int rx_other=0;
 
 void Midi_Init(void)
@@ -78,7 +78,7 @@ void Queue_Push(tBuffer buffer)
   entry = (tQueue_Entry *)malloc(sizeof(tQueue_Entry));
   if (entry == NULL)
   {
-    //tbd
+    FormError->ShowError("Error: no memory left to create queue entry");
     return;
   }
 
@@ -86,19 +86,16 @@ void Queue_Push(tBuffer buffer)
   entry->payload.buffer = (UInt8 *) malloc(buffer.length);
   if (entry->payload.buffer == NULL)
   {
-    // TBD
+    FormError->ShowError("Error: no memory left to queue data");
     free(entry);
     return;
   }
 
   // Copy buffer into queue entry payload
-  memcpy(entry->payload.buffer, \
-         buffer.buffer,  \
-         buffer.length);
+  memcpy(entry->payload.buffer, buffer.buffer, buffer.length);
   entry->payload.length=buffer.length;
 
   entry->next_ptr=NULL;
-
 
   // Push entry onto tail of queue
   if (Rx_Msg_Queue.ptr == NULL)
@@ -281,14 +278,11 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
       header_ptr = (MIDIHDR *)p1;
       rx_sysex++;
 
-      //FormDebug->Log(NULL,"RX: "+AnsiString((UInt32)header_ptr->dwBytesRecorded));
-
       if (Midi_Open == TRUE)
       {
         entry.buffer=header_ptr->lpData;
         entry.length=header_ptr->dwBytesRecorded;
         Queue_Push(entry);
-        // Process the data
 
       }
       // Make the buffer free for next lot of SysEx data
@@ -349,7 +343,6 @@ unsigned int Midi_In_Open(int device)
   status=midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
   if (status != MMSYSERR_NOERROR)
   {
-    // TBD: Report buffer error details
     return status;
   }
 
@@ -466,7 +459,6 @@ void process(void)
 	   offset+=1;
 
 	   FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(buffer.length-offset));
-       //FormDebug->LogHex(NULL, "RX: ",  buffer.buffer+offset, buffer.length-offset );
 	 }
        }
      }
