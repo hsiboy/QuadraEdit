@@ -44,4 +44,5 @@ unsigned int Midi_Out_Close(void);
 unsigned int Midi_In_Close(void);
 void decode_quad(UInt8 *buffer, UInt32 length);
 void encode_quad(UInt8 *buffer, UInt32 length);
+void process(void);
 #endif

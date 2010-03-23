@@ -11,7 +11,7 @@
 #include "error.h"
 #include "debug.h"
 
-#define MIDI_IN_BUF_SIZE  (2048)
+#define MIDI_IN_BUF_SIZE  (20480)
 #define MIDI_IN_NUM_BUF    (1)
 
 
@@ -32,9 +32,9 @@ typedef struct tQueue
 } tQueue;
 
 
-const UInt8 Sysex_Hdr[]={0xF0,              // SysEx
-                         0x00,0x00,0x0E,    // Alesis Manufacturer Id
-                         0x07};             // Quadraverb GT
+const UInt8 Sysex_Start[]={0xF0};              // SysEx start 
+const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};    // Manufacturer Id: Alesis
+const UInt8 Sysex_QuadGT[]={0x07};             // Device Id: Quadraverb GT
 
 const UInt8 Sysex_Edit[]={0x01};                // Command to edit a Quadraverb function
 const UInt8 Sysex_Data_Dump[]={0x02};           // Command to send a program data dump
@@ -227,8 +227,14 @@ unsigned int Midi_Out_Dump_Req(UInt8 program)
   long int status;
 
   // Build message in buffer
-  memcpy(buffer, Sysex_Hdr, sizeof(Sysex_Hdr));
-  buf_len+=sizeof(Sysex_Hdr);
+  memcpy(buffer+buf_len, Sysex_Start, sizeof(Sysex_Start));
+  buf_len+=sizeof(Sysex_Start);
+
+  memcpy(buffer+buf_len, Sysex_Alesis, sizeof(Sysex_Alesis));
+  buf_len+=sizeof(Sysex_Alesis);
+
+  memcpy(buffer+buf_len, Sysex_QuadGT, sizeof(Sysex_QuadGT));
+  buf_len+=sizeof(Sysex_QuadGT);
 
   memcpy(buffer+buf_len, Sysex_Dump_Req, sizeof(Sysex_Dump_Req));
   buf_len+=sizeof(Sysex_Dump_Req);
@@ -275,7 +281,7 @@ void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
       header_ptr = (MIDIHDR *)p1;
       rx_sysex++;
 
-      FormDebug->Log(NULL,"RX: "+AnsiString((UInt32)header_ptr->dwBytesRecorded));
+      //FormDebug->Log(NULL,"RX: "+AnsiString((UInt32)header_ptr->dwBytesRecorded));
 
       if (Midi_Open == TRUE)
       {
@@ -437,11 +443,33 @@ void encode_quad(UInt8 *buffer, UInt32 length)
 void process(void)
 {
    tBuffer buffer;
+   UInt32 offset;
+   UInt8 code,prog;
 
+   offset=0;
    buffer = Queue_Pop();
    if (buffer.buffer != NULL)
    {
-     FormDebug->LogHex(NULL, "RX: ",  buffer.buffer, buffer.length );
+     if (memcmp(Sysex_Start, buffer.buffer+offset, sizeof(Sysex_Start))==0)
+     {
+       offset+=sizeof(Sysex_Start);
+       if (memcmp(Sysex_Alesis, buffer.buffer+offset, sizeof(Sysex_Alesis))==0)
+       {
+         offset+=sizeof(Sysex_Alesis);
+         if (memcmp(Sysex_QuadGT, buffer.buffer+offset, sizeof(Sysex_QuadGT))==0)
+         {
+           offset+=sizeof(Sysex_QuadGT);
+
+	   code = *(buffer.buffer+offset);
+	   offset+=1;
+	   prog = *(buffer.buffer+offset);
+	   offset+=1;
+
+	   FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(buffer.length-offset));
+       //FormDebug->LogHex(NULL, "RX: ",  buffer.buffer+offset, buffer.length-offset );
+	 }
+       }
+     }
      free(buffer.buffer);
    }
 }

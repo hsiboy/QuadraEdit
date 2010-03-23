@@ -367,14 +367,7 @@ void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 
 void __fastcall TMainForm::TimerProcessTimer(TObject *Sender)
 {
-   tBuffer buffer;
-
-   buffer = Queue_Pop();
-   if (buffer.buffer != NULL)
-   {
-     FormDebug->LogHex(NULL, "RX: ",  buffer.buffer, buffer.length );
-     free(buffer.buffer);
-   }
+   process();
 }
 //---------------------------------------------------------------------------
 
