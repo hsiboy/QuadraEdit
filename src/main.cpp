@@ -19,7 +19,6 @@
 #include "midi.h"
 #include "error.h"
 #include "debug.h"
-#include <mmsystem.h>                       // MultiMedia System headers
 #include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
@@ -172,16 +171,16 @@ void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
    unsigned int status;
 
    status=Midi_Out_Open(ComboBoxOutDevs->ItemIndex);
-   if (status != MMSYSERR_NOERROR)
+   if (status != 0)
    {
-     FormError->ShowError("Error ["+AnsiString(status)+"] opening Midi output device");
+     FormError->ShowError(status,"opening Midi output device");
    }
    else
    {
      status=Midi_In_Open(ComboBoxInDevs->ItemIndex);
-     if (status != MMSYSERR_NOERROR)
+     if (status != 0)
      {
-       FormError->ShowError("Error ["+AnsiString(status)+"] opening Midi input device");
+       FormError->ShowError(status,"opening Midi input device");
      }
      else
      {
@@ -329,9 +328,9 @@ void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
   patch = (UInt8) StrToInt(QuadPatchNum->Text);
   status=Midi_Out_Dump_Req(patch);
 
-  if (status != MMSYSERR_NOERROR)
+  if (status != 0)
   {
-     FormError->ShowError("Error ["+AnsiString(status)+"] sending SYSEX to Midi output device");
+     FormError->ShowError(status, "sending SYSEX to Midi output device");
   }
 
 }
@@ -341,15 +340,15 @@ void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
   unsigned int status;
 
   status=Midi_In_Close();
-  if (status != MMSYSERR_NOERROR)
+  if (status != 0)
   {
-    FormError->ShowError("Error ["+AnsiString(status)+"] closing Midi input device");
+    FormError->ShowError(status, "closing Midi input device");
   }
 
   status=Midi_Out_Close();
-  if (status != MMSYSERR_NOERROR)
+  if (status != 0)
   {
-    FormError->ShowError("Error ["+AnsiString(status)+"] closing Midi output device");
+    FormError->ShowError(status, "closing Midi output device");
   }
 
   ButtonMidiDevOpen->Enabled=true;
@@ -377,9 +376,9 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
 
   status=Midi_Out_Dump_Req(QUADGT_ALL);
 
-  if (status != MMSYSERR_NOERROR)
+  if (status != 0)
   {
-     FormError->ShowError("Error ["+AnsiString(status)+"] sending SYSEX to Midi output device");
+     FormError->ShowError(status, "sending SYSEX to Midi output device");
   }
 
     

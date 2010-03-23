@@ -11,7 +11,8 @@
 #include "error.h"
 #include "debug.h"
 
-#define MIDI_IN_BUF_SIZE  (20480)
+#define MIDI_IN_BUF_SIZE  (20480)  // Make this big so we don't have to deal with
+                                   // Sysex messages crossing multiple buffers
 #define MIDI_IN_NUM_BUF    (1)
 
 //---------------------------------------------------------------------------
@@ -34,6 +35,8 @@ typedef struct tQueue
 const UInt8 Sysex_Start[]={0xF0};              // SysEx start 
 
 const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};   // Manufacturer Id: Alesis
+
+const UInt8 Sysex_Quad[]={0x02};               // Device Id: Quadraverb
 const UInt8 Sysex_QuadGT[]={0x07};             // Device Id: Quadraverb GT
 
 const UInt8 Sysex_Edit[]={0x01};               // Command to edit a Quadraverb function
@@ -78,7 +81,7 @@ void Queue_Push(tBuffer buffer)
   entry = (tQueue_Entry *)malloc(sizeof(tQueue_Entry));
   if (entry == NULL)
   {
-    FormError->ShowError("Error: no memory left to create queue entry");
+    FormError->ShowError(1,"no memory left to create queue entry");
     return;
   }
 
@@ -86,7 +89,7 @@ void Queue_Push(tBuffer buffer)
   entry->payload.buffer = (UInt8 *) malloc(buffer.length);
   if (entry->payload.buffer == NULL)
   {
-    FormError->ShowError("Error: no memory left to queue data");
+    FormError->ShowError(2,"no memory left to queue data");
     free(entry);
     return;
   }
@@ -343,6 +346,7 @@ unsigned int Midi_In_Open(int device)
   status=midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
   if (status != MMSYSERR_NOERROR)
   {
+    // TBD: Report buffer error details
     return status;
   }
 

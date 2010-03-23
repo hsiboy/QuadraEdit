@@ -2,6 +2,7 @@
 #include <vcl.h>
 #pragma hdrstop
 
+#include "types.h"
 #include "error.h"
 #include "debug.h"
 //---------------------------------------------------------------------------
@@ -26,8 +27,8 @@ void __fastcall TFormError::ButtonOkClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TFormError::ShowError(AnsiString string)
+void __fastcall TFormError::ShowError(UInt32 code, AnsiString string)
 {
-  LabelError->Caption=string;
+  LabelError->Caption="Error ["+AnsiString(code)+"] "+string;
   ShowModal();
 }
