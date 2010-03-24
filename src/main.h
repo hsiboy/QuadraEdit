@@ -117,6 +117,8 @@ __published:	// IDE-managed Components
     TTrackBar *PreOutLevel;
 
     TTimer *TimerProcess;
+    TButton *QuadProgWrite;
+    TButton *QuadMidiWrite;
     void __fastcall ButtonPlayClick(TObject *Sender);
     void __fastcall ButtonSilenceClick(TObject *Sender);
     void __fastcall ButtonInstrumentClick(TObject *Sender);
@@ -139,6 +141,8 @@ __published:	// IDE-managed Components
     
     void __fastcall TimerProcessTimer(TObject *Sender);
     void __fastcall QuadBankReadClick(TObject *Sender);
+    void __fastcall QuadProgWriteClick(TObject *Sender);
+    void __fastcall QuadMidiWriteClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

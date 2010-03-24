@@ -262,6 +262,55 @@ unsigned int Midi_Out_Dump_Req(UInt8 program)
 
 }
 
+unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
+{
+  MIDIHDR out;
+  UInt8 buffer[100];
+  UInt8 buf_len=0;
+  long int status;
+
+  // Build message in buffer
+  memcpy(buffer+buf_len, Sysex_Start, sizeof(Sysex_Start));
+  buf_len+=sizeof(Sysex_Start);
+
+  memcpy(buffer+buf_len, Sysex_Alesis, sizeof(Sysex_Alesis));
+  buf_len+=sizeof(Sysex_Alesis);
+
+  memcpy(buffer+buf_len, Sysex_QuadGT, sizeof(Sysex_QuadGT));
+  buf_len+=sizeof(Sysex_QuadGT);
+
+  memcpy(buffer+buf_len, Sysex_Edit, sizeof(Sysex_Edit));
+  buf_len+=sizeof(Sysex_Edit);
+
+  buffer[buf_len] = function;
+  buf_len+=1;
+
+  buffer[buf_len] = page;
+  buf_len+=1;
+
+  encode_quad((UInt8*)&data,2);
+  //TBD: Put encoded data in buffer
+  buf_len+=3;
+
+  memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
+  buf_len+=sizeof(Sysex_End);
+
+  FormDebug->LogHex(NULL, "TX", buffer, buf_len);
+
+  // Prepare header
+  out.lpData = buffer;
+  out.dwBufferLength = buf_len;
+  out.dwBytesRecorded = buf_len;
+  out.dwFlags = 0;
+
+  // Prepare and send the MIDI message
+  midiOutPrepareHeader(Midi_Out_Handle, &out, sizeof(out));
+  status=midiOutLongMsg(Midi_Out_Handle, &out, sizeof(out));
+  midiOutUnprepareHeader(Midi_Out_Handle, &out, sizeof(out));
+
+  return(status);
+
+}
 void Midi_Out_ShortMsg(const unsigned long message)
 {
   midiOutShortMsg(Midi_Out_Handle, message);
@@ -434,6 +483,7 @@ void encode_quad(UInt8 *buffer, UInt32 length)
 	    oc=0;
     }
   }
+  if ((i%8)!=0) out[j++]=oc;
   FormDebug->LogHex(NULL,"Encoded :",out,j);
 }
 

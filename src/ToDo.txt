@@ -18,11 +18,17 @@ QUADRAVERB
 - Check message is from a Quadraverb                                         -> Done
 - Decode patch number                                                        -> Done
 - Decode contents of message
-- Check if funtion #'s 0,5 and 6 work for "Program", "Midi" and "Store"
-- See if we can request and read the ROM version:q
+- Check if funtion #'s 0,5 and 6 work for "Program", "Midi" and "Store"      -> Done apart from encoding
+- See if we can request and read the ROM version
 - Message encoder                                                            -> Done, use it
 - Request all patches (handy for testing callback routine)                   -> Done
 
 Problems:
-- MIDI close gets continuous MM_LONGMSG messages
-- Program hangs at close (as at V25)
+- MIDI close gets continuous MM_LONGDATA messages
+- Program hangs at close (as at V18, V17 ok, V20 worse)
+  - To reporoduce:
+    - Start program
+    - Open MIDI (must have Midi Out and Midi In devices, GS Wavetable (Out) and USB (in) will cause prob.)
+    - Exit
+    - Program crashed (V18) or hangs (V20)
+- Encode routine is wrong

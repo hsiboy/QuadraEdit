@@ -67,7 +67,8 @@ void __fastcall TMainForm::Init(void)
 
   UInt8 buffer[]={0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F, 0x7F};
   decode_quad(buffer, sizeof(buffer));
-  UInt8 buffer2[]={0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+  UInt8 buffer2[]={0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81};
   encode_quad(buffer2, sizeof(buffer2));
 
   Midi_Init();
@@ -378,10 +379,36 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
 
   if (status != 0)
   {
-     FormError->ShowError(status, "sending SYSEX to Midi output device");
+     FormError->ShowError(status, "sending SYSEX data request to Midi output device");
   }
 
     
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::QuadProgWriteClick(TObject *Sender)
+{
+  long int status;
+
+  status=Midi_Out_Edit(0, 0, 65535);
+
+  if (status != 0)
+  {
+     FormError->ShowError(status, "sending SYSEX edit command to Midi output device");
+  }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::QuadMidiWriteClick(TObject *Sender)
+{
+  long int status;
+
+  status=Midi_Out_Edit(1, 0, 65535);
+
+  if (status != 0)
+  {
+     FormError->ShowError(status, "sending SYSEX edit command to Midi output device");
+  }
 }
 //---------------------------------------------------------------------------
 
