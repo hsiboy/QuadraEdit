@@ -11,12 +11,13 @@ GUI
 
 MIDI
 - Resolve code for closing MIDI channels
-- Queue up rx'd messages for processing                                      -> Dummy queue done
+- Queue up rx'd messages for processing                                      -> Done
 - Process rx'd messages in a seperate thread
+- Handle messages that span multiple queue entries
 
 QUADRAVERB
 - Check message is from a Quadraverb                                         -> Done
-- Decode patch number                                                        -> Done
+- Extract patch number                                                       -> Done
 - Decode contents of message
 - Check if funtion #'s 0,5 and 6 work for "Program", "Midi" and "Store"      -> Done apart from encoding
 - See if we can request and read the ROM version
@@ -31,4 +32,6 @@ Problems:
     - Open MIDI (must have Midi Out and Midi In devices, GS Wavetable (Out) and USB (in) will cause prob.)
     - Exit
     - Program crashed (V18) or hangs (V20)
-- Encode routine is wrong
+- Encode routine is wrong                                                    -> Done
+- Ensure decode and encode return the correct number of bytes
+- Safety checks on output length in decode and encode routines             

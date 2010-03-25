@@ -288,8 +288,7 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   buffer[buf_len] = page;
   buf_len+=1;
 
-  encode_quad((UInt8*)&data,2);
-  //TBD: Put encoded data in buffer
+  encode_quad((UInt8*)&data,2,&buffer[buf_len],3);
   buf_len+=3;
 
   memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
@@ -442,49 +441,66 @@ unsigned int Midi_Out_Close(void)
 }
 
 // Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
-void decode_quad(UInt8 *buffer, UInt32 length)
+UInt32 decode_quad(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
 {
   UInt8 oc;
-  UInt8 out[1000];  // TBD determine proper size
   UInt32 i,j;
   UInt8 shift;
 
-  FormDebug->LogHex(NULL,"To Decode :",buffer,length);
+  // TBD: Safety checks on out_len
+  // TBD: Ensure output is correct length
+  FormDebug->LogHex(NULL,AnsiString(length)+" SYSEX",in,length);
   j=0;
   oc = 0;
   for (i=0; i<length; i++) {
      if (shift = i % 8) {
-        oc = (oc << shift) + (buffer[i] >> (7-shift));
+        oc = (oc << shift) + (in[i] >> (7-shift));
         out[j++]=oc;
      }
-     oc = buffer[i];
+     oc = in[i];
   }
-  FormDebug->LogHex(NULL,"Decoded :",out,j);
-  // TBD: Return the decoded buffer
+  FormDebug->LogHex(NULL,AnsiString(j)+" QUAD",out,j);
+  
+  return(j);
 }
 
 // Encode 8bit quadraverb data into low 7 bits for SysEx
-void encode_quad(UInt8 *buffer, UInt32 length)
+UInt32 encode_quad(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len)
 {
-  UInt8 oc;
-  UInt8 out[1000];  // TBD determine proper size
+  UInt8 lc,cc;
   UInt32 i,j;
+  UInt8 shift;
 
-  FormDebug->LogHex(NULL,"To Encode :",buffer,length);
+  // TBD: Safety checks on out_len
+  FormDebug->LogHex(NULL,AnsiString(length)+" QUAD",in,length);
+  i=0;
   j=0;
-  oc=0;
-  for (i=0; i<length; i++)
+  lc=0;
+  cc=in[0];
+  while (i<length)
   {
-    if (buffer[i] & 1) oc=0x80 | oc;
-    out[j++]=buffer[i]>>1;
-    oc=oc>>1;
-    if ((i!=0)&&(i%8)==0){
-	    out[j++]=oc;
-	    oc=0;
+    shift = j % 8;
+
+    if (shift == 0)
+    {
+      out[j]= cc>>1;
+      lc=cc;
+      cc=in[++i];
     }
+    else if (shift == 7)
+    {
+      out[j]= cc & 0x7F;
+    }
+    else
+    {
+      out[j]= (cc >> shift+1) + (lc<< 7-shift);
+      lc=cc;
+      cc=in[++i];
+    }
+    j++;
   }
-  if ((i%8)!=0) out[j++]=oc;
-  FormDebug->LogHex(NULL,"Encoded :",out,j);
+  FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
+  return(j);
 }
 
 void process(void)
