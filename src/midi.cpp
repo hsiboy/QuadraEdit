@@ -9,11 +9,14 @@
 #include "types.h"
 #include "midi.h"
 #include "error.h"
+#include "main.h"
 #include "debug.h"
+
+#include "quadgt.h"
 
 #define MIDI_IN_BUF_SIZE  (20480)  // Make this big so we don't have to deal with
                                    // Sysex messages crossing multiple buffers
-#define MIDI_IN_NUM_BUF    (1)
+#define MIDI_IN_NUM_BUF    (1)     // TBD: Get rid of this entirely
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -33,15 +36,6 @@ typedef struct tQueue
 
 
 const UInt8 Sysex_Start[]={0xF0};              // SysEx start 
-
-const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};   // Manufacturer Id: Alesis
-
-const UInt8 Sysex_Quad[]={0x02};               // Device Id: Quadraverb
-const UInt8 Sysex_QuadGT[]={0x07};             // Device Id: Quadraverb GT
-
-const UInt8 Sysex_Edit[]={0x01};               // Command to edit a Quadraverb function
-const UInt8 Sysex_Data_Dump[]={0x02};          // Command to send a program data dump
-const UInt8 Sysex_Dump_Req[]={0x03};           // Command to request a dump
 
 const UInt8 Sysex_End[]={0xF7};                // SysEx End
 
@@ -288,7 +282,7 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   buffer[buf_len] = page;
   buf_len+=1;
 
-  encode_quad((UInt8*)&data,2,&buffer[buf_len],3);
+  QuadGT_Encode_To_Sysex((UInt8*)&data,2,&buffer[buf_len],3);
   buf_len+=3;
 
   memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
@@ -441,7 +435,7 @@ unsigned int Midi_Out_Close(void)
 }
 
 // Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
-UInt32 decode_quad(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
+UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
 {
   UInt8 oc;
   UInt32 i,j;
@@ -465,7 +459,7 @@ UInt32 decode_quad(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
 }
 
 // Encode 8bit quadraverb data into low 7 bits for SysEx
-UInt32 encode_quad(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len)
+UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len)
 {
   UInt8 lc,cc;
   UInt32 i,j;
@@ -503,7 +497,7 @@ UInt32 encode_quad(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len)
   return(j);
 }
 
-void process(void)
+void Midi_Sysex_Process(void)
 {
    tBuffer buffer;
    UInt32 offset;
@@ -534,4 +528,265 @@ void process(void)
      }
      free(buffer.buffer);
    }
+}
+
+void Midi_Test(void)
+{
+  UInt8 quad_data[]={0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 
+                     0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81};
+  UInt8 sysex_data[100];
+  UInt32 count;
+
+  count=QuadGT_Encode_To_Sysex(quad_data, sizeof(quad_data), sysex_data, sizeof(sysex_data));
+
+  count=QuadGT_Decode_From_Sysex(sysex_data, count, quad_data, sizeof(quad_data));
+
+  UInt8 sysex_data2[]={0x00, 0x32, 0x00, 0x11, 0x40, 0x1F, 0x20, 0x64, 0x00, 0x46, 0x03, 0x74, 0x00, 0x04, 0x30, 0x14, 0x00, 0x64, 0x0C, 0x40, 0x08, 0x60, 0x27, 0x08, 0x32, 0x00, 0x23, 0x00, 0x04, 0x6C, 0x02, 0x01, 0x00, 0x08, 0x45, 0x40, 0x00, 0x4A, 0x2A, 0x50, 0x00, 0x40, 0x20, 0x03, 0x60, 0x04, 0x02, 0x63, 0x00, 0x54, 0x22, 0x00, 0x0A, 0x44, 0x20, 0x00, 0x3F, 0x40, 0x60, 0x00, 0x00, 0x00, 0x4E, 0x37, 0x31, 0x4F, 0x01, 0x03, 0x61, 0x00, 0x10, 0x00, 0x00, 0x13, 0x60, 0x00, 0x03, 0x10, 0x09, 0x47, 0x00, 0x18, 0x60, 0x00, 0x01, 0x48, 0x30, 0x16, 0x0A, 0x04, 0x43, 0x00, 0x5A, 0x00, 0x30, 0x0B, 0x20, 0x44, 0x60, 0x44, 0x18, 0x38, 0x00, 0x20, 0x31, 0x40, 0x04, 0x06, 0x18, 0x00, 0x40, 0x63, 0x00, 0x08, 0x0C, 0x30, 0x01, 0x01, 0x46, 0x00, 0x00, 0x13, 0x2D, 0x17, 0x19, 0x01, 0x22, 0x75, 0x32, 0x59, 0x2D, 0x62, 0x01, 0x00, 0x40, 0x20, 0x10, 0x18, 0x6C, 0x31, 0x6B, 0x0C, 0x00, 0x00, 0x03, 0x58, 0x60};
+  UInt8 quad_data2[100];
+  count=QuadGT_Decode_From_Sysex(sysex_data2, sizeof(sysex_data2), quad_data2, sizeof(quad_data2));
+
+  QuadGT_Display_Update(10, quad_data2);
+
+}
+
+//---------------------------------------------------------------------------
+// Name      : quadgt.cpp
+//---------------------------------------------------------------------------
+
+static UInt8 Quad_Patch[QUAD_NUM_PATCH][QUAD_PATCH_SIZE];
+
+void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data)
+{
+  char prog_name[NAME_LENGTH+1];
+  UInt8 config;
+
+  /* Program Number */
+  MainForm->QuadPatchNum->Text=AnsiString(program);
+
+  /* Program name */
+  memcpy(prog_name, &quad_data[NAME_IDX], NAME_LENGTH);
+  prog_name[NAME_LENGTH]=0;
+  MainForm->EditQuadPatchName->Text=AnsiString(prog_name);
+
+ 
+  /* Configuration */
+  config=quad_data[CONFIG_IDX];
+
+  switch (config) 
+  {
+    case 0:
+      MainForm->Config0->Checked=TRUE;
+      break;
+    case 1:
+      MainForm->Config1->Checked=TRUE;
+      break;
+    case 2:
+      MainForm->Config2->Checked=TRUE;
+      break;
+    case 3:
+      MainForm->Config3->Checked=TRUE;
+      break;
+    case 4:
+      MainForm->Config4->Checked=TRUE;
+      break;
+    case 5:
+      MainForm->Config5->Checked=TRUE;
+      break;
+    case 6:
+      MainForm->Config6->Checked=TRUE;
+      break;
+    case 7:
+      MainForm->Config7->Checked=TRUE;
+      break;
+    default:      
+      break;
+  }
+
+  QuadGT_Display_Update_Reverb(config, quad_data);
+
+  QuadGT_Display_Update_Delay(config, quad_data);
+
+  QuadGT_Display_Update_Pitch(config, quad_data);
+
+  QuadGT_Display_Update_Eq(config, quad_data);
+
+  QuadGT_Display_Update_Mix(config, quad_data);
+
+  QuadGT_Display_Update_Mod(config, quad_data);
+
+  QuadGT_Display_Update_Preamp(config, quad_data);
+}
+
+void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_data)
+{
+  // TBD
+}
+
+void QuadGT_Display_Update_Delay(const UInt8 config, const UInt8 * const quad_data)
+{
+  // TBD
+}
+
+void QuadGT_Display_Update_Pitch(const UInt8 config, const UInt8 * const quad_data)
+{
+  // TBD
+}
+
+void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
+{
+  MainForm->EqFreq1->Position = quad_data[LOW_EQ_FREQ_IDX];
+  MainForm->EqAmp1->Position = quad_data[LOW_EQ_AMP_IDX];
+
+  MainForm->EqFreq2->Position = quad_data[MID_EQ_FREQ_IDX];
+  MainForm->EqAmp2->Position = quad_data[MID_EQ_AMP_IDX];
+  MainForm->EqQ2->Position = quad_data[MID_EQ_BW_IDX];
+
+  MainForm->EqFreq3->Position = quad_data[HIGH_EQ_FREQ_IDX];
+  MainForm->EqAmp3->Position = quad_data[HIGH_EQ_AMP_IDX];
+}
+
+void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data)
+{
+  UInt8 val;
+
+  // Pre or Post Eq
+  val=quad_data[PREPOST_EQ_IDX] & BIT0;
+  if (val == 0) 
+  {
+    MainForm->MixPreEq->Checked=TRUE;
+    MainForm->MixPostEq->Checked=FALSE;
+  }
+  else
+  {
+    MainForm->MixPreEq->Checked=FALSE;
+    MainForm->MixPostEq->Checked=TRUE;
+  }
+
+  // Direct level
+  val=(quad_data[DIRECT_LEVEL_IDX ] & BITS1to7) >> 1;
+  MainForm->MixDirect->Position=99-val;
+
+  // Master Fx Level
+  if (config != 7)
+  {
+    val=quad_data[MASTER_EFFECTS_LEVEL_IDX ];
+    MainForm->MixMaster->Position=99-val;
+    MainForm->MixMaster->Visible=TRUE;
+  }
+  else
+  {
+    MainForm->MixMaster->Visible=FALSE;
+  }
+
+  // Preamp Level
+  if (MainForm->MixPreEq->Checked==TRUE)
+  {
+    val=quad_data[PREAMP_LEVEL_IDX ];
+    MainForm->MixPreampEq->Position=99-val;
+    MainForm->MixPreampEq->Visible=TRUE;
+  }
+  else 
+  {
+    MainForm->MixPreampEq->Visible=FALSE;
+  }
+
+  // Pitch Level
+  val=quad_data[PITCH_LEVEL_IDX ];
+  MainForm->MixPitch->Position=99-val;
+
+  // Delay Level
+  val=quad_data[DELAY_LEVEL_IDX ];
+  MainForm->MixDelay->Position=99-val;
+
+  // Reverb Level
+  val=quad_data[REVERB_LEVEL_IDX ];
+  MainForm->MixReverb->Position=99-val;
+
+  // Modulation (on/off)
+  // TBD: Fix grouping so this doesnt effect pre/post eq
+  val=(quad_data[MIX_MOD_IDX] & BITS6to7) >> 6;
+  if (val == 0) MainForm->Modulation->Checked=FALSE;
+  else MainForm->Modulation->Checked=TRUE;
+
+  // Mod Depth
+  // Mod Speed
+ 
+  // Leslie Level
+
+  // Eq Level
+  if (MainForm->MixPostEq->Checked==TRUE)
+  {
+    val=quad_data[EQ_LEVEL_IDX ];
+    MainForm->MixPreampEq->Position=99-val;
+  }
+
+  // Ring Level
+  
+  // Resonator Level
+}
+
+void QuadGT_Display_Update_Mod(const UInt8 config, const UInt8 * const quad_data)
+{
+  // Modulation
+  switch (config)
+  {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+      MainForm->QuadModSource1->ItemIndex=quad_data[MOD1_SOURCE_IDX];
+      MainForm->QuadModTarget1->ItemIndex=quad_data[MOD1_TARGET_IDX];
+      MainForm->QuadModAmp1->Position=quad_data[MOD1_AMP_IDX]-99;
+      break;
+
+    case 7:
+    default:
+      break;
+  }
+}
+
+void QuadGT_Display_Update_Preamp(const UInt8 config, const UInt8 * const quad_data)
+{
+  UInt8 val;
+
+  // Compression (0-7)
+  val=(quad_data[PREAMP_COMP_IDX] & BITS4to6) >> 4;
+  MainForm->PreComp->Position=7-val;
+  FormDebug->Log(NULL,"Compression: "+AnsiString(val));
+
+  // Overdrive (0-7)
+  val=(quad_data[PREAMP_OD_IDX] & BITS5to7) >> 5;
+  MainForm->PreOd->Position=7-val;
+  FormDebug->Log(NULL,"OD: "+AnsiString(val));
+
+  // Distortion (0-8)
+  val=(quad_data[PREAMP_DIST_IDX] & BITS0to3);
+  MainForm->PreDist->Position=8-val;
+
+  // Tone (0-2)
+  // TBD: Make a radio button:  ???, flat, bright
+  val=(quad_data[PREAMP_TONE_IDX] & BITS2to3) >> 2;
+  MainForm->PreTone->Position=2-val;
+
+  // Bass Boost (0-1)
+  // TBD: Make a check box (on/off)
+
+  // Cab sim (0-2)
+  // TBD: Make a radio button:  ???
+  
+  // Effect Loop (0-1)
+  // TBD: Make a check box (in/out)
+ 
+  // Noise Gate (0-17)
+  val=(quad_data[PREAMP_GATE_IDX] & BITS0to4);
+  MainForm->PreGate->Position=17-val;
+  FormDebug->Log(NULL,"Gate: "+AnsiString(val));
+
+  /* Preamp Output Level (0-99) */
+  val=quad_data[PREAMP_OUT_LEVEL_IDX];
+  MainForm->PreOutLevel->Position = 99-val;
+  FormDebug->Log(NULL, "Preamp output level :"+AnsiString(val));
+
 }

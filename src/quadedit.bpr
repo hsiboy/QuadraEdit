@@ -229,7 +229,7 @@ $(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # This section of the project file is for hand done extensions to the makefile
-all: version.nsh executable
+all: executable
 
 # clean - removes all generated files
 clean:
@@ -242,4 +242,4 @@ clean:
 ide: Modem.dfm About.dfm releasenotes.dfm CannedMessageProperties.dfm version.h runide txtform
 
 run:
-      HaloConfig.exe
+      quadedit.exe

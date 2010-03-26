@@ -65,16 +65,6 @@ void __fastcall TMainForm::Init(void)
   FormDebug->Log(MainForm, "WORD "+AnsiString(sizeof(WORD)));
   FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
 
-
-  UInt8 quad_data[]={0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 
-                     0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81};
-  UInt8 sysex_data[100];
-  UInt32 count;
-
-  count=encode_quad(quad_data, sizeof(quad_data), sysex_data, sizeof(sysex_data));
-
-  count=decode_quad(sysex_data, count, quad_data, sizeof(quad_data));
-
   Midi_Init();
 }
 //---------------------------------------------------------------------------
@@ -371,7 +361,7 @@ void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 
 void __fastcall TMainForm::TimerProcessTimer(TObject *Sender)
 {
-   process();
+   Midi_Sysex_Process();
 }
 //---------------------------------------------------------------------------
 
@@ -389,7 +379,9 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
     
 }
 //---------------------------------------------------------------------------
-
+// Name        : QuadProgWriteClick
+// Description : Sends a sysex command to set the program/patch number when
+//               the user clicks the "Prog Write" button
 void __fastcall TMainForm::QuadProgWriteClick(TObject *Sender)
 {
   long int status;
@@ -413,6 +405,12 @@ void __fastcall TMainForm::QuadMidiWriteClick(TObject *Sender)
   {
      FormError->ShowError(status, "sending SYSEX edit command to Midi output device");
   }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::TestClick(TObject *Sender)
+{
+  Midi_Test();    
 }
 //---------------------------------------------------------------------------
 

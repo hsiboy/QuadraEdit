@@ -1,6 +1,6 @@
 
 ARCHITECTURE
-- Seperate Quadraverb code into gui_quad_gt and midi_quad_gt modules
+- Seperate Quadraverb code into gui_quadgt and midi_quadgt modules
 - Put queue routines into queue module
 - Clean up return codes and error handling
 
@@ -8,6 +8,7 @@ GUI
 - Rescan for MIDI devices when user clicks on device lists?
 - Provide titles for various quadraverb forms
 - Disable/enable send/get buttons based on MIDI open status
+- Split EQ panel in 3band, 5band, graphic and preset
 
 MIDI
 - Resolve code for closing MIDI channels
@@ -18,7 +19,7 @@ MIDI
 QUADRAVERB
 - Check message is from a Quadraverb                                         -> Done
 - Extract patch number                                                       -> Done
-- Decode contents of message
+- Decode contents of message                                                 -> In progress
 - Check if funtion #'s 0,5 and 6 work for "Program", "Midi" and "Store"      -> Done apart from encoding
 - See if we can request and read the ROM version
 - Message encoder                                                            -> Done, use it
