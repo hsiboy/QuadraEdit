@@ -58,13 +58,13 @@
 //#define _IDX (0x18) // SAMPLE START / TAP 1 DELAY LSB  
 //#define _IDX (0x19) // SAMPLE LENGTH / TAP 1 VOLUME    
 //#define _IDX (0x1A) // PITCH MODE      
-//#define _IDX (0x1B) // PITCH INPUT (0) / RES** 4 AMP (1-7)     
-//#define _IDX (0x1B) // PITCH INPUT (0) / RES** 4 AMP (1-7)     
-//#define _IDX (0x1C) // LFO WAVEFORM (0) / EQ PRESET NUMBER (1-7)       
-//#define _IDX (0x1C) // LFO WAVEFORM (0) / EQ PRESET NUMBER (1-7)       
+//#define _IDX (0x1B) // PITCH INPUT (0)
+//#define _IDX (0x1B) // RES** 4 AMP (1-7)     
+//#define _IDX (0x1C) // LFO WAVEFORM (0)
+//#define _IDX (0x1C) // EQ PRESET NUMBER (1-7)       
 //#define _IDX (0x1D) // LFO SPEED       
-//#define _IDX (0x1E) // LFO DEPTH / RES*** DECAY        
-//#define _IDX (0x1E) // LFO DEPTH / RES*** DECAY        
+//#define _IDX (0x1E) // LFO DEPTH
+//#define _IDX (0x1E) // RES*** DECAY        
 //#define _IDX (0x1F) // SAMPLE PLAYBACK MODE / TAP 1 PAN        
 //#define _IDX (0x1F) // SAMPLE PLAYBACK MODE / TAP 1 PAN        
 //#define _IDX (0x20) // PITCH FEEDBACK  
@@ -92,8 +92,10 @@
 //#define _IDX (0x2E) // RIGHT DELAY LSB / TAP 3 VOLUME  
 //#define _IDX (0x2F) // RIGHT FEEDBACK / TAP 3 PAN      
 //#define _IDX (0x30) // SAMPLE LOW MIDI NOTE / TAP 3 FEEDBACK   
-//#define _IDX (0x31) // SAMPLE HIGH MIDI NOTE / TAP 4 DELAY MSB 
-//#define _IDX (0x32) // REVERB MODE / TAP 4 DELAY LSB   
+//#define _IDX (0x31) // SAMPLE HIGH MIDI NOTE
+//#define _IDX (0x31) // TAP 4 DELAY MSB 
+//#define _IDX (0x32) // TAP 4 DELAY LSB   
+#define REVERB_MODE_IDX (0x32) // REVERB MODE
 //#define _IDX (0x33) // TAP 4 VOLUME    
 //#define _IDX (0x34) // REVERB INPUT 1 / TAP 4 PAN      
 //#define _IDX (0x35) // REVERB INPUT 2 / TAP 4 FEEDBACK 

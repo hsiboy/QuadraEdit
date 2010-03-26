@@ -205,7 +205,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   if (Config0->Checked == TRUE)
   {
     FormDebug->Log(Sender,"Config 0");
-    PanelQuadEq->Visible=true;
+    PanelQuadEq3->Visible=true;
     PanelQuadPitch->Visible=true;
     PanelQuadDelay->Visible=true;
     PanelQuadReverb->Visible=true;
@@ -217,7 +217,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   else if (Config1->Checked == TRUE)
   {
     FormDebug->Log(Sender,"Config 1");
-    PanelQuadEq->Visible=false;
+    PanelQuadEq3->Visible=false;
     PanelQuadPitch->Visible=false;
     PanelQuadDelay->Visible=true;
     PanelQuadReverb->Visible=true;
@@ -228,7 +228,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 2: Graphic Eq-Delay
   else if (Config2->Checked == TRUE)
   {
-    PanelQuadEq->Visible=true;
+    PanelQuadEq3->Visible=true;
     PanelQuadPitch->Visible=false;
     PanelQuadDelay->Visible=true;
     PanelQuadReverb->Visible=false;
@@ -239,7 +239,8 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 3: 5 Band Eq-Pitch-Delay
   else if (Config3->Checked == TRUE)
   {
-    PanelQuadEq->Visible=true;
+    PanelQuadEq3->Visible=false;
+    PanelQuadEq5->Visible=true;
     PanelQuadPitch->Visible=true;
     PanelQuadDelay->Visible=true;
     PanelQuadReverb->Visible=false;
@@ -250,7 +251,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 4: 3 Band Eq-Reverb
   else if (Config4->Checked == TRUE)
   {
-    PanelQuadEq->Visible=true;
+    PanelQuadEq3->Visible=true;
     PanelQuadPitch->Visible=false;
     PanelQuadDelay->Visible=false;
     PanelQuadReverb->Visible=true;
@@ -261,7 +262,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 5: Ring Mod-Delay-Reverb
   else if (Config5->Checked == TRUE)
   {
-    PanelQuadEq->Visible=false;
+    PanelQuadEq3->Visible=false;
     PanelQuadPitch->Visible=false;
     PanelQuadDelay->Visible=true;
     PanelQuadReverb->Visible=true;
@@ -272,7 +273,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 6: Resonator-Delay-Reverb
   else if (Config6->Checked == TRUE)
   {
-    PanelQuadEq->Enabled=false;
+    PanelQuadEq3->Enabled=false;
     PanelQuadPitch->Enabled=false;
     PanelQuadDelay->Enabled=true;
     PanelQuadReverb->Enabled=true;
@@ -283,7 +284,7 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 7: Sampling
   else if (Config7->Checked == TRUE)
   {
-    PanelQuadEq->Enabled=false;
+    PanelQuadEq3->Enabled=false;
     PanelQuadPitch->Enabled=false;
     PanelQuadDelay->Enabled=false;
     PanelQuadReverb->Enabled=false;
@@ -411,6 +412,13 @@ void __fastcall TMainForm::QuadMidiWriteClick(TObject *Sender)
 void __fastcall TMainForm::TestClick(TObject *Sender)
 {
   Midi_Test();    
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::BarChange(TObject *Sender)
+{
+  TTrackBar * bar = (TTrackBar *)Sender;
+  bar->Hint=AnsiString(bar->Max - bar->Position);
 }
 //---------------------------------------------------------------------------
 

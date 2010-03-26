@@ -619,7 +619,15 @@ void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data)
 
 void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_data)
 {
-  // TBD
+  UInt8 val;
+
+  val = quad_data[REVERB_MODE_IDX];
+
+  if (val==0) MainForm->ReverbPlate->Checked=TRUE;
+  else if (val==1) MainForm->ReverbRoom->Checked=TRUE;
+  else if (val==2) MainForm->ReverbChamber->Checked=TRUE;
+  else if (val==3) MainForm->ReverbHall->Checked=TRUE;
+  else if (val==4) MainForm->ReverbReverse->Checked=TRUE;
 }
 
 void QuadGT_Display_Update_Delay(const UInt8 config, const UInt8 * const quad_data)
@@ -634,15 +642,33 @@ void QuadGT_Display_Update_Pitch(const UInt8 config, const UInt8 * const quad_da
 
 void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
 {
-  MainForm->EqFreq1->Position = quad_data[LOW_EQ_FREQ_IDX];
-  MainForm->EqAmp1->Position = quad_data[LOW_EQ_AMP_IDX];
+  // 3 Band Eq
+  if ((config==0) || (config==4))
+  {
+    MainForm->PanelQuadEq3->Visible=TRUE;
 
-  MainForm->EqFreq2->Position = quad_data[MID_EQ_FREQ_IDX];
-  MainForm->EqAmp2->Position = quad_data[MID_EQ_AMP_IDX];
-  MainForm->EqQ2->Position = quad_data[MID_EQ_BW_IDX];
+    MainForm->EqFreq1->Position = quad_data[LOW_EQ_FREQ_IDX];
+    MainForm->EqAmp1->Position = quad_data[LOW_EQ_AMP_IDX];
 
-  MainForm->EqFreq3->Position = quad_data[HIGH_EQ_FREQ_IDX];
-  MainForm->EqAmp3->Position = quad_data[HIGH_EQ_AMP_IDX];
+    MainForm->EqFreq2->Position = quad_data[MID_EQ_FREQ_IDX];
+    MainForm->EqAmp2->Position = quad_data[MID_EQ_AMP_IDX];
+    MainForm->EqQ2->Position = quad_data[MID_EQ_BW_IDX];
+
+    MainForm->EqFreq3->Position = quad_data[HIGH_EQ_FREQ_IDX];
+    MainForm->EqAmp3->Position = quad_data[HIGH_EQ_AMP_IDX];
+  }
+  else
+  {
+    MainForm->PanelQuadEq3->Visible=FALSE;
+  }
+
+  // 5 Band Eq
+  if (config==3) MainForm->PanelQuadEq5->Visible=TRUE;
+  else MainForm->PanelQuadEq5->Visible=FALSE;
+
+  // Graphic Eq
+
+  // Resonator
 }
 
 void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data)
@@ -653,13 +679,11 @@ void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data
   val=quad_data[PREPOST_EQ_IDX] & BIT0;
   if (val == 0) 
   {
-    MainForm->MixPreEq->Checked=TRUE;
-    MainForm->MixPostEq->Checked=FALSE;
+    MainForm->PrePostEq->ItemIndex=0;
   }
   else
   {
-    MainForm->MixPreEq->Checked=FALSE;
-    MainForm->MixPostEq->Checked=TRUE;
+    MainForm->PrePostEq->ItemIndex=1;
   }
 
   // Direct level
@@ -679,15 +703,17 @@ void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data
   }
 
   // Preamp Level
-  if (MainForm->MixPreEq->Checked==TRUE)
+  if (MainForm->PrePostEq->ItemIndex==0)
   {
     val=quad_data[PREAMP_LEVEL_IDX ];
     MainForm->MixPreampEq->Position=99-val;
     MainForm->MixPreampEq->Visible=TRUE;
+    MainForm->PreAmp->Visible=TRUE;
   }
   else 
   {
     MainForm->MixPreampEq->Visible=FALSE;
+    MainForm->PreAmp->Visible=FALSE;
   }
 
   // Pitch Level
@@ -714,7 +740,7 @@ void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data
   // Leslie Level
 
   // Eq Level
-  if (MainForm->MixPostEq->Checked==TRUE)
+  if (MainForm->PrePostEq->ItemIndex==1)
   {
     val=quad_data[EQ_LEVEL_IDX ];
     MainForm->MixPreampEq->Position=99-val;
@@ -766,9 +792,8 @@ void QuadGT_Display_Update_Preamp(const UInt8 config, const UInt8 * const quad_d
   MainForm->PreDist->Position=8-val;
 
   // Tone (0-2)
-  // TBD: Make a radio button:  ???, flat, bright
   val=(quad_data[PREAMP_TONE_IDX] & BITS2to3) >> 2;
-  MainForm->PreTone->Position=2-val;
+  MainForm->PreTone->ItemIndex=val;
 
   // Bass Boost (0-1)
   // TBD: Make a check box (on/off)
