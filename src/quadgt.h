@@ -200,6 +200,9 @@ const UInt8 Sysex_Dump_Req[]={0x03};           // Command to request a dump
 
 UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len);
 UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len);
+
+void QuadGT_Init(void);
+void QuadGT_Display_Update_Patch(UInt8 program);
 void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data);
 void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Delay(const UInt8 config, const UInt8 * const quad_data);

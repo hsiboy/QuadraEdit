@@ -555,6 +555,21 @@ void Midi_Test(void)
 
 static UInt8 Quad_Patch[QUAD_NUM_PATCH][QUAD_PATCH_SIZE];
 
+void QuadGT_Init(void)
+{
+  UInt8 patch;
+
+  for (patch=0; patch<QUAD_NUM_PATCH; patch++)
+  {
+    memset(Quad_Patch[patch], 0x00, QUAD_PATCH_SIZE);
+  }
+}
+
+void QuadGT_Display_Update_Patch(UInt8 program)
+{
+  QuadGT_Display_Update(program, Quad_Patch[program]);
+}
+
 void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data)
 {
   char prog_name[NAME_LENGTH+1];

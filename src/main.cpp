@@ -19,6 +19,7 @@
 #include "midi.h"
 #include "error.h"
 #include "debug.h"
+#include "quadgt.h"
 #include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
@@ -66,6 +67,7 @@ void __fastcall TMainForm::Init(void)
   FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
 
   Midi_Init();
+  QuadGT_Init();
 }
 //---------------------------------------------------------------------------
 
@@ -132,7 +134,8 @@ void __fastcall TMainForm::QuadPatchNumChange(TObject *Sender)
 
    PanelQuad->Caption = "Quad Patch " + QuadPatchNum->Text + " selected";
 
-  // TBD: User changed the patch number, update display
+
+  QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
 }
 //---------------------------------------------------------------------------
 
