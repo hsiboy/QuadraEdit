@@ -202,94 +202,94 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // TBD: How to set it up so enabling/disabling a panel causes it's children to also be enabled/disabled
 
   // 0: EQ-Pitch-Delay-Reverb;
-  if (Config0->Checked == TRUE)
+  if (QuadConfig->ItemIndex==0)
   {
     FormDebug->Log(Sender,"Config 0");
     PanelQuadEq3->Visible=true;
-    PanelQuadPitch->Visible=true;
+    QuadPitch->Visible=true;
     PanelQuadDelay->Visible=true;
-    PanelQuadReverb->Visible=true;
+    QuadReverb->Visible=true;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
   // 1: Leslie-Delay-Reverb;
-  else if (Config1->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==1)
   {
     FormDebug->Log(Sender,"Config 1");
     PanelQuadEq3->Visible=false;
-    PanelQuadPitch->Visible=false;
+    QuadPitch->Visible=false;
     PanelQuadDelay->Visible=true;
-    PanelQuadReverb->Visible=true;
+    QuadReverb->Visible=true;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
   // 2: Graphic Eq-Delay
-  else if (Config2->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==2)
   {
     PanelQuadEq3->Visible=true;
-    PanelQuadPitch->Visible=false;
+    QuadPitch->Visible=false;
     PanelQuadDelay->Visible=true;
-    PanelQuadReverb->Visible=false;
+    QuadReverb->Visible=false;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
   // 3: 5 Band Eq-Pitch-Delay
-  else if (Config3->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==3)
   {
     PanelQuadEq3->Visible=false;
-    PanelQuadEq5->Visible=true;
-    PanelQuadPitch->Visible=true;
+    QuadEq5->Visible=true;
+    QuadPitch->Visible=true;
     PanelQuadDelay->Visible=true;
-    PanelQuadReverb->Visible=false;
+    QuadReverb->Visible=false;
 
-    DelayMultiTap->Enabled=true;
+    //TBD: Enable Multitap in RadioGroupDelay list
   }
 
   // 4: 3 Band Eq-Reverb
-  else if (Config4->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==4)
   {
     PanelQuadEq3->Visible=true;
-    PanelQuadPitch->Visible=false;
+    QuadPitch->Visible=false;
     PanelQuadDelay->Visible=false;
-    PanelQuadReverb->Visible=true;
+    QuadReverb->Visible=true;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
   // 5: Ring Mod-Delay-Reverb
-  else if (Config5->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==5)
   {
     PanelQuadEq3->Visible=false;
-    PanelQuadPitch->Visible=false;
+    QuadPitch->Visible=false;
     PanelQuadDelay->Visible=true;
-    PanelQuadReverb->Visible=true;
+    QuadReverb->Visible=true;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
   // 6: Resonator-Delay-Reverb
-  else if (Config6->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==6)
   {
     PanelQuadEq3->Enabled=false;
-    PanelQuadPitch->Enabled=false;
+    QuadPitch->Enabled=false;
     PanelQuadDelay->Enabled=true;
-    PanelQuadReverb->Enabled=true;
+    QuadReverb->Enabled=true;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
   // 7: Sampling
-  else if (Config7->Checked == TRUE)
+  else if (QuadConfig->ItemIndex==7)
   {
     PanelQuadEq3->Enabled=false;
-    PanelQuadPitch->Enabled=false;
+    QuadPitch->Enabled=false;
     PanelQuadDelay->Enabled=false;
-    PanelQuadReverb->Enabled=false;
+    QuadReverb->Enabled=false;
 
-    DelayMultiTap->Enabled=false;
+    //TBD: Remove Multitap from RadioGroupDelay list
   }
 
 }
@@ -421,4 +421,7 @@ void __fastcall TMainForm::BarChange(TObject *Sender)
   bar->Hint=AnsiString(bar->Max - bar->Position);
 }
 //---------------------------------------------------------------------------
+
+
+
 

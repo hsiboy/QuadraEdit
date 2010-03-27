@@ -26,24 +26,25 @@
 #define QUAD_NUM_PATCH    (10)
 
 #define CONFIG_IDX           (0x44)
-#define LOW_EQ_FREQ_IDX (0x00) // LOW EQ FREQ MSB / RES* 1 TUNE   
-#define RES1_TUNE_IDX (0x00) // LOW EQ FREQ MSB / RES* 1 TUNE   
-#define RES1_DECAY_IDX (0x01) // LOW EQ FREQ LSB / RES* 1 DECAY /16Hz    
+#define LOW_EQ_FREQ_IDX (0x00) // LOW EQ FREQ MSB
+#define RES1_TUNE_IDX (0x00) // RES* 1 TUNE   
+#define RES1_DECAY_IDX (0x01) // RES* 1 DECAY
+#define GEQ_16HZ_IDX (0x01) // 16Hz    
 #define LOW_EQ_AMP_IDX (0x02) // LOW EQ AMP MSB / RES* 1 AMP / 32Hz      
 //#define _IDX (0x03) // LOW EQ AMP LSB / RES* 2 TUNE / 62Hz     
 #define MID_EQ_FREQ_IDX (0x04) // MID EQ FREQ MSB /126Hz  
 //#define _IDX (0x05) // MID EQ FREQ LSB / 250Hz 
 #define MID_EQ_BW_IDX (0x06) // MID EQ BANDWIDTH / 500Hz        
 #define MID_EQ_AMP_IDX (0x07) // MID EQ AMP
-//#define _IDX (0x07) // 1KHz   
-//#define _IDX (0x08) // 2KHz   
+#define GEQ_1KHZ_IDX (0x07) // 1KHz   
+#define GEQ_2KHZ_IDX (0x08) // 2KHz   
 #define HIGH_EQ_FREQ_IDX (0x09) // HIGH EQ FREQ 
 //#define _IDX (0x09) // RES* 2 DECAY
-//#define _IDX (0x09) // 4KHz  
+#define GEQ_4KHZ_IDX (0x09) // 4KHz  
 //#define _IDX (0x0A) // RES* 2 AMP
-//#define _IDX (0x0A) // 8KHz    
+#define GEQ_8KHZ_IDX (0x0A) // 8KHz    
 #define HIGH_EQ_AMP_IDX (0x0B) // HIGH EQ AMP
-//#define _IDX (0x0B) // 16KHz 
+#define GEQ_16KHZ_IDX (0x0B) // 16KHz 
 //#define _IDX (0x0D) // LESLIE HIGH ROTOR LEVEL / TAP 1 DELAY MSB       
 //#define _IDX (0x0E) // LOW MID EQ FREQ MSB / RES **1 TUNE      
 //#define _IDX (0x0F) // LOW MID EQ FREQ LSB / RES** 1 DECAY     
@@ -75,22 +76,29 @@
 //#define _IDX (0x23) // LESLIE MOTOR / SAMPLE REC AUDIO TRIG / TAP 2 DELAY MSB  
 //#define _IDX (0x23) // LESLIE MOTOR / SAMPLE REC AUDIO TRIG / TAP 2 DELAY MSB  
 //#define _IDX (0x23) // LESLIE MOTOR / SAMPLE REC AUDIO TRIG / TAP 2 DELAY MSB  
+//#define _IDX (0x23) // LESLIE MOTOR / SAMPLE REC AUDIO TRIG / TAP 2 DELAY MSB  
+//#define _IDX (0x23) // LESLIE MOTOR / SAMPLE REC AUDIO TRIG / TAP 2 DELAY MSB  
 //#define _IDX (0x24) // LESLIE SPEED / SAMPLE MIDI TRIG / TAP 2 DELAY LSB       
 //#define _IDX (0x24) // LESLIE SPEED / SAMPLE MIDI TRIG / TAP 2 DELAY LSB       
 //#define _IDX (0x24) // LESLIE SPEED / SAMPLE MIDI TRIG / TAP 2 DELAY LSB       
 //#define _IDX (0x25) // TRIGGER FLANGE / RES*** MIDI GATE       
 //#define _IDX (0x25) // TRIGGER FLANGE / RES*** MIDI GATE       
 //#define _IDX (0x26) // SAMPLE MIDI BASE NOTE / TAP 2 VOLUME    
-//#define _IDX (0x27) // DELAY MODE      
-//#define _IDX (0x28) // DELAY INPUT (0) / RES** 5 AMP (1-7)     
-//#define _IDX (0x28) // DELAY INPUT (0) / RES** 5 AMP (1-7)     
+#define DELAY_MODE_IDX (0x27) // DELAY MODE      
+//#define _IDX (0x28) // DELAY INPUT (0)
+//#define _IDX (0x28) // RES** 5 AMP (1-7)     
 //#define _IDX (0x29) // DELAY INPUT MIX 
-//#define _IDX (0x2A) // DELAY MSB / LEFT DELAY MSB / TAP 2 PAN  
-//#define _IDX (0x2B) // DELAY LSB / LEFT DELAY LSB /TAP 2 FEEDBACK      
-//#define _IDX (0x2C) // FEEDBACK / LEFT FEEDBACK / TAP 3 DELAY MSB      
-//#define _IDX (0x2D) // RIGHT DELAY MSB / TAP 3 DELAY LSB       
-//#define _IDX (0x2E) // RIGHT DELAY LSB / TAP 3 VOLUME  
-//#define _IDX (0x2F) // RIGHT FEEDBACK / TAP 3 PAN      
+//#define _IDX (0x2A) // DELAY MSB
+//#define _IDX (0x2A) // LEFT DELAY MSB
+//#define _IDX (0x2A) // TAP 2 PAN  
+//#define _IDX (0x2B) // TAP 2 FEEDBACK      
+//#define _IDX (0x2C) // FEEDBACK
+//#define _IDX (0x2C) // LEFT FEEDBACK
+//#define _IDX (0x2C) // TAP 3 DELAY MSB      
+//#define _IDX (0x2D) // RIGHT DELAY MSB
+//#define _IDX (0x2E) // TAP 3 VOLUME  
+//#define _IDX (0x2F) // RIGHT FEEDBACK
+//#define _IDX (0x2F) // TAP 3 PAN      
 //#define _IDX (0x30) // SAMPLE LOW MIDI NOTE / TAP 3 FEEDBACK   
 //#define _IDX (0x31) // SAMPLE HIGH MIDI NOTE
 //#define _IDX (0x31) // TAP 4 DELAY MSB 
@@ -119,74 +127,65 @@
 #define PREAMP_LEVEL_IDX (0x46) // PREAMP LEVEL / EQ LEVEL 
 #define EQ_LEVEL_IDX (0x46) // PREAMP LEVEL / EQ LEVEL 
 #define MASTER_EFFECTS_LEVEL_IDX (0x47) // MASTER EFFECTS LEVEL    
-#define PITCH_LEVEL_IDX (0x48) // PITCH LEVEL / LESLIE LEVEL / RING MOD LEV       
-//#define _IDX (0x48) // PITCH LEVEL / LESLIE LEVEL / RING MOD LEV       
-//#define _IDX (0x48) // PITCH LEVEL / LESLIE LEVEL / RING MOD LEV       
+#define PITCH_LEVEL_IDX (0x48) // PITCH LEVEL
+//#define _IDX (0x48) // LESLIE LEVEL
+//#define _IDX (0x48) // RING MOD LEV       
 #define DELAY_LEVEL_IDX (0x49) // DELAY LEVEL     
 #define REVERB_LEVEL_IDX (0x4A) // REVERB LEVEL
 //#define _IDX (0x4A) // RES** 1 AMP      
-//#define _IDX (0x4B) // RES*** PITCH 1 / TAP 8 DELAY MSB        
-//#define _IDX (0x4C) // RES*** PITCH 2 / TAP 8 DELAY LSB        
-//#define _IDX (0x4D) // RES*** PITCH 3 / TAP 8 VOLUME   
-//#define _IDX (0x4E) // RES*** PITCH 4 / TAP 8 PAN      
-//#define _IDX (0x4F) // RES*** PITCH 5 / TAP 8 FEEDBACK 
+//#define _IDX (0x4B) // RES*** PITCH 1
+//#define _IDX (0x4B) // TAP 8 DELAY MSB        
+//#define _IDX (0x4C) // RES*** PITCH 2
+//#define _IDX (0x4D) // RES*** PITCH 3
+//#define _IDX (0x4D) // TAP 8 VOLUME   
+//#define _IDX (0x4E) // RES*** PITCH 4
+//#define _IDX (0x4E) // TAP 8 PAN      
+//#define _IDX (0x4F) // RES*** PITCH 5
+//#define _IDX (0x4F) // TAP 8 FEEDBACK 
 #define MOD1_SOURCE_IDX (0x50) // MOD 1 SOURCE    
 #define MOD1_TARGET_IDX (0x51) // MOD 1 TARGET    
 #define MOD1_AMP_IDX (0x52) // MOD 1 AMPLITUDE 
-//#define _IDX (0x53) // MOD 2 SOURCE    
-//#define _IDX (0x54) // MOD 2 TARGET    
-//#define _IDX (0x55) // MOD 2 AMPLITUDE 
-//#define _IDX (0x56) // MOD 3 SOURCE    
-//#define _IDX (0x57) // MOD 3 TARGET    
-//#define _IDX (0x58) // MOD 3 AMPLITUDE 
-//#define _IDX (0x59) // MOD 4 SOURCE    
-//#define _IDX (0x5A) // MOD 4 TARGET    
-//#define _IDX (0x5B) // MOD 4 AMPLITUDE 
-//#define _IDX (0x5C) // MOD 5 SOURCE    
-//#define _IDX (0x5D) // MOD 5 TARGET    
-//#define _IDX (0x5E) // MOD 5 AMPLITUDE 
-//#define _IDX (0x5F) // MOD 6 SOURCE    
-//#define _IDX (0x60) // MOD 6 TARGET    
-//#define _IDX (0x61) // MOD 6 AMPLITUDE 
-//#define _IDX (0x62) // MOD 7 SOURCE    
-//#define _IDX (0x63) // MOD 7 TARGET    
-//#define _IDX (0x64) // MOD 7 AMPLITUDE 
-//#define _IDX (0x65) // MOD 8 SOURCE    
-//#define _IDX (0x66) // MOD 8 TARGET    
-//#define _IDX (0x67) // MOD 8 AMPLITUDE 
+#define MOD2_SOURCE_IDX (0x53) // MOD 2 SOURCE    
+#define MOD2_TARGET_IDX (0x54) // MOD 2 TARGET    
+#define MOD2_AMP_IDX (0x55) // MOD 2 AMPLITUDE 
+#define MOD3_SOURCE_IDX (0x56) // MOD 3 SOURCE    
+#define MOD3_TARGET_IDX (0x57) // MOD 3 TARGET    
+#define MOD3_AMP_IDX (0x58) // MOD 3 AMPLITUDE 
+#define MOD4_SOURCE_IDX (0x59) // MOD 4 SOURCE    
+#define MOD4_TARGET_IDX (0x5A) // MOD 4 TARGET    
+#define MOD4_AMP_IDX (0x5B) // MOD 4 AMPLITUDE 
+#define MOD5_SOURCE_IDX (0x5C) // MOD 5 SOURCE    
+#define MOD5_TARGET_IDX (0x5D) // MOD 5 TARGET    
+#define MOD5_AMP_IDX (0x5E) // MOD 5 AMPLITUDE 
+#define MOD6_SOURCE_IDX (0x5F) // MOD 6 SOURCE    
+#define MOD6_TARGET_IDX (0x60) // MOD 6 TARGET    
+#define MOD6_AMP_IDX (0x61) // MOD 6 AMPLITUDE 
+#define MOD7_SOURCE_IDX (0x62) // MOD 7 SOURCE    
+#define MOD7_TARGET_IDX (0x63) // MOD 7 TARGET    
+#define MOD7_AMP_IDX (0x64) // MOD 7 AMPLITUDE 
+#define MOD8_SOURCE_IDX (0x65) // MOD 8 SOURCE    
+#define MOD8_TARGET_IDX (0x66) // MOD 8 TARGET    
+#define MOD8_AMP_IDX (0x67) // MOD 8 AMPLITUDE 
 //#define _IDX (0x68) // MULTITAP MASTER FEEDBACK        
 //#define _IDX (0x69) // MULTITAP NUMBER 
 #define NAME_IDX (0x6A) // 1ST DIGIT NAME  
-//#define _IDX (0x6B) // 2ND DIGIT NAME  
-//#define _IDX (0x6C) // 3RD DIGIT NAME  
-//#define _IDX (0x6D) // 4TH DIGIT NAME  
-//#define _IDX (0x6E) // 5TH DIGIT NAME  
-//#define _IDX (0x6F) // 6TH DIGIT NAME  
-//#define _IDX (0x70) // 7TH DIGIT NAME  
-//#define _IDX (0x71) // 8TH DIGIT NAME  
-//#define _IDX (0x72) // 9TH DIGIT NAME  
-//#define _IDX (0x73) // 10TH DIGIT NAME 
-//#define _IDX (0x74) // 11TH DIGIT NAME 
-//#define _IDX (0x75) // 12TH DIGIT NAME 
-//#define _IDX (0x76) // 13TH DIGIT NAME 
-//#define _IDX (0x77) // 14TH DIGIT NAME 
-//#define _IDX (0x78) // RING MOD OUTPUT MIX / RES** 2 AMP       
-//#define _IDX (0x79) // RING MOD DEL/REV MIX / RES** 3 AMP      
-//#define _IDX (0x7A) // PAN SPEED       
-//#define _IDX (0x7B) // PAN DEPTH       
-//#define _IDX (0x7C) // EQ-MODE (7)/COMPRESSION (4-6) / DISTORTION (3-0)        
+//#define _IDX (0x78) // RING MOD OUTPUT MIX
+//#define _IDX (0x78) // RES** 2 AMP       
+//#define _IDX (0x79) // RING MOD DEL/REV MIX
+//#define _IDX (0x79) // RES** 3 AMP      
+#define PAN_SPEED_IDX (0x7A) // PAN SPEED       
+#define PAN_DEPTH_IDX (0x7B) // PAN DEPTH       
+//#define _IDX (0x7C) // EQ-MODE (7)
 #define PREAMP_COMP_IDX (0x7C) // COMPRESSION (4-6)
 #define PREAMP_DIST_IDX (0x7C) // DISTORTION (3-0)        
 #define MIX_MOD_IDX (0x7D) // MIX MODULATION (6-7) 
 #define EFFECT_LOOP_IDX (0x7D) // EFFECT LOOP (5)
-//#define _IDX (0x7D) // MIX MODULATION (6-7) / EFFECT LOOP (5) / BASS BOOST (4) / AMP TONE (3-2) / CAB (1-0)    
-//#define _IDX (0x7D) // MIX MODULATION (6-7) / EFFECT LOOP (5) / BASS BOOST (4) / AMP TONE (3-2) / CAB (1-0)    
+#define BASS_BOOST_IDX (0x7D) // BASS BOOST (4) 
 #define PREAMP_TONE_IDX (0x7D) // AMP TONE (3-2)
-//#define _IDX (0x7D) // MIX MODULATION (6-7) / EFFECT LOOP (5) / BASS BOOST (4) / AMP TONE (3-2) / CAB (1-0)    
+#define CAB_SIM_IDX (0x7D) // CAB (1-0)    
 #define PREAMP_OD_IDX (0x7E) // OVERDRIVE (7-5)
 #define PREAMP_GATE_IDX (0x7E) // NOISE GATE (4-0)      
 #define PREAMP_OUT_LEVEL_IDX (0x7F) // PREAMP OUTPUT LEVEL     
-
 
 #define NAME_LENGTH       (14)
 

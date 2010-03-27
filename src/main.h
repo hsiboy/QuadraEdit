@@ -9,6 +9,7 @@
 #include <ExtCtrls.hpp>
 #include <Menus.hpp>
 #include <ComCtrls.hpp>
+#include <Mask.hpp>
 //---------------------------------------------------------------------------
 class TMainForm : public TForm
 {
@@ -30,12 +31,10 @@ __published:	// IDE-managed Components
     TMenuItem *MenuHelpAbout;
     TPanel *PanelPlay;
     TPanel *PanelQuad;
-    TPanel *PanelQuadConfig;
-    TPanel *PanelQuadReverb;
-    TPanel *PanelQuadDelay;
-    TPanel *PanelQuadPitch;
-    TPanel *PanelQuadEq3;
-    TEdit *QuadPatchNum;
+    TGroupBox *QuadReverb;
+    TGroupBox *PanelQuadDelay;
+    TGroupBox *QuadPitch;
+    TGroupBox *PanelQuadEq3;
     TUpDown *UpDownQuadPatch;
     TLabel *LabelQuadPatch;
     TButton *QuadPatchRead;
@@ -53,30 +52,12 @@ __published:	// IDE-managed Components
     TLabel *LabelInDevName;
     TComboBox *ComboBoxInDevs;
     TTimer *TimerMidiCounts;
-    TRadioGroup *RadioGroupConfig;
-    TRadioButton *Config0;
-    TRadioButton *Config1;
-    TRadioButton *Config2;
-    TRadioButton *Config3;
-    TRadioButton *Config4;
-    TRadioButton *Config5;
-    TRadioButton *Config6;
-    TRadioButton *Config7;
-    TPanel *PanelQuadMix;
-    TPanel *PanelQuadMod;
-    TPanel *PanelQuadPreamp;
-    TRadioGroup *RadioGroupReverb;
-    TRadioButton *ReverbPlate;
-    TRadioButton *ReverbRoom;
-    TRadioButton *ReverbChamber;
-    TRadioButton *ReverbHall;
-    TRadioButton *ReverbReverse;
-    TRadioGroup *RadioGroupDelay;
-    TRadioButton *DelayMono;
-    TRadioButton *DelayStereo;
-    TRadioButton *DelayPingPong;
-    TRadioGroup *RadioGroupPitch;
-    TRadioButton *PitchMonoChorus;
+    TGroupBox *PanelQuadMix;
+    TGroupBox *PanelQuadMod;
+    TGroupBox *PanelQuadPreamp;
+    TRadioGroup *ReverbType;
+    TRadioGroup *DelayMode;
+    TRadioGroup *PitchMode;
     TButton *QuadPatchAudition;
     TTrackBar *EqAmp1;
     TTrackBar *EqAmp2;
@@ -95,13 +76,9 @@ __published:	// IDE-managed Components
     TTrackBar *ModDepth;
     TTrackBar *ModSpeed;
     TTrackBar *MixLeslieRingModReson;
-    TRadioButton *DelayMultiTap;
     TTrackBar *PreComp;
     TTrackBar *PreOd;
     TTrackBar *PreDist;
-    TTrackBar *TrackBar20;
-    TTrackBar *TrackBar21;
-    TTrackBar *TrackBar22;
     TTrackBar *PreGate;
     TTrackBar *PreOutLevel;
 
@@ -123,7 +100,7 @@ __published:	// IDE-managed Components
     TLabel *Reverb;
     TLabel *Depth;
     TLabel *Speed;
-    TPanel *PanelQuadEq5;
+    TGroupBox *QuadEq5;
     TTrackBar *TrackBar1;
     TTrackBar *TrackBar2;
     TTrackBar *TrackBar4;
@@ -140,6 +117,90 @@ __published:	// IDE-managed Components
     TLabel *Comp;
     TLabel *OD;
     TLabel *Dist;
+    TLabel *LeslieRingModReson;
+    TLabel *Gate;
+    TLabel *Out;
+    TGroupBox *Bass;
+    TCheckBox *Boost;
+    TRadioGroup *CabSim;
+    TGroupBox *EffectLoop;
+    TCheckBox *EffectLoopIn;
+    TRadioGroup *ReverbInput1;
+    TRadioGroup *ReverbInput2;
+    TTrackBar *ReverbInMix;
+    TLabel *Label1;
+    TTrackBar *ReverbPreDelay;
+    TLabel *Label2;
+    TTrackBar *ReverbPreMix;
+    TLabel *Label3;
+    TTrackBar *ReverbDecay;
+    TLabel *Label4;
+    TTrackBar *TrackBar18;
+    TLabel *Label5;
+    TTrackBar *TrackBar19;
+    TLabel *Label6;
+    TRadioGroup *QuadConfig;
+    TGroupBox *ReverbGate;
+    TCheckBox *ReverbGateOn;
+    TTrackBar *TrackBar20;
+    TTrackBar *TrackBar21;
+    TLabel *Hold;
+    TLabel *Release;
+    TTrackBar *TrackBar22;
+    TLabel *Level;
+    TTrackBar *ReverbLowDecay;
+    TTrackBar *ReverbHighDecay;
+    TLabel *Label7;
+    TLabel *Label8;
+    TUpDown *UpDown1;
+    TMaskEdit *ModNumber;
+    TLabel *Label9;
+    TMaskEdit *QuadPatchNum;
+    TRadioGroup *DelayInput;
+    TTrackBar *DelayInMix;
+    TLabel *Label10;
+    TTrackBar *DelayDelay;
+    TTrackBar *DelayFeedback;
+    TLabel *Label11;
+    TLabel *Label12;
+    TTrackBar *TrackBar3;
+    TLabel *Label13;
+    TTrackBar *TrackBar15;
+    TLabel *Label14;
+    TGroupBox *DelayTap;
+    TLabel *Label15;
+    TLabel *Label16;
+    TLabel *Label17;
+    TTrackBar *TrackBar16;
+    TTrackBar *TrackBar17;
+    TTrackBar *TrackBar23;
+    TLabel *Label18;
+    TMaskEdit *MaskEdit1;
+    TUpDown *UpDown2;
+    TTrackBar *TrackBar24;
+    TLabel *Label19;
+    TRadioGroup *PitchInput;
+    TRadioGroup *PitchWave;
+    TTrackBar *PitchSpeed;
+    TTrackBar *PitchDepth;
+    TTrackBar *PitchFeedback;
+    TLabel *Label20;
+    TLabel *Label21;
+    TLabel *Label22;
+    TGroupBox *QuadLeslie;
+    TRadioGroup *PitchChorus;
+    TRadioGroup *LeslieWave;
+    TTrackBar *LeslieSpeed;
+    TTrackBar *LeslieDepth;
+    TLabel *Label23;
+    TLabel *Label24;
+    TGroupBox *QuadRingMod;
+    TTrackBar *TrackBar25;
+    TLabel *Label25;
+    TTrackBar *TrackBar26;
+    TLabel *Label26;
+    TTrackBar *TrackBar27;
+    TLabel *Label27;
     void __fastcall ButtonPlayClick(TObject *Sender);
     void __fastcall ButtonSilenceClick(TObject *Sender);
     void __fastcall ButtonInstrumentClick(TObject *Sender);
@@ -166,6 +227,8 @@ __published:	// IDE-managed Components
     void __fastcall QuadMidiWriteClick(TObject *Sender);
     void __fastcall TestClick(TObject *Sender);
     void __fastcall BarChange(TObject *Sender);
+    
+    
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

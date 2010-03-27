@@ -571,36 +571,7 @@ void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data)
  
   /* Configuration */
   config=quad_data[CONFIG_IDX];
-
-  switch (config) 
-  {
-    case 0:
-      MainForm->Config0->Checked=TRUE;
-      break;
-    case 1:
-      MainForm->Config1->Checked=TRUE;
-      break;
-    case 2:
-      MainForm->Config2->Checked=TRUE;
-      break;
-    case 3:
-      MainForm->Config3->Checked=TRUE;
-      break;
-    case 4:
-      MainForm->Config4->Checked=TRUE;
-      break;
-    case 5:
-      MainForm->Config5->Checked=TRUE;
-      break;
-    case 6:
-      MainForm->Config6->Checked=TRUE;
-      break;
-    case 7:
-      MainForm->Config7->Checked=TRUE;
-      break;
-    default:      
-      break;
-  }
+  MainForm->QuadConfig->ItemIndex=config;
 
   QuadGT_Display_Update_Reverb(config, quad_data);
 
@@ -621,23 +592,88 @@ void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_d
 {
   UInt8 val;
 
-  val = quad_data[REVERB_MODE_IDX];
+  if (config==0)
+  {
+    MainForm->QuadReverb->Visible=true;
+    MainForm->ReverbInput1->Visible=true;
+    MainForm->ReverbInMix->Visible=true;
+  }
+  else if ((config==1) || (config==5) || (config==6))
+  {
+    MainForm->QuadReverb->Visible=true;
+    MainForm->ReverbInput1->Visible=true;
+    MainForm->ReverbInMix->Visible=true;
+    // TBD: Disable input 1, selection 3
+  }
+  else if ((config==2) || (config==7))
+  {
+    MainForm->QuadReverb->Visible=false;
+  }
+  else if (config==3)
+  {
+    // TBD
+  }
+  else if (config==4)
+  {
+    MainForm->QuadReverb->Visible=true;
+    MainForm->ReverbInput1->Visible=FALSE;
+    MainForm->ReverbInMix->Visible=FALSE;
+  }
 
-  if (val==0) MainForm->ReverbPlate->Checked=TRUE;
-  else if (val==1) MainForm->ReverbRoom->Checked=TRUE;
-  else if (val==2) MainForm->ReverbChamber->Checked=TRUE;
-  else if (val==3) MainForm->ReverbHall->Checked=TRUE;
-  else if (val==4) MainForm->ReverbReverse->Checked=TRUE;
+  MainForm->ReverbType->ItemIndex = quad_data[REVERB_MODE_IDX];
+
 }
 
 void QuadGT_Display_Update_Delay(const UInt8 config, const UInt8 * const quad_data)
 {
-  // TBD
+  UInt8 mode;
+
+  mode=quad_data[DELAY_MODE_IDX];
+  if (mode ==0)
+  {
+    MainForm->DelayTap->Visible=FALSE;
+  }
+  else if (mode ==1)
+  {
+    MainForm->DelayTap->Visible=FALSE;
+  }
 }
 
 void QuadGT_Display_Update_Pitch(const UInt8 config, const UInt8 * const quad_data)
 {
-  // TBD
+  if ((config==0) || (config==3))
+  {
+    MainForm->QuadPitch->Visible=TRUE;
+    MainForm->QuadLeslie->Visible=FALSE;
+    MainForm->QuadRingMod->Visible=FALSE;
+  }
+  else if (config==1)
+  {
+    MainForm->QuadPitch->Visible=FALSE;
+    MainForm->QuadLeslie->Visible=TRUE;
+    MainForm->QuadRingMod->Visible=FALSE;
+  }
+  else if ((config==2) || (config==6) || (config==7))
+  {
+    MainForm->QuadPitch->Visible=FALSE;
+    MainForm->QuadLeslie->Visible=FALSE;
+    MainForm->QuadRingMod->Visible=FALSE;
+  }
+  else if (config==4)
+  {
+    MainForm->QuadPitch->Visible=TRUE;
+    MainForm->QuadLeslie->Visible=FALSE;
+    MainForm->QuadRingMod->Visible=FALSE;
+
+    MainForm->PitchWave->Visible=FALSE;
+    MainForm->PitchChorus->Visible=TRUE;
+  }
+  else if (config==5)
+  {
+    MainForm->QuadPitch->Visible=FALSE;
+    MainForm->QuadLeslie->Visible=FALSE;
+    MainForm->QuadRingMod->Visible=FALSE;
+  }
 }
 
 void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
@@ -663,8 +699,8 @@ void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
   }
 
   // 5 Band Eq
-  if (config==3) MainForm->PanelQuadEq5->Visible=TRUE;
-  else MainForm->PanelQuadEq5->Visible=FALSE;
+  if (config==3) MainForm->QuadEq5->Visible=TRUE;
+  else MainForm->QuadEq5->Visible=FALSE;
 
   // Graphic Eq
 
