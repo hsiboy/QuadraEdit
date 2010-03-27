@@ -558,10 +558,13 @@ static UInt8 Quad_Patch[QUAD_NUM_PATCH][QUAD_PATCH_SIZE];
 void QuadGT_Init(void)
 {
   UInt8 patch;
+  char patch_name[NAME_LENGTH+1];
 
   for (patch=0; patch<QUAD_NUM_PATCH; patch++)
   {
     memset(Quad_Patch[patch], 0x00, QUAD_PATCH_SIZE);
+    sprintf(patch_name,"Patch-%2.2d",patch);
+    strcpy(&Quad_Patch[patch][NAME_IDX],patch_name);
   }
 }
 
@@ -865,4 +868,15 @@ void QuadGT_Display_Update_Preamp(const UInt8 config, const UInt8 * const quad_d
   MainForm->PreOutLevel->Position = 99-val;
   FormDebug->Log(NULL, "Preamp output level :"+AnsiString(val));
 
+}
+
+void QuadtGT_Param_Change(TObject * Sender)
+{
+  UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+
+  if (Sender == MainForm->QuadConfig)
+  {
+    Quad_Patch[prog][CONFIG_IDX]=MainForm->QuadConfig->ItemIndex;
+  }
+  QuadGT_Display_Update_Patch(prog);
 }

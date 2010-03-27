@@ -140,7 +140,6 @@ __published:	// IDE-managed Components
     TUpDown *UpDown1;
     TMaskEdit *ModNumber;
     TLabel *Label9;
-    TMaskEdit *QuadPatchNum;
     TRadioGroup *DelayInput;
     TTrackBar *DelayInMix;
     TLabel *Label10;
@@ -186,8 +185,8 @@ __published:	// IDE-managed Components
     TLabel *Label26;
     TTrackBar *TrackBar27;
     TLabel *Label27;
+    TMaskEdit *QuadPatchNum;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
-    void __fastcall QuadPatchNumChange(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
     
@@ -195,7 +194,7 @@ __published:	// IDE-managed Components
     
     void __fastcall ButtonMidiDevOpenClick(TObject *Sender);
     void __fastcall MenuFileExitClick(TObject *Sender);
-    void __fastcall RadioConfigClick(TObject *Sender);
+    void __fastcall QuadParamChange(TObject *Sender);
     void __fastcall RadioDelayClick(TObject *Sender);
     void __fastcall RadioPitchClick(TObject *Sender);
     void __fastcall RadioReverbClick(TObject *Sender);
@@ -212,6 +211,10 @@ __published:	// IDE-managed Components
     
     
     
+    void __fastcall QuadPatchNumKeyDown(TObject *Sender, WORD &Key,
+          TShiftState Shift);
+    
+    void __fastcall QuadPatchNumExit(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

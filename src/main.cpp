@@ -24,7 +24,7 @@
 #include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
-#define QUAD_PATCH_MAX (9)
+#define QUAD_PATCH_MAX (99)
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
@@ -49,15 +49,15 @@ void __fastcall TMainForm::Init(void)
   FormDebug->Log(MainForm, "Starting...");
 
   // Set up Quadraverb specific values
-  UpDownQuadPatch->Min=QUAD_PATCH_MIN;
-  UpDownQuadPatch->Max=QUAD_PATCH_MAX;
+  UpDownQuadPatch->Min=0;
+  UpDownQuadPatch->Max=QUAD_NUM_PATCH-1;
   EditQuadPatchName->Text="---";
 
   // Get list of Midi devices
   Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
 
   // Set GUI elements to default state
-  RadioConfigClick(MainForm);
+  QuadParamChange(MainForm);
 
   FormDebug->Log(MainForm, "Sizes:");
   FormDebug->Log(MainForm, "UInt8 "+AnsiString(sizeof(UInt8)));
@@ -97,22 +97,12 @@ void __fastcall TMainForm::MenuHelpAboutClick(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::QuadPatchNumChange(TObject *Sender)
-{
-   // TBD: Check it is numeric and in range
-
-   PanelQuad->Caption = "Quad Patch " + QuadPatchNum->Text + " selected";
-
-
-  QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
-}
-//---------------------------------------------------------------------------
 
 
 void __fastcall TMainForm::UpDownQuadPatchClick(TObject *Sender,
       TUDBtnType Button)
 {
- // Nothing to do - handled automatically
+ QuadPatchNumExit(Sender);
 }
 //---------------------------------------------------------------------------
 
@@ -167,103 +157,9 @@ void __fastcall TMainForm::MenuFileExitClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
-void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
+void __fastcall TMainForm::QuadParamChange(TObject *Sender)
 {
-  // Handler for the Config radio buttons
- 
-  // TBD: How to set it up so enabling/disabling a panel causes it's children to also be enabled/disabled
-
-  // 0: EQ-Pitch-Delay-Reverb;
-  if (QuadConfig->ItemIndex==0)
-  {
-    FormDebug->Log(Sender,"Config 0");
-    PanelQuadEq3->Visible=true;
-    QuadPitch->Visible=true;
-    PanelQuadDelay->Visible=true;
-    QuadReverb->Visible=true;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
-  // 1: Leslie-Delay-Reverb;
-  else if (QuadConfig->ItemIndex==1)
-  {
-    FormDebug->Log(Sender,"Config 1");
-    PanelQuadEq3->Visible=false;
-    QuadPitch->Visible=false;
-    PanelQuadDelay->Visible=true;
-    QuadReverb->Visible=true;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
-  // 2: Graphic Eq-Delay
-  else if (QuadConfig->ItemIndex==2)
-  {
-    PanelQuadEq3->Visible=true;
-    QuadPitch->Visible=false;
-    PanelQuadDelay->Visible=true;
-    QuadReverb->Visible=false;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
-  // 3: 5 Band Eq-Pitch-Delay
-  else if (QuadConfig->ItemIndex==3)
-  {
-    PanelQuadEq3->Visible=false;
-    QuadEq5->Visible=true;
-    QuadPitch->Visible=true;
-    PanelQuadDelay->Visible=true;
-    QuadReverb->Visible=false;
-
-    //TBD: Enable Multitap in RadioGroupDelay list
-  }
-
-  // 4: 3 Band Eq-Reverb
-  else if (QuadConfig->ItemIndex==4)
-  {
-    PanelQuadEq3->Visible=true;
-    QuadPitch->Visible=false;
-    PanelQuadDelay->Visible=false;
-    QuadReverb->Visible=true;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
-  // 5: Ring Mod-Delay-Reverb
-  else if (QuadConfig->ItemIndex==5)
-  {
-    PanelQuadEq3->Visible=false;
-    QuadPitch->Visible=false;
-    PanelQuadDelay->Visible=true;
-    QuadReverb->Visible=true;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
-  // 6: Resonator-Delay-Reverb
-  else if (QuadConfig->ItemIndex==6)
-  {
-    PanelQuadEq3->Visible=false;
-    QuadPitch->Visible=false;
-    PanelQuadDelay->Visible=true;
-    QuadReverb->Visible=true;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
-  // 7: Sampling
-  else if (QuadConfig->ItemIndex==7)
-  {
-    PanelQuadEq3->Visible=false;
-    QuadPitch->Visible=false;
-    PanelQuadDelay->Visible=false;
-    QuadReverb->Visible=false;
-
-    //TBD: Remove Multitap from RadioGroupDelay list
-  }
-
+  QuadtGT_Param_Change(Sender);
 }
 
 
@@ -397,4 +293,22 @@ void __fastcall TMainForm::BarChange(TObject *Sender)
 
 
 
+
+void __fastcall TMainForm::QuadPatchNumKeyDown(TObject *Sender, WORD &Key,
+      TShiftState Shift)
+{
+  if (Key == 13)
+  {
+    QuadPatchNumExit(Sender);
+  }
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
+{
+  FormDebug->Log(Sender,"Quad Patch [" + QuadPatchNum->Text + "] selected");
+  QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
+}
+//---------------------------------------------------------------------------
 

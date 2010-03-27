@@ -23,7 +23,7 @@
 #define BITS1to7     (0xFE)
 
 #define QUAD_PATCH_SIZE   (128)
-#define QUAD_NUM_PATCH    (10)
+#define QUAD_NUM_PATCH    (100)
 
 #define CONFIG_IDX           (0x44)
 #define LOW_EQ_FREQ_IDX (0x00) // LOW EQ FREQ MSB
@@ -211,3 +211,4 @@ void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
 void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Mod(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Preamp(const UInt8 config, const UInt8 * const quad_data);
+void QuadtGT_Param_Change(TObject * Sender);
