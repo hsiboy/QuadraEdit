@@ -211,6 +211,7 @@ __published:	// IDE-managed Components
     void __fastcall BarChange(TObject *Sender);
     
     
+    
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

@@ -245,10 +245,10 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 6: Resonator-Delay-Reverb
   else if (QuadConfig->ItemIndex==6)
   {
-    PanelQuadEq3->Enabled=false;
-    QuadPitch->Enabled=false;
-    PanelQuadDelay->Enabled=true;
-    QuadReverb->Enabled=true;
+    PanelQuadEq3->Visible=false;
+    QuadPitch->Visible=false;
+    PanelQuadDelay->Visible=true;
+    QuadReverb->Visible=true;
 
     //TBD: Remove Multitap from RadioGroupDelay list
   }
@@ -256,10 +256,10 @@ void __fastcall TMainForm::RadioConfigClick(TObject *Sender)
   // 7: Sampling
   else if (QuadConfig->ItemIndex==7)
   {
-    PanelQuadEq3->Enabled=false;
-    QuadPitch->Enabled=false;
-    PanelQuadDelay->Enabled=false;
-    QuadReverb->Enabled=false;
+    PanelQuadEq3->Visible=false;
+    QuadPitch->Visible=false;
+    PanelQuadDelay->Visible=false;
+    QuadReverb->Visible=false;
 
     //TBD: Remove Multitap from RadioGroupDelay list
   }
@@ -393,6 +393,7 @@ void __fastcall TMainForm::BarChange(TObject *Sender)
   bar->Hint=AnsiString(bar->Max - bar->Position);
 }
 //---------------------------------------------------------------------------
+
 
 
 
