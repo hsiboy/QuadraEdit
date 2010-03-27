@@ -13,6 +13,7 @@ USEFORM("about.cpp", FormAbout);
 USEFORM("error.cpp", FormError);
 USEUNIT("midi.cpp");
 USEFORM("debug.cpp", FormDebug);
+USEFORM("device.cpp", FormDevice);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -25,7 +26,7 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         Application->CreateForm(__classid(TFormDebug), &FormDebug);
         Application->CreateForm(__classid(TFormAbout), &FormAbout);
         Application->CreateForm(__classid(TFormError), &FormError);
-
+        Application->CreateForm(__classid(TFormDevice), &FormDevice);
         FormDebug->Show();
         MainForm->Init();
 

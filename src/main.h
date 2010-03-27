@@ -14,22 +14,12 @@
 class TMainForm : public TForm
 {
 __published:	// IDE-managed Components
-    TButton *ButtonPlay;
-    TButton *ButtonSilence;
-    TButton *ButtonInstrument;
-    TEdit *EditSilenceNote;
-    TEdit *EditInstrument;
-    TEdit *EditPlayNote;
     TPanel *PanelDev;
-    TLabel *LabelOutDevName;
-    TPanel *PanelOutDev;
-    TComboBox *ComboBoxOutDevs;
     TMainMenu *MainMenu1;
     TMenuItem *MenuFile;
     TMenuItem *MenuFileExit;
     TMenuItem *MenuHelp;
     TMenuItem *MenuHelpAbout;
-    TPanel *PanelPlay;
     TPanel *PanelQuad;
     TGroupBox *QuadReverb;
     TGroupBox *PanelQuadDelay;
@@ -46,11 +36,6 @@ __published:	// IDE-managed Components
     TButton *QuadBankLoad;
     TButton *QuadBankSave;
     TEdit *EditQuadPatchName;
-    TButton *ButtonMidiDevOpen;
-    TLabel *LabelMidiDevError;
-    TButton *ButtonMidiDevClose;
-    TLabel *LabelInDevName;
-    TComboBox *ComboBoxInDevs;
     TTimer *TimerMidiCounts;
     TGroupBox *PanelQuadMix;
     TGroupBox *PanelQuadMod;
@@ -201,9 +186,6 @@ __published:	// IDE-managed Components
     TLabel *Label26;
     TTrackBar *TrackBar27;
     TLabel *Label27;
-    void __fastcall ButtonPlayClick(TObject *Sender);
-    void __fastcall ButtonSilenceClick(TObject *Sender);
-    void __fastcall ButtonInstrumentClick(TObject *Sender);
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall QuadPatchNumChange(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,

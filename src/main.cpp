@@ -19,6 +19,7 @@
 #include "midi.h"
 #include "error.h"
 #include "debug.h"
+#include "device.h"
 #include "quadgt.h"
 #include <stdlib.h>
 
@@ -53,7 +54,7 @@ void __fastcall TMainForm::Init(void)
   EditQuadPatchName->Text="---";
 
   // Get list of Midi devices
-  Midi_Get_Dev_Lists(ComboBoxInDevs,ComboBoxOutDevs,LabelMidiDevError);
+  Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
 
   // Set GUI elements to default state
   RadioConfigClick(MainForm);
@@ -81,38 +82,6 @@ union {
    unsigned char data[4];
 } message;
 
-int instrument;
-int note;
-
-void __fastcall TMainForm::ButtonSilenceClick(TObject *Sender)
-{
-      note = StrToInt(MainForm->EditSilenceNote->Text);
-      message.data[0] = 0x80;                                     // note off
-      message.data[1] = note;                                       // note #
-      message.data[2] = 100;                   // once set, no need to repeat
-      message.data[3] = 0;                     // once set, no need to repeat
-      Midi_Out_ShortMsg(message.word);
-}
-
-//--------------------------------------------------------- Instrument Button
-void __fastcall TMainForm::ButtonInstrumentClick(TObject *Sender)
-{
-   instrument = StrToInt(MainForm->EditInstrument->Text);
-   message.data[0] = 0xC0;                               // choose instrument
-   message.data[1] = instrument;
-   Midi_Out_ShortMsg(message.word);
-}
-
-void __fastcall TMainForm::ButtonPlayClick(TObject *Sender)
-{
-     note = StrToInt(MainForm->EditPlayNote->Text);
-      message.data[0] = 0x90;                                      // note on
-      message.data[1] = note;                                       // note #
-      message.data[2] = 100;                   // once set, no need to repeat
-      message.data[3] = 0;                     // once set, no need to repeat
-      Midi_Out_ShortMsg(message.word);
-
-}
 //---------------------------------------------------------------------------
 
 
@@ -168,14 +137,14 @@ void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
 {
    unsigned int status;
 
-   status=Midi_Out_Open(ComboBoxOutDevs->ItemIndex);
+   status=Midi_Out_Open(FormDevice->ComboBoxOutDevs->ItemIndex);
    if (status != 0)
    {
      FormError->ShowError(status,"opening Midi output device");
    }
    else
    {
-     status=Midi_In_Open(ComboBoxInDevs->ItemIndex);
+     status=Midi_In_Open(FormDevice->ComboBoxInDevs->ItemIndex);
      if (status != 0)
      {
        FormError->ShowError(status,"opening Midi input device");
@@ -183,8 +152,8 @@ void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
      else
      {
        FormDebug->Log(Sender,"Midi devices succesfully opened");
-       ButtonMidiDevOpen->Enabled=false;
-       ButtonMidiDevClose->Enabled=true;
+       FormDevice->ButtonMidiDevOpen->Enabled=false;
+       FormDevice->ButtonMidiDevClose->Enabled=true;
      }
    }
 }
@@ -350,8 +319,8 @@ void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
     FormError->ShowError(status, "closing Midi output device");
   }
 
-  ButtonMidiDevOpen->Enabled=true;
-  ButtonMidiDevClose->Enabled=false;
+  FormDevice->ButtonMidiDevOpen->Enabled=true;
+  FormDevice->ButtonMidiDevClose->Enabled=false;
 
 }
 //---------------------------------------------------------------------------

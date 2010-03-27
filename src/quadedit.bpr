@@ -24,10 +24,10 @@ VERSION = BCB.03
 # ---------------------------------------------------------------------------
 PROJECT = quadedit.exe
 OBJFILES = obj\quadedit.obj obj\main.obj obj\about.obj obj\error.obj obj\midi.obj \
-  obj\debug.obj
+  obj\debug.obj obj\device.obj
 RESFILES = quadedit.res
 DEFFILE =
-RESDEPEN = $(RESFILES) main.dfm about.dfm error.dfm debug.dfm
+RESDEPEN = $(RESFILES) main.dfm about.dfm error.dfm debug.dfm device.dfm
 LIBFILES =
 LIBRARIES = VCL35.lib
 SPARELIBS = VCL35.lib
