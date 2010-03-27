@@ -171,11 +171,11 @@
 #define NAME_IDX (0x6A) // 1ST DIGIT NAME  
 //#define _IDX (0x78) // RING MOD OUTPUT MIX
 //#define _IDX (0x78) // RES** 2 AMP       
-//#define _IDX (0x79) // RING MOD DEL/REV MIX
-//#define _IDX (0x79) // RES** 3 AMP      
+#define RING_MOD_DEL_REV_MIX_IDX (0x79) // RING MOD DEL/REV MIX
+#define RES3_AMP_IDX (0x79) // RES** 3 AMP      
 #define PAN_SPEED_IDX (0x7A) // PAN SPEED       
 #define PAN_DEPTH_IDX (0x7B) // PAN DEPTH       
-//#define _IDX (0x7C) // EQ-MODE (7)
+#define EQ_MODE_IDX (0x7C) // EQ-MODE (7)
 #define PREAMP_COMP_IDX (0x7C) // COMPRESSION (4-6)
 #define PREAMP_DIST_IDX (0x7C) // DISTORTION (3-0)        
 #define MIX_MOD_IDX (0x7D) // MIX MODULATION (6-7) 
@@ -211,4 +211,5 @@ void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
 void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Mod(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Preamp(const UInt8 config, const UInt8 * const quad_data);
+void QuadGT_Display_Update_Resonator(const UInt8 config, const UInt8 * const quad_data);
 void QuadtGT_Param_Change(TObject * Sender);

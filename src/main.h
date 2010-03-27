@@ -14,7 +14,6 @@
 class TMainForm : public TForm
 {
 __published:	// IDE-managed Components
-    TPanel *PanelDev;
     TMainMenu *MainMenu1;
     TMenuItem *MenuFile;
     TMenuItem *MenuFileExit;
@@ -186,6 +185,34 @@ __published:	// IDE-managed Components
     TTrackBar *TrackBar27;
     TLabel *Label27;
     TMaskEdit *QuadPatchNum;
+    TGroupBox *QuadGraphEq;
+    TTrackBar *TrackBar28;
+    TTrackBar *TrackBar29;
+    TTrackBar *TrackBar30;
+    TTrackBar *TrackBar31;
+    TTrackBar *TrackBar32;
+    TTrackBar *TrackBar33;
+    TLabel *Label28;
+    TLabel *Label29;
+    TLabel *Label30;
+    TLabel *Label31;
+    TLabel *Label32;
+    TLabel *Label33;
+    TTrackBar *TrackBar34;
+    TLabel *Label34;
+    TTrackBar *TrackBar35;
+    TLabel *Label35;
+    TTrackBar *TrackBar36;
+    TLabel *Label36;
+    TTrackBar *TrackBar37;
+    TLabel *Label37;
+    TTrackBar *TrackBar38;
+    TLabel *Label38;
+    TRadioGroup *GraphicEqPreset;
+    TGroupBox *QuadResonator;
+    TMenuItem *Device;
+    TMenuItem *Open;
+    TMenuItem *Close;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -215,6 +242,8 @@ __published:	// IDE-managed Components
           TShiftState Shift);
     
     void __fastcall QuadPatchNumExit(TObject *Sender);
+    
+    
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

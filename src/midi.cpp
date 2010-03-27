@@ -22,6 +22,7 @@
 #pragma package(smart_init)
 
 static boolean Midi_Open=FALSE;
+static UInt8 Quad_Patch[QUAD_NUM_PATCH][QUAD_PATCH_SIZE];
 
 typedef struct tQueue_Entry
 {
@@ -308,9 +309,12 @@ void Midi_Out_ShortMsg(const unsigned long message)
 {
   midiOutShortMsg(Midi_Out_Handle, message);
 }
-
-void CALLBACK Midi_In_Proc(HMIDIIN handle, UINT msg,
-                           DWORD *instance, DWORD *p1, DWORD *p2)
+//---------------------------------------------------------------------------
+// Name        : Midi_In_Callback
+// Description : Call back routine to process data received from Midi In.
+//---------------------------------------------------------------------------
+static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
+                                  DWORD *instance, DWORD *p1, DWORD *p2)
 {
   MIDIHDR *header_ptr;
   UInt32 status;
@@ -364,7 +368,7 @@ unsigned int Midi_In_Open(int device)
   UInt8 i;
   MMRESULT status;
 
-  status=midiInOpen(&Midi_In_Handle, device, (DWORD) Midi_In_Proc, 0, CALLBACK_FUNCTION);
+  status=midiInOpen(&Midi_In_Handle, device, (DWORD) Midi_In_Callback, 0, CALLBACK_FUNCTION);
   if (status != MMSYSERR_NOERROR)
   {
     return status;
@@ -497,6 +501,10 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   return(j);
 }
 
+//---------------------------------------------------------------------------
+// Name        : Midi_Sysex_Process
+// Description : Process the Sysex data received
+//---------------------------------------------------------------------------
 void Midi_Sysex_Process(void)
 {
    tBuffer buffer;
@@ -523,6 +531,8 @@ void Midi_Sysex_Process(void)
 	   offset+=1;
 
 	   FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(buffer.length-offset));
+           QuadGT_Decode_From_Sysex(buffer.buffer+offset,buffer.length-offset, &Quad_Patch[prog][0], QUAD_PATCH_SIZE);
+           QuadGT_Display_Update_Patch(prog);
 	 }
        }
      }
@@ -552,8 +562,6 @@ void Midi_Test(void)
 //---------------------------------------------------------------------------
 // Name      : quadgt.cpp
 //---------------------------------------------------------------------------
-
-static UInt8 Quad_Patch[QUAD_NUM_PATCH][QUAD_PATCH_SIZE];
 
 void QuadGT_Init(void)
 {
@@ -604,6 +612,8 @@ void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data)
   QuadGT_Display_Update_Mod(config, quad_data);
 
   QuadGT_Display_Update_Preamp(config, quad_data);
+
+  QuadGT_Display_Update_Resonator(config, quad_data);
 }
 
 void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_data)
@@ -629,7 +639,7 @@ void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_d
   }
   else if (config==3)
   {
-    // TBD
+    MainForm->QuadReverb->Visible=false;
   }
   else if (config==4)
   {
@@ -690,7 +700,7 @@ void QuadGT_Display_Update_Pitch(const UInt8 config, const UInt8 * const quad_da
   {
     MainForm->QuadPitch->Visible=FALSE;
     MainForm->QuadLeslie->Visible=FALSE;
-    MainForm->QuadRingMod->Visible=FALSE;
+    MainForm->QuadRingMod->Visible=TRUE;
   }
 }
 
@@ -717,10 +727,24 @@ void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data)
   }
 
   // 5 Band Eq
-  if (config==3) MainForm->QuadEq5->Visible=TRUE;
-  else MainForm->QuadEq5->Visible=FALSE;
+  if (config==3) 
+  {
+    MainForm->QuadEq5->Visible=TRUE;
+  }
+  else 
+  {
+    MainForm->QuadEq5->Visible=FALSE;
+  }
 
   // Graphic Eq
+  if (config==2) 
+  {
+    MainForm->QuadGraphEq->Visible=TRUE;
+  }
+  else 
+  {
+    MainForm->QuadGraphEq->Visible=FALSE;
+  }
 
   // Resonator
 }
@@ -879,4 +903,23 @@ void QuadtGT_Param_Change(TObject * Sender)
     Quad_Patch[prog][CONFIG_IDX]=MainForm->QuadConfig->ItemIndex;
   }
   QuadGT_Display_Update_Patch(prog);
+}
+
+void QuadGT_Display_Update_Resonator(const UInt8 config, const UInt8 * const quad_data)
+{
+  //UInt8 prog = (UInt8) StrToInt(MainFormQuadPatchNum->Text);
+
+  // Config 3 and Eq-Mode is 3Band+Resonator
+  if ((config == 3) && ((quad_data[EQ_MODE_IDX]&BIT7)>>7) == 1)
+  {
+    MainForm->QuadResonator->Visible=TRUE;
+  }
+  else if (config==6)
+  {
+    MainForm->QuadResonator->Visible=TRUE;
+  }
+  else
+  {
+    MainForm->QuadResonator->Visible=FALSE;
+  }
 }

@@ -56,9 +56,6 @@ void __fastcall TMainForm::Init(void)
   // Get list of Midi devices
   Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
 
-  // Set GUI elements to default state
-  QuadParamChange(MainForm);
-
   FormDebug->Log(MainForm, "Sizes:");
   FormDebug->Log(MainForm, "UInt8 "+AnsiString(sizeof(UInt8)));
   FormDebug->Log(MainForm, "UInt16 "+AnsiString(sizeof(UInt16)));
@@ -69,6 +66,9 @@ void __fastcall TMainForm::Init(void)
 
   Midi_Init();
   QuadGT_Init();
+
+  QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
+
 }
 //---------------------------------------------------------------------------
 
@@ -126,6 +126,8 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
 {
    unsigned int status;
+
+   FormDevice->ShowModal();
 
    status=Midi_Out_Open(FormDevice->ComboBoxOutDevs->ItemIndex);
    if (status != 0)
@@ -311,4 +313,6 @@ void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
   QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
 }
 //---------------------------------------------------------------------------
+
+
 
