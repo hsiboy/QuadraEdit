@@ -26,7 +26,7 @@
 #define QUAD_NUM_PATCH    (100)
 
 #define CONFIG_IDX           (0x44)
-#define LOW_EQ_FREQ_IDX (0x00) // LOW EQ FREQ MSB
+#define LOW_EQ_FREQ_IDX (0x00) // LOW EQ FREQ, 16 bits
 #define RES1_TUNE_IDX (0x00) // RES* 1 TUNE   
 #define RES1_DECAY_IDX (0x01) // RES* 1 DECAY
 #define GEQ_16HZ_IDX (0x01) // 16Hz    
@@ -193,9 +193,47 @@ typedef struct tQuadGT_Patch
 {
   char  name[NAME_LENGTH+1];
   UInt8 config;
+
+  // Preamp parameters
   UInt8 comp;
   UInt8 od;
   UInt8 dist;
+  UInt8 preamp_tone;
+  UInt8 preamp_gate;
+  UInt8 preamp_out_level;
+
+  // Eq parameters
+  UInt8 eq_mode;
+  UInt16 low_eq_freq;
+  UInt16 low_eq_amp;
+  UInt16 mid_eq_freq;
+  UInt16 mid_eq_amp;
+  UInt16 mid_eq_q;
+  UInt16 high_eq_freq;
+  UInt16 high_eq_amp;
+
+  // Reverb parameters
+  UInt8 reverb_mode;
+
+  // Delay parameters
+  UInt8 delay_mode;
+
+  // Mix parameters
+  UInt8 prepost_eq;
+  UInt8 direct_level;
+  UInt8 master_effects_level;
+  UInt8 preamp_level;
+  UInt8 pitch_level;
+  UInt8 delay_level;
+  UInt8 reverb_level;
+  UInt8 mix_mod;
+  UInt8 eq_level;
+
+  // Midi modulation parameters
+  // TBD: Use arrays
+  UInt8 mod1_source; 
+  UInt8 mod1_target; 
+  UInt8 mod1_amp; 
 } tQuadGT_Patch;
 
 const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};   // Manufacturer Id: Alesis
@@ -214,12 +252,12 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data);
 
 void QuadGT_Init(void);
 void QuadGT_Display_Update_Patch(UInt8 program);
-void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Delay(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Pitch(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Eq(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Mix(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Mod(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Preamp(const UInt8 config, const UInt8 * const quad_data);
-void QuadGT_Display_Update_Resonator(const UInt8 config, const UInt8 * const quad_data);
+void QuadGT_Display_Update_Reverb(const UInt8 program);
+void QuadGT_Display_Update_Delay(const UInt8 program);
+void QuadGT_Display_Update_Pitch(const UInt8 program);
+void QuadGT_Display_Update_Eq(const UInt8 program);
+void QuadGT_Display_Update_Mix(const UInt8 program);
+void QuadGT_Display_Update_Mod(const UInt8 program);
+void QuadGT_Display_Update_Preamp(const UInt8 program);
+void QuadGT_Display_Update_Resonator(const UInt8 program);
 void QuadtGT_Param_Change(TObject * Sender);

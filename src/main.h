@@ -244,6 +244,8 @@ __published:	// IDE-managed Components
           TShiftState Shift);
 
     void __fastcall QuadPatchNumExit(TObject *Sender);
+    void __fastcall QuadBankSaveClick(TObject *Sender);
+    void __fastcall QuadBankLoadClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

@@ -311,3 +311,7 @@ void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
 
 
 
+
+//---------------------------------------------------------------------------
+
+
