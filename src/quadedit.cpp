@@ -14,6 +14,7 @@ USEFORM("error.cpp", FormError);
 USEUNIT("midi.cpp");
 USEFORM("debug.cpp", FormDebug);
 USEFORM("device.cpp", FormDevice);
+USEUNIT("quadgt.cpp");
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
