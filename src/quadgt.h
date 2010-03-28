@@ -201,6 +201,9 @@ typedef struct tQuadGT_Patch
   UInt8 preamp_tone;
   UInt8 preamp_gate;
   UInt8 preamp_out_level;
+  UInt8 effect_loop;
+  UInt8 bass_boost;
+  UInt8 cab_sim;
 
   // Eq parameters
   UInt8 eq_mode;

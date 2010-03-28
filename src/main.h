@@ -104,7 +104,7 @@ __published:	// IDE-managed Components
     TLabel *Gate;
     TLabel *Out;
     TGroupBox *Bass;
-    TCheckBox *Boost;
+    TCheckBox *BassBoost;
     TRadioGroup *CabSim;
     TGroupBox *EffectLoop;
     TCheckBox *EffectLoopIn;

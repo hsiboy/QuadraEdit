@@ -854,13 +854,13 @@ void QuadGT_Display_Update_Preamp(const UInt8 program)
   MainForm->PreTone->ItemIndex=val;
 
   // Bass Boost (0-1)
-  // TBD: Make a check box (on/off)
+  MainForm->BassBoost->Checked = QuadGT_Patch[program].bass_boost == 1 ? TRUE : FALSE;
 
   // Cab sim (0-2)
-  // TBD: Make a radio button:  ???
+  MainForm->CabSim->ItemIndex=QuadGT_Patch[program].cab_sim;
   
   // Effect Loop (0-1)
-  // TBD: Make a check box (in/out)
+  MainForm->EffectLoopIn->Checked = QuadGT_Patch[program].effect_loop == 1 ? TRUE : FALSE;
 
   // Noise Gate (0-17)
   val=(QuadGT_Patch[program].preamp_gate & BITS0to4);
@@ -966,6 +966,9 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data)
   QuadGT_Patch[prog].preamp_tone=(data[PREAMP_TONE_IDX] & BITS2to3) >> 2;
   QuadGT_Patch[prog].preamp_gate=(data[PREAMP_GATE_IDX] & BITS0to4);
   QuadGT_Patch[prog].preamp_out_level=data[PREAMP_OUT_LEVEL_IDX];
+  QuadGT_Patch[prog].effect_loop=data[EFFECT_LOOP_IDX];
+  QuadGT_Patch[prog].bass_boost=data[BASS_BOOST_IDX];
+  QuadGT_Patch[prog].cab_sim=data[CAB_SIM_IDX];
 
   return 0;
 }
