@@ -189,6 +189,15 @@
 
 #define NAME_LENGTH       (14)
 
+typedef struct tQuadGT_Patch
+{
+  char  name[NAME_LENGTH+1];
+  UInt8 config;
+  UInt8 comp;
+  UInt8 od;
+  UInt8 dist;
+} tQuadGT_Patch;
+
 const UInt8 Sysex_Alesis[]={0x00,0x00,0x0E};   // Manufacturer Id: Alesis
 
 const UInt8 Sysex_Quad[]={0x02};               // Device Id: Quadraverb
@@ -201,9 +210,10 @@ const UInt8 Sysex_Dump_Req[]={0x03};           // Command to request a dump
 UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len);
 UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len);
 
+UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data);
+
 void QuadGT_Init(void);
 void QuadGT_Display_Update_Patch(UInt8 program);
-void QuadGT_Display_Update(UInt8 program, UInt8 *quad_data);
 void QuadGT_Display_Update_Reverb(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Delay(const UInt8 config, const UInt8 * const quad_data);
 void QuadGT_Display_Update_Pitch(const UInt8 config, const UInt8 * const quad_data);

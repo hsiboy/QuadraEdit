@@ -69,7 +69,6 @@ __published:	// IDE-managed Components
     TTimer *TimerProcess;
     TButton *QuadProgWrite;
     TButton *QuadMidiWrite;
-    TButton *Test;
     TComboBox *QuadModSource1;
     TComboBox *QuadModTarget1;
     TTrackBar *QuadModAmp1;
@@ -171,7 +170,6 @@ __published:	// IDE-managed Components
     TLabel *Label21;
     TLabel *Label22;
     TGroupBox *QuadLeslie;
-    TRadioGroup *PitchChorus;
     TRadioGroup *LeslieWave;
     TTrackBar *LeslieSpeed;
     TTrackBar *LeslieDepth;
@@ -213,40 +211,44 @@ __published:	// IDE-managed Components
     TMenuItem *Device;
     TMenuItem *Open;
     TMenuItem *Close;
+    TGroupBox *QuadChorus;
+    TLabel *Label39;
+    TLabel *Label40;
+    TTrackBar *ChorusSpeed;
+    TTrackBar *ChorusDepth;
+    TRadioGroup *ChorusOnOff;
+    TRadioGroup *ChorusWave;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
     
     void __fastcall TimerMidiCountsTimer(TObject *Sender);
     
-    void __fastcall ButtonMidiDevOpenClick(TObject *Sender);
+    void __fastcall DeviceOpenClick(TObject *Sender);
     void __fastcall MenuFileExitClick(TObject *Sender);
     void __fastcall QuadParamChange(TObject *Sender);
     void __fastcall RadioDelayClick(TObject *Sender);
     void __fastcall RadioPitchClick(TObject *Sender);
     void __fastcall RadioReverbClick(TObject *Sender);
     void __fastcall QuadPatchReadClick(TObject *Sender);
-    void __fastcall ButtonMidiDevCloseClick(TObject *Sender);
+    void __fastcall DeviceCloseClick(TObject *Sender);
     void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
     
     void __fastcall TimerProcessTimer(TObject *Sender);
     void __fastcall QuadBankReadClick(TObject *Sender);
     void __fastcall QuadProgWriteClick(TObject *Sender);
     void __fastcall QuadMidiWriteClick(TObject *Sender);
-    void __fastcall TestClick(TObject *Sender);
     void __fastcall BarChange(TObject *Sender);
-    
-    
-    
+
     void __fastcall QuadPatchNumKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
-    
+
     void __fastcall QuadPatchNumExit(TObject *Sender);
-    
-    
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
+    void __fastcall EnableIO(void);
+    void __fastcall DisableIO(void);
     void __fastcall Init(void);
 };
 //---------------------------------------------------------------------------

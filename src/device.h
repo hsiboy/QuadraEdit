@@ -16,7 +16,9 @@ __published:	// IDE-managed Components
     TComboBox *ComboBoxInDevs;
     TLabel *LabelMidiDevError;
     TButton *ButtonMidiDevOpen;
-    TButton *ButtonMidiDevClose;
+    TButton *ButtonMidiDevCancel;
+    void __fastcall ButtonMidiDevOpenClick(TObject *Sender);
+    void __fastcall ButtonMidiDevCancelClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TFormDevice(TComponent* Owner);

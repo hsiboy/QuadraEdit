@@ -53,6 +53,8 @@ void __fastcall TMainForm::Init(void)
   UpDownQuadPatch->Max=QUAD_NUM_PATCH-1;
   EditQuadPatchName->Text="---";
 
+  DisableIO();
+
   // Get list of Midi devices
   Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
 
@@ -123,31 +125,9 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 
 
 
-void __fastcall TMainForm::ButtonMidiDevOpenClick(TObject *Sender)
+void __fastcall TMainForm::DeviceOpenClick(TObject *Sender)
 {
-   unsigned int status;
-
    FormDevice->ShowModal();
-
-   status=Midi_Out_Open(FormDevice->ComboBoxOutDevs->ItemIndex);
-   if (status != 0)
-   {
-     FormError->ShowError(status,"opening Midi output device");
-   }
-   else
-   {
-     status=Midi_In_Open(FormDevice->ComboBoxInDevs->ItemIndex);
-     if (status != 0)
-     {
-       FormError->ShowError(status,"opening Midi input device");
-     }
-     else
-     {
-       FormDebug->Log(Sender,"Midi devices succesfully opened");
-       FormDevice->ButtonMidiDevOpen->Enabled=false;
-       FormDevice->ButtonMidiDevClose->Enabled=true;
-     }
-   }
 }
 //---------------------------------------------------------------------------
 
@@ -201,7 +181,7 @@ void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
+void __fastcall TMainForm::DeviceCloseClick(TObject *Sender)
 {
   unsigned int status;
 
@@ -211,15 +191,34 @@ void __fastcall TMainForm::ButtonMidiDevCloseClick(TObject *Sender)
     FormError->ShowError(status, "closing Midi input device");
   }
 
+
   status=Midi_Out_Close();
   if (status != 0)
   {
     FormError->ShowError(status, "closing Midi output device");
   }
 
-  FormDevice->ButtonMidiDevOpen->Enabled=true;
-  FormDevice->ButtonMidiDevClose->Enabled=false;
+  DisableIO();
+}
 
+void __fastcall TMainForm::EnableIO(void)
+{
+    QuadPatchRead->Enabled=TRUE;
+    QuadPatchWrite->Enabled=TRUE;
+    QuadBankRead->Enabled=TRUE;
+    QuadBankWrite->Enabled=TRUE;
+    Open->Enabled=FALSE;
+    Close->Enabled=TRUE;
+}
+
+void __fastcall TMainForm::DisableIO(void)
+{
+    QuadPatchRead->Enabled=FALSE;
+    QuadPatchWrite->Enabled=FALSE;
+    QuadBankRead->Enabled=FALSE;
+    QuadBankWrite->Enabled=FALSE;
+    Open->Enabled=TRUE;
+    Close->Enabled=FALSE;
 }
 //---------------------------------------------------------------------------
 
@@ -277,12 +276,7 @@ void __fastcall TMainForm::QuadMidiWriteClick(TObject *Sender)
      FormError->ShowError(status, "sending SYSEX edit command to Midi output device");
   }
 }
-//---------------------------------------------------------------------------
 
-void __fastcall TMainForm::TestClick(TObject *Sender)
-{
-  Midi_Test();    
-}
 //---------------------------------------------------------------------------
 
 void __fastcall TMainForm::BarChange(TObject *Sender)
@@ -313,6 +307,7 @@ void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
   QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
 }
 //---------------------------------------------------------------------------
+
 
 
 
