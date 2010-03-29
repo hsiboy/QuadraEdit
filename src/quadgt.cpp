@@ -104,24 +104,16 @@ void QuadGT_Display_Update_Patch(UInt8 prog)
   /* Program name */
   MainForm->EditQuadPatchName->Text=AnsiString(QuadGT_Patch[prog].name);
 
- 
   /* Configuration */
   MainForm->QuadConfig->ItemIndex=QuadGT_Patch[prog].config;
 
   QuadGT_Display_Update_Reverb(prog);
-
   QuadGT_Display_Update_Delay(prog);
-
   QuadGT_Display_Update_Pitch(prog);
-
   QuadGT_Display_Update_Eq(prog);
-
   QuadGT_Display_Update_Mix(prog);
-
   QuadGT_Display_Update_Mod(prog);
-
   QuadGT_Display_Update_Preamp(prog);
-
   QuadGT_Display_Update_Resonator(prog);
 }
 
@@ -169,10 +161,24 @@ void QuadGT_Display_Update_Delay(const UInt8 prog)
   if (mode ==0)
   {
     MainForm->DelayTap->Visible=FALSE;
+    MainForm->DelayRight->Visible=FALSE;
+    MainForm->DelayRightFeedback->Visible=FALSE;
   }
   else if (mode ==1)
   {
     MainForm->DelayTap->Visible=FALSE;
+    MainForm->DelayRight->Visible=TRUE;
+    MainForm->DelayRightFeedback->Visible=TRUE;
+  }
+  else if (mode ==2)
+  {
+    MainForm->DelayTap->Visible=FALSE;
+    MainForm->DelayRight->Visible=TRUE;
+    MainForm->DelayRightFeedback->Visible=TRUE;
+  }
+  else if (mode ==3)
+  {
+    MainForm->DelayTap->Visible=TRUE;
   }
 }
 
@@ -433,7 +439,19 @@ void QuadtGT_Param_Change(TObject * Sender)
     MainForm->BarChange(Sender);
     FormDebug->Log(NULL,"  Set DIST: "+AnsiString(QuadGT_Patch[prog].dist));
   }
+  if (Sender == MainForm->EditQuadPatchName)
+  {
+    strncpy(QuadGT_Patch[prog].name,MainForm->EditQuadPatchName->Text.c_str(),NAME_LENGTH);
+  }
 }
+
+void __fastcall TMainForm::DelayModeClick(TObject *Sender)
+{
+  UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+  QuadGT_Patch[prog].delay_mode=MainForm->DelayMode->ItemIndex;
+  QuadGT_Display_Update_Delay(prog);
+}
+//---------------------------------------------------------------------------
 
 void QuadGT_Display_Update_Resonator(const UInt8 prog)
 {
@@ -469,6 +487,9 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data)
   if (prog >= QUAD_NUM_PATCH) return 1;
 
   QuadGT_Patch[prog].config= data[CONFIG_IDX];
+  memcpy(QuadGT_Patch[prog].name, &data[NAME_IDX], NAME_LENGTH);
+  QuadGT_Patch[prog].name[NAME_LENGTH]=0;
+
 
   //-------------------------------------------------------------------------
   // Preamp Parameters
@@ -490,7 +511,7 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data)
 
   // 3 and 5 Band Eq
   if ( (QuadGT_Patch[prog].config==0) || (QuadGT_Patch[prog].config==4) ||
-       (QuadGT_Patch[prog].config==3)) 
+       (QuadGT_Patch[prog].config==3))
   {
     QuadGT_Patch[prog].low_eq_freq   = EXTRACT_16BIT(data[LOW_EQ_FREQ_IDX]);
     QuadGT_Patch[prog].low_eq_amp    = EXTRACT_16BIT(data[LOW_EQ_AMP_IDX]);
@@ -502,7 +523,7 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data)
   }
 
   // 5 Band Eq only
-  if (QuadGT_Patch[prog].config==3) 
+  if (QuadGT_Patch[prog].config==3)
   {
     // TBD
     QuadGT_Patch[prog].low_mid_eq_freq   = EXTRACT_16BIT(data[LOW_MID_EQ_FREQ_IDX]);
@@ -513,9 +534,9 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data)
     QuadGT_Patch[prog].high_mid_eq_amp    = EXTRACT_16BIT(data[HIGH_MID_EQ_AMP_IDX]);
     QuadGT_Patch[prog].high_mid_eq_q      = data[HIGH_MID_EQ_BW_IDX];
   }
- 
+
   // Graphic Eq
-  if (QuadGT_Patch[prog].config==2) 
+  if (QuadGT_Patch[prog].config==2)
   {
     QuadGT_Patch[prog].geq_16hz   = data[GEQ_16HZ_IDX];
     QuadGT_Patch[prog].geq_32hz   = data[GEQ_32HZ_IDX];
@@ -638,6 +659,8 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
 
   fclose(bank_file);
 
+  prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+  QuadGT_Display_Update_Patch(prog);
 }
 //---------------------------------------------------------------------------
 

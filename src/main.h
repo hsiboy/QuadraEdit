@@ -125,11 +125,11 @@ __published:	// IDE-managed Components
     TRadioGroup *QuadConfig;
     TGroupBox *ReverbGate;
     TCheckBox *ReverbGateOn;
-    TTrackBar *TrackBar20;
-    TTrackBar *TrackBar21;
+    TTrackBar *ReverbGateHold;
+    TTrackBar *ReverbGateRelease;
     TLabel *Hold;
     TLabel *Release;
-    TTrackBar *TrackBar22;
+    TTrackBar *ReverbGateLevel;
     TLabel *Level;
     TTrackBar *ReverbLowDecay;
     TTrackBar *ReverbHighDecay;
@@ -145,9 +145,9 @@ __published:	// IDE-managed Components
     TTrackBar *DelayFeedback;
     TLabel *Label11;
     TLabel *Label12;
-    TTrackBar *TrackBar3;
+    TTrackBar *DelayRight;
     TLabel *Label13;
-    TTrackBar *TrackBar15;
+    TTrackBar *DelayRightFeedback;
     TLabel *Label14;
     TGroupBox *DelayTap;
     TLabel *Label15;
@@ -248,6 +248,8 @@ __published:	// IDE-managed Components
     void __fastcall QuadBankSaveClick(TObject *Sender);
     void __fastcall QuadBankLoadClick(TObject *Sender);
     void __fastcall TESTClick(TObject *Sender);
+    void __fastcall DelayModeClick(TObject *Sender);
+
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

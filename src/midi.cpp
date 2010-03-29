@@ -468,11 +468,11 @@ void Midi_Sysex_Process(void)
 	   offset+=1;
 
 	   FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
-           QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset, quadgt, QUAD_PATCH_SIZE);
+       QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
 
-           QuadGT_Convert_Data_To_Internal(prog, sysex.buffer+offset);
+       QuadGT_Convert_Data_To_Internal(prog, quadgt);
 
-           QuadGT_Display_Update_Patch(prog);
+       QuadGT_Display_Update_Patch(prog);
 	 }
        }
      }
