@@ -25,7 +25,7 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
 
   // TBD: Safety checks on out_len
   // TBD: Ensure output is correct length
-  FormDebug->LogHex(NULL,AnsiString(length)+" SYSEX",in,length);
+  //FormDebug->LogHex(NULL,AnsiString(length)+" SYSEX",in,length);
   j=0;
   oc = 0;
   for (i=0; i<length; i++) {
@@ -35,7 +35,7 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
      }
      oc = in[i];
   }
-  FormDebug->LogHex(NULL,AnsiString(j)+" QUAD",out,j);
+  //FormDebug->LogHex(NULL,AnsiString(j)+" QUAD",out,j);
   
   return(j);
 }
@@ -48,7 +48,7 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   UInt8 shift;
 
   // TBD: Safety checks on out_len
-  FormDebug->LogHex(NULL,AnsiString(length)+" QUAD",in,length);
+  //FormDebug->LogHex(NULL,AnsiString(length)+" QUAD",in,length);
   i=0;
   j=0;
   lc=0;
@@ -75,7 +75,7 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
     }
     j++;
   }
-  FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
+  //FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
   return(j);
 }
 
@@ -257,6 +257,20 @@ void QuadGT_Display_Update_Eq(const UInt8 prog)
   if (QuadGT_Patch[prog].config==2) 
   {
     MainForm->QuadGraphEq->Visible=TRUE;
+
+    MainForm->GEQPreset->ItemIndex =QuadGT_Patch[prog].geq_preset;
+    MainForm->GEQ_16Hz->Position =-1*QuadGT_Patch[prog].geq_16hz  ;
+    MainForm->GEQ_32Hz->Position =-1*QuadGT_Patch[prog].geq_32hz  ;
+    MainForm->GEQ_62Hz->Position =-1*QuadGT_Patch[prog].geq_62hz  ;
+    MainForm->GEQ_126Hz->Position=-1*QuadGT_Patch[prog].geq_126hz ;
+    MainForm->GEQ_250Hz->Position=-1*QuadGT_Patch[prog].geq_250hz ;
+    MainForm->GEQ_500Hz->Position=-1*QuadGT_Patch[prog].geq_500hz ;
+    MainForm->GEQ_1KHz->Position =-1*QuadGT_Patch[prog].geq_1khz  ;
+    MainForm->GEQ_2KHz->Position =-1*QuadGT_Patch[prog].geq_2khz  ;
+    MainForm->GEQ_4KHz->Position =-1*QuadGT_Patch[prog].geq_4khz  ;
+    MainForm->GEQ_8KHz->Position =-1*QuadGT_Patch[prog].geq_8khz  ;
+    MainForm->GEQ_16KHz->Position=-1*QuadGT_Patch[prog].geq_16khz ;
+
   }
   else 
   {
@@ -538,16 +552,18 @@ UInt32 QuadGT_Convert_Data_To_Internal(UInt8 prog, UInt8* data)
   // Graphic Eq
   if (QuadGT_Patch[prog].config==2)
   {
-    QuadGT_Patch[prog].geq_16hz   = data[GEQ_16HZ_IDX];
-    QuadGT_Patch[prog].geq_32hz   = data[GEQ_32HZ_IDX];
-    QuadGT_Patch[prog].geq_62hz   = data[GEQ_62HZ_IDX];
-    QuadGT_Patch[prog].geq_126hz  = data[GEQ_126HZ_IDX];
-    QuadGT_Patch[prog].geq_250hz  = data[GEQ_250HZ_IDX];
-    QuadGT_Patch[prog].geq_1khz   = data[GEQ_1KHZ_IDX];
-    QuadGT_Patch[prog].geq_2khz   = data[GEQ_2KHZ_IDX];
-    QuadGT_Patch[prog].geq_4khz   = data[GEQ_4KHZ_IDX];
-    QuadGT_Patch[prog].geq_8khz   = data[GEQ_8KHZ_IDX];
-    QuadGT_Patch[prog].geq_16khz  = data[GEQ_16KHZ_IDX];
+    QuadGT_Patch[prog].geq_preset = (data[EQ_PRESET_IDX]&BITS1to7)>>1;
+    QuadGT_Patch[prog].geq_16hz   = data[GEQ_16HZ_IDX]-14;
+    QuadGT_Patch[prog].geq_32hz   = data[GEQ_32HZ_IDX]-14;
+    QuadGT_Patch[prog].geq_62hz   = data[GEQ_62HZ_IDX]-14;
+    QuadGT_Patch[prog].geq_126hz  = data[GEQ_126HZ_IDX]-14;
+    QuadGT_Patch[prog].geq_250hz  = data[GEQ_250HZ_IDX]-14;
+    QuadGT_Patch[prog].geq_500hz  = data[GEQ_500HZ_IDX]-14;
+    QuadGT_Patch[prog].geq_1khz   = data[GEQ_1KHZ_IDX]-14;
+    QuadGT_Patch[prog].geq_2khz   = data[GEQ_2KHZ_IDX]-14;
+    QuadGT_Patch[prog].geq_4khz   = data[GEQ_4KHZ_IDX]-14;
+    QuadGT_Patch[prog].geq_8khz   = data[GEQ_8KHZ_IDX]-14;
+    QuadGT_Patch[prog].geq_16khz  = data[GEQ_16KHZ_IDX]-14;
   }
 
 

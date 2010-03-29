@@ -74,7 +74,8 @@
 #define MID_EQ_FREQ_IDX	(0x04)	// MID EQ FREQ, 16bits
 #define GEQ_126HZ_IDX	(0x04)	// 126Hz  
 #define GEQ_250HZ_IDX	(0x05)	// 250Hz 
-#define MID_EQ_BW_IDX	(0x06)	// MID EQ BANDWIDTH / 500Hz        
+#define MID_EQ_BW_IDX	(0x06)	// MID EQ BANDWIDTH
+#define GEQ_500HZ_IDX	(0x06)	// 500Hz        
 #define MID_EQ_AMP_IDX	(0x07)	// MID EQ AMP, 16bits
 #define GEQ_1KHZ_IDX	(0x07)	// 1KHz   
 #define GEQ_2KHZ_IDX	(0x08)	// 2KHz   
@@ -277,16 +278,18 @@ typedef struct tQuadGT_Patch
   UInt16 high_mid_eq_amp;
   UInt16 high_mid_eq_q;
 
-  UInt8 geq_16hz;
-  UInt8 geq_32hz;
-  UInt8 geq_62hz;
-  UInt8 geq_126hz;
-  UInt8 geq_250hz;
-  UInt8 geq_1khz;
-  UInt8 geq_2khz;
-  UInt8 geq_4khz;
-  UInt8 geq_8khz;
-  UInt8 geq_16khz;
+  UInt8 geq_preset;
+  SInt8 geq_16hz;
+  SInt8 geq_32hz;
+  SInt8 geq_62hz;
+  SInt8 geq_126hz;
+  SInt8 geq_250hz;
+  SInt8 geq_500hz;
+  SInt8 geq_1khz;
+  SInt8 geq_2khz;
+  SInt8 geq_4khz;
+  SInt8 geq_8khz;
+  SInt8 geq_16khz;
 
   // Reverb parameters
   UInt8 reverb_mode;
