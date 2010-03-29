@@ -1,19 +1,20 @@
 
 ARCHITECTURE
-- Seperate Quadraverb code into gui_quadgt and midi_quadgt modules
 - Put queue routines into queue module
 - Clean up return codes and error handling
+- Data structure with TObject, IDX, shift and mask?
 
 GUI
 - Rescan for MIDI devices when user clicks on device lists?
-- Provide titles for various quadraverb forms
-- Disable/enable send/get buttons based on MIDI open status
-- Split EQ panel in 3band, 5band, graphic and preset
+- Provide titles for various quadraverb forms                                -> Done
+- Disable/enable send/get buttons based on MIDI open status                  -> In prog
+- Split EQ panel in 3band, 5band, graphic and preset                         -> Done except preset
+- Add graphical indications of config (redraw manual)
 
 MIDI
 - Resolve code for closing MIDI channels
 - Queue up rx'd messages for processing                                      -> Done
-- Process rx'd messages in a seperate thread
+- Process rx'd messages in a seperate thread                                 -> Done but only 1 thread
 - Handle messages that span multiple queue entries
 
 QUADRAVERB
@@ -35,4 +36,6 @@ Problems:
     - Program crashed (V18) or hangs (V20)
 - Encode routine is wrong                                                    -> Done
 - Ensure decode and encode return the correct number of bytes
-- Safety checks on output length in decode and encode routines             
+- Safety checks on output length in decode and encode routines  
+- Add file and function header documentation
+- Properly convert 16bit QuadGT values to internal data structure

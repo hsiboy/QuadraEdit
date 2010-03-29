@@ -218,6 +218,7 @@ __published:	// IDE-managed Components
     TTrackBar *ChorusDepth;
     TRadioGroup *ChorusOnOff;
     TRadioGroup *ChorusWave;
+    TButton *TEST;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -246,6 +247,7 @@ __published:	// IDE-managed Components
     void __fastcall QuadPatchNumExit(TObject *Sender);
     void __fastcall QuadBankSaveClick(TObject *Sender);
     void __fastcall QuadBankLoadClick(TObject *Sender);
+    void __fastcall TESTClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

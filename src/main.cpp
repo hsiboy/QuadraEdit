@@ -39,10 +39,10 @@ __fastcall TMainForm::TMainForm(TComponent* Owner)
 }
 
 //---------------------------------------------------------------------------
-// Name       : TMainForm::Init
-// Desc.      : Initialises the GUI main form
-// Params.    : NONE.
-// Returns    : NONE.
+// Name        : TMainForm::Init
+// Description : Initialises the GUI main form
+// Parameters  : NONE.
+// Returns     : NONE.
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::Init(void)
 {
@@ -314,4 +314,14 @@ void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
+void __fastcall TMainForm::TESTClick(TObject *Sender)
+{
+  UInt16 val;
+  UInt8 data[]={0x01, 0x01, 0xFF, 0xFF, 0x01, 0x01};
+
+  val = *(UInt16 *) &data[2];
+  FormDebug->Log(Sender,"Test [" + AnsiString(val) + "] ");
+
+}
+//---------------------------------------------------------------------------
 
