@@ -254,9 +254,10 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
 //               the user clicks the "Prog Write" button
 void __fastcall TMainForm::QuadProgWriteClick(TObject *Sender)
 {
-  long int status;
+  UInt32 status;
+  UInt16 prog=10;  // Harcoded to program 10 for now
 
-  status=Midi_Out_Edit(0, 0, 65535);
+  status=Midi_Out_Edit(0, 0, prog);
 
   if (status != 0)
   {
@@ -324,6 +325,7 @@ void __fastcall TMainForm::TESTClick(TObject *Sender)
 
 }
 //---------------------------------------------------------------------------
+
 
 
 

@@ -84,19 +84,19 @@ __published:	// IDE-managed Components
     TLabel *Depth;
     TLabel *Speed;
     TGroupBox *QuadEq5;
-    TTrackBar *TrackBar1;
-    TTrackBar *TrackBar2;
-    TTrackBar *TrackBar4;
-    TTrackBar *TrackBar5;
-    TTrackBar *TrackBar6;
-    TTrackBar *TrackBar7;
-    TTrackBar *TrackBar8;
-    TTrackBar *TrackBar9;
-    TTrackBar *TrackBar10;
-    TTrackBar *TrackBar11;
-    TTrackBar *TrackBar12;
-    TTrackBar *TrackBar13;
-    TTrackBar *TrackBar14;
+    TTrackBar *Eq5Amp1;
+    TTrackBar *Eq5Amp2;
+    TTrackBar *Eq5Freq1;
+    TTrackBar *Eq5Freq2;
+    TTrackBar *Eq5Q2;
+    TTrackBar *Eq5Freq3;
+    TTrackBar *Eq5Amp3;
+    TTrackBar *Eq5Q3;
+    TTrackBar *Eq5Freq4;
+    TTrackBar *Eq5Amp4;
+    TTrackBar *Eq5Q4;
+    TTrackBar *Eq5Freq5;
+    TTrackBar *Eq5Amp5;
     TLabel *Comp;
     TLabel *OD;
     TLabel *Dist;
@@ -118,9 +118,9 @@ __published:	// IDE-managed Components
     TLabel *Label3;
     TTrackBar *ReverbDecay;
     TLabel *Label4;
-    TTrackBar *TrackBar18;
+    TTrackBar *ReverbDiffusion;
     TLabel *Label5;
-    TTrackBar *TrackBar19;
+    TTrackBar *ReverbDensity;
     TLabel *Label6;
     TRadioGroup *QuadConfig;
     TGroupBox *ReverbGate;
@@ -153,13 +153,13 @@ __published:	// IDE-managed Components
     TLabel *Label15;
     TLabel *Label16;
     TLabel *Label17;
-    TTrackBar *TrackBar16;
-    TTrackBar *TrackBar17;
-    TTrackBar *TrackBar23;
+    TTrackBar *TapDelay;
+    TTrackBar *TapVol;
+    TTrackBar *TapPan;
     TLabel *Label18;
-    TMaskEdit *MaskEdit1;
+    TMaskEdit *TapNumber;
     TUpDown *UpDown2;
-    TTrackBar *TrackBar24;
+    TTrackBar *TapFeedback;
     TLabel *Label19;
     TRadioGroup *PitchInput;
     TRadioGroup *PitchWave;
@@ -250,6 +250,7 @@ __published:	// IDE-managed Components
     void __fastcall TESTClick(TObject *Sender);
     void __fastcall DelayModeClick(TObject *Sender);
 
+    void __fastcall QuadPatchAuditionClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
