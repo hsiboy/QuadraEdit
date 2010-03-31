@@ -12,7 +12,7 @@ GUI
 - Add graphical indications of config (redraw manual)
 
 MIDI
-- Resolve code for closing MIDI channels
+- Resolve code for closing MIDI channels                                     -> Done
 - Queue up rx'd messages for processing                                      -> Done
 - Process rx'd messages in a seperate thread                                 -> Done but only 1 thread
 - Handle messages that span multiple queue entries
@@ -33,9 +33,9 @@ Problems:
     - Start program
     - Open MIDI (must have Midi Out and Midi In devices, GS Wavetable (Out) and USB (in) will cause prob.)
     - Exit
-    - Program crashed (V18) or hangs (V20)
+    - Program crashed (V18) or hangs (V20)                                   -> Fixed in 48
 - Encode routine is wrong                                                    -> Done
 - Ensure decode and encode return the correct number of bytes
 - Safety checks on output length in decode and encode routines  
 - Add file and function header documentation
-- Properly convert 16bit QuadGT values to internal data structure
+- Properly convert 16bit QuadGT values to internal data structure            -> Done check for byte swapping

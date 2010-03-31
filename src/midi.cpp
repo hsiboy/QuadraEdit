@@ -333,18 +333,12 @@ static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
         Queue_Push(entry);
 
       }
-      // Make the buffer free for next lot of SysEx data
-      midiInUnprepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
 
-      // TBD: use proper index on Midi_In or only use a single buffer
-      header_ptr->lpData = Midi_In[0].Buffer;
-      header_ptr->dwBufferLength = sizeof(Midi_In[0].Buffer);
-      header_ptr->dwBytesRecorded = 0;
-      header_ptr->dwFlags = 0;
-      status = midiInPrepareHeader(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
-      if (status != 0) FormDebug->Log(NULL,"Proc prepare error");
-      status=midiInAddBuffer(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
-      if (status != 0) FormDebug->Log(NULL,"Proc buffer error");
+      if (header_ptr->dwBytesRecorded != 0) 
+      {
+        status=midiInAddBuffer(Midi_In_Handle, header_ptr, sizeof(MIDIHDR));
+        if (status != 0) FormDebug->Log(NULL,"Proc buffer error");
+      }
 
       break;
 

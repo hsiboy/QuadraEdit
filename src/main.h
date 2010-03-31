@@ -77,7 +77,7 @@ __published:	// IDE-managed Components
     TRadioGroup *PreTone;
     TLabel *Direct;
     TLabel *Master;
-    TLabel *PreAmp;
+    TLabel *PreAmpEq;
     TLabel *Pitch;
     TLabel *Delay;
     TLabel *Reverb;

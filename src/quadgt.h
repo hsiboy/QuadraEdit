@@ -253,7 +253,12 @@
 //---------------------------------------------------------------------------
 // Macro definitions
 //---------------------------------------------------------------------------
-#define EXTRACT_16BIT(x) *(UInt16 *) &x
+
+// Unpack a 16 bit value from 2 8 bit values received via SYSEX
+#define UNPACK_16BIT(x) (((UInt16) *(x+1)) + (((UInt16) *(x))<<8))
+
+// TBD: Swap bytes?
+#define PACK_16BIT(x,y) (*(x))= (UInt8)((y)>>8); *((x)+1)=(UInt8)((y) & 0xff)
 
 //---------------------------------------------------------------------------
 // Type definitions
