@@ -219,6 +219,14 @@ __published:	// IDE-managed Components
     TRadioGroup *ChorusOnOff;
     TRadioGroup *ChorusWave;
     TButton *TEST;
+    TEdit *Eq5Amp1Val;
+    TEdit *Eq5Amp2Val;
+    TEdit *Eq5Amp3Val;
+    TEdit *Eq5Amp4Val;
+    TEdit *Eq5Amp5Val;
+    TEdit *Eq3Amp1Val;
+    TEdit *Eq3Amp2Val;
+    TEdit *Eq3Amp3Val;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -251,6 +259,7 @@ __published:	// IDE-managed Components
     void __fastcall DelayModeClick(TObject *Sender);
 
     void __fastcall QuadPatchAuditionClick(TObject *Sender);
+    void __fastcall VertBarCentChange(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

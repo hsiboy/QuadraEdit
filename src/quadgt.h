@@ -310,6 +310,24 @@ typedef struct tQuadGT_Patch
   SInt8 geq_8khz;                            // -14 - 14
   SInt8 geq_16khz;                           // -14 - 14
 
+  // Pitch parameters
+  UInt8 pitch_mode;
+  UInt8 pitch_input;
+  UInt8 lfo_waveform;
+  UInt8 lfo_speed;
+  UInt8 lfo_depth;
+  UInt8 pitch_feedback;
+
+  // Delay parameters
+  UInt8 delay_mode;
+  UInt8 delay_input;
+  UInt16 delay;
+  UInt16 delay_feedback;
+  UInt16 delay_left;
+  UInt16 delay_left_feedback;
+  UInt16 delay_right;
+  UInt16 delay_right_feedback;
+
   // Reverb parameters
   UInt8 reverb_mode;
   UInt8 reverb_input_1;                      // 0 - 3
@@ -326,16 +344,6 @@ typedef struct tQuadGT_Patch
   UInt8 reverb_gate_hold;                    // 0 - 99
   UInt8 reverb_gate_release;                 // 0 - 99
   UInt8 reverb_gated_level;                  // 0 - 99
-
-  // Delay parameters
-  UInt8 delay_mode;
-  UInt8 delay_input;
-  UInt16 delay;
-  UInt16 delay_feedback;
-  UInt16 delay_left;
-  UInt16 delay_left_feedback;
-  UInt16 delay_right;
-  UInt16 delay_right_feedback;
 
   // Mix parameters
   UInt8 prepost_eq;
@@ -362,7 +370,7 @@ typedef struct tQuadGT_Patch
   UInt8 res_pitch[NUM_RES];
 
   // Ring modulator parameters
-
+ 
 } tQuadGT_Patch;
 
 //---------------------------------------------------------------------------
@@ -384,6 +392,7 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
 UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len);
 
 UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data);
+UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data);
 
 void QuadGT_Init(void);
 void QuadGT_Display_Update_Patch(UInt8 program);
@@ -395,4 +404,6 @@ void QuadGT_Display_Update_Mix(const UInt8 program);
 void QuadGT_Display_Update_Mod(const UInt8 program);
 void QuadGT_Display_Update_Preamp(const UInt8 program);
 void QuadGT_Display_Update_Resonator(const UInt8 program);
-void QuadtGT_Param_Change(TObject * Sender);
+void QuadGT_Param_Change(TObject * Sender);
+UInt16 QuadGT_Decode_16Bit(UInt8 *data);
+void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data);

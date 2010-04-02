@@ -213,6 +213,51 @@ UInt8 Midi_Out_Open(int device)
 
 }
 
+UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size)
+{
+  MIDIHDR out;
+  UInt8 buffer[500];
+  UInt8 buf_len=0;
+  long int status;
+
+  // Build message in buffer
+  memcpy(buffer+buf_len, Sysex_Start, sizeof(Sysex_Start));
+  buf_len+=sizeof(Sysex_Start);
+
+  memcpy(buffer+buf_len, Sysex_Alesis, sizeof(Sysex_Alesis));
+  buf_len+=sizeof(Sysex_Alesis);
+
+  memcpy(buffer+buf_len, Sysex_QuadGT, sizeof(Sysex_QuadGT));
+  buf_len+=sizeof(Sysex_QuadGT);
+
+  memcpy(buffer+buf_len, Sysex_Data_Dump, sizeof(Sysex_Dump_Req));
+  buf_len+=sizeof(Sysex_Dump_Req);
+
+  buffer[buf_len] = program;
+  buf_len+=1;
+
+  memcpy(buffer+buf_len, data, size);
+  buf_len+=size;
+
+  memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
+  buf_len+=sizeof(Sysex_End);
+
+  FormDebug->LogHex(NULL, "TX", buffer, buf_len);
+
+  // Prepare header
+  out.lpData = buffer;
+  out.dwBufferLength = buf_len;
+  out.dwBytesRecorded = buf_len;
+  out.dwFlags = 0;
+
+  // Prepare and send the MIDI message
+  midiOutPrepareHeader(Midi_Out_Handle, &out, sizeof(out));
+  status=midiOutLongMsg(Midi_Out_Handle, &out, sizeof(out));
+  midiOutUnprepareHeader(Midi_Out_Handle, &out, sizeof(out));
+
+  return(status);
+
+}
 unsigned int Midi_Out_Dump_Req(UInt8 program)
 {
   MIDIHDR out;
@@ -461,12 +506,22 @@ void Midi_Sysex_Process(void)
 	   prog = *(sysex.buffer+offset);
 	   offset+=1;
 
-	   FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
-       QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
+	   //FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
 
-       QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
-
-       QuadGT_Display_Update_Patch(prog);
+           if (code == *Sysex_Data_Dump)
+           {
+             if (prog < QUAD_NUM_PATCH)
+             {
+               QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
+               QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
+               QuadGT_Display_Update_Patch(prog);
+             }
+             else
+             {
+	       FormDebug->Log(NULL, "Data Dump Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
+             }
+           }
+           // TBD: Handle other program types
 	 }
        }
      }

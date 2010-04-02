@@ -34,6 +34,7 @@ tBuffer Queue_Pop(void);
 void Midi_Get_Dev_Lists(TComboBox *in_list,TComboBox *out_list, TLabel * error_text);
 
 UInt8 Midi_Out_Open(int device);
+UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size);
 unsigned int Midi_Out_Dump_Req(UInt8 program);
 unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data);
 void Midi_Out_ShortMsg(const unsigned long message);

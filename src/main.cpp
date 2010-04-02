@@ -141,7 +141,7 @@ void __fastcall TMainForm::MenuFileExitClick(TObject *Sender)
 
 void __fastcall TMainForm::QuadParamChange(TObject *Sender)
 {
-  QuadtGT_Param_Change(Sender);
+  QuadGT_Param_Change(Sender);
 }
 
 
@@ -328,4 +328,6 @@ void __fastcall TMainForm::TESTClick(TObject *Sender)
 
 
 
+
+//---------------------------------------------------------------------------
 
