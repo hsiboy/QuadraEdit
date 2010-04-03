@@ -5,7 +5,7 @@ ARCHITECTURE
 - Data structure with TObject, IDX, shift and mask?
 
 GUI
-- Rescan for MIDI devices when user clicks on device lists?
+- Rescan for MIDI devices when user clicks on device lists                   -> Done
 - Provide titles for various quadraverb forms                                -> Done
 - Disable/enable send/get buttons based on MIDI open status                  -> In prog
 - Split EQ panel in 3band, 5band, graphic and preset                         -> Done except preset
@@ -23,8 +23,8 @@ QUADRAVERB
 - Decode contents of message                                                 -> In progress
 - Check if funtion #'s 0,5 and 6 work for "Program", "Midi" and "Store"      -> Done apart from encoding
 - See if we can request and read the ROM version
-- Message encoder                                                            -> Done, use it
-- Request all patches (handy for testing callback routine)                   -> Done
+- Message encoder                                                            -> Done
+- Request all patches (handy for testing callback routine)                   -> Done, decode and use
 
 Problems:
 - MIDI close gets continuous MM_LONGDATA messages
@@ -38,4 +38,4 @@ Problems:
 - Ensure decode and encode return the correct number of bytes
 - Safety checks on output length in decode and encode routines  
 - Add file and function header documentation
-- Properly convert 16bit QuadGT values to internal data structure            -> Done check for byte swapping
+- Properly convert 16bit QuadGT values to internal data structure            -> Done

@@ -149,6 +149,7 @@ void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_
   /**************************************************************************
   * Build the list of possible MIDI output devices
   **************************************************************************/
+  out_list->Items->Clear();
   devs = midiOutGetNumDevs();
   if (devs < 1) {
     error_text->Caption="No MIDI Output devices available";
@@ -174,6 +175,7 @@ void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_
   /**************************************************************************
   * Build the list of possible MIDI input devices
   **************************************************************************/
+  in_list->Items->Clear();
   devs = midiInGetNumDevs();
   if (devs < 1) {
         error_text->Caption="No MIDI Input devices available";
@@ -242,7 +244,7 @@ UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size)
   memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
   buf_len+=sizeof(Sysex_End);
 
-  FormDebug->LogHex(NULL, "TX", buffer, buf_len);
+  FormDebug->LogHex(NULL, "TX "+AnsiString(buf_len)+": ", buffer, buf_len);
 
   // Prepare header
   out.lpData = buffer;
@@ -506,6 +508,7 @@ void Midi_Sysex_Process(void)
 	   prog = *(sysex.buffer+offset);
 	   offset+=1;
 
+           //FormDebug->LogHex(NULL, "RX "+AnsiString[sysex.length]+": ", sysex.buffer, sysex.length);
 	   //FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
 
            if (code == *Sysex_Data_Dump)

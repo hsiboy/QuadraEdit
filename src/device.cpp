@@ -50,7 +50,7 @@ void __fastcall TFormDevice::ButtonMidiDevOpenClick(TObject *Sender)
 
 void __fastcall TFormDevice::ButtonMidiDevCancelClick(TObject *Sender)
 {
-  ModalResult=0;
+  ModalResult=1;
 }
 //---------------------------------------------------------------------------
 

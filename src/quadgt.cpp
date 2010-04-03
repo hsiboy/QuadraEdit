@@ -25,6 +25,8 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
 
   // TBD: Safety checks on out_len
   // TBD: Ensure output is correct length
+  //FormDebug->Log(NULL,"----------------------------------");
+  //FormDebug->Log(NULL,"Decode to Quad");
   //FormDebug->LogHex(NULL,AnsiString(length)+" SYSEX",in,length);
   j=0;
   oc = 0;
@@ -48,33 +50,30 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   UInt8 shift;
 
   // TBD: Safety checks on out_len
+  //FormDebug->Log(NULL,"----------------------------------");
+  //FormDebug->Log(NULL,"Encode to SYSEX");
   //FormDebug->LogHex(NULL,AnsiString(length)+" QUAD",in,length);
   i=0;
   j=0;
   lc=0;
   cc=in[0];
-  while (i<length)
+  while (i<=length)
   {
     shift = j % 8;
 
     if (shift == 0)
     {
       out[j]= cc>>1;
-      lc=cc;
-      cc=in[++i];
-    }
-    else if (shift == 7)
-    {
-      out[j]= cc & 0x7F;
     }
     else
     {
-      out[j]= (cc >> shift+1) + (lc<< 7-shift);
-      lc=cc;
-      cc=in[++i];
+      out[j]= (cc >> (shift+1)) | ((lc<< (7-shift))&0x7F);
     }
+    lc=cc;
+    if (shift != 7) cc=in[++i];
     j++;
   }
+  // TBD: Resolve issue with last byte
   //FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
   return(j);
 }
@@ -933,7 +932,7 @@ void __fastcall TMainForm::QuadPatchAuditionClick(TObject *Sender)
   sysex_size=QuadGT_Encode_To_Sysex(data, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
 
   // Send message
-  Midi_Out_Dump(100, data, sysex_size);
+  Midi_Out_Dump(100, sysex, sysex_size);
 }
 //---------------------------------------------------------------------------
 

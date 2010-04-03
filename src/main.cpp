@@ -55,8 +55,6 @@ void __fastcall TMainForm::Init(void)
 
   DisableIO();
 
-  // Get list of Midi devices
-  Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
 
   FormDebug->Log(MainForm, "Sizes:");
   FormDebug->Log(MainForm, "UInt8 "+AnsiString(sizeof(UInt8)));
@@ -127,7 +125,10 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 
 void __fastcall TMainForm::DeviceOpenClick(TObject *Sender)
 {
-   FormDevice->ShowModal();
+  // Get list of Midi devices
+  Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
+
+  FormDevice->ShowModal();
 }
 //---------------------------------------------------------------------------
 
