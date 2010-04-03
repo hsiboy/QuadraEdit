@@ -650,6 +650,9 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
+  //-------------------------------------------------------------------------
+  // Eq Parameters
+  //-------------------------------------------------------------------------
   // TBD: Select Resonator * or Eq
   QuadGT_Encode_16Bit(QuadGT_Patch[prog].low_eq_freq, &data[LOW_EQ_FREQ_IDX]);
   QuadGT_Encode_16Bit(QuadGT_Patch[prog].low_eq_amp, &data[LOW_EQ_AMP_IDX]);
@@ -678,13 +681,104 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   // TBD: Encode
 
 
-  data[PITCH_MODE_IDX] = QuadGT_Patch[prog].pitch_mode;
-  data[PITCH_INPUT_IDX] = QuadGT_Patch[prog].pitch_input & BIT0;
-  data[RES4_AMP_IDX] |= QuadGT_Patch[prog].res_amp[3] << 1;
+  //-------------------------------------------------------------------------
+  // Pitch Parameters (0x1A - 
+  //-------------------------------------------------------------------------
+  data[PITCH_MODE_IDX]   = QuadGT_Patch[prog].pitch_mode;
 
+  data[PITCH_INPUT_IDX]  = QuadGT_Patch[prog].pitch_input & BIT0;
+  data[RES4_AMP_IDX]    |= (QuadGT_Patch[prog].res_amp[3] << 1) & BITS1to7;
 
+  data[LFO_WAVEFORM_IDX] = QuadGT_Patch[prog].lfo_waveform & BIT0;
+  data[EQ_PRESET_IDX]   |= (QuadGT_Patch[prog].geq_preset << 1) & BITS1to7;
+
+  data[LFO_SPEED_IDX] = QuadGT_Patch[prog].lfo_speed;
+
+  data[LFO_DEPTH_IDX] = QuadGT_Patch[prog].lfo_depth;
+
+  //-------------------------------------------------------------------------
+  // Delay Parameters (0x27 - 
+  //-------------------------------------------------------------------------
+  data[DELAY_MODE_IDX]   = QuadGT_Patch[prog].delay_mode;
+
+  data[DELAY_INPUT_IDX]  = QuadGT_Patch[prog].delay_input & BIT0;
+  data[RES5_AMP_IDX]    |= (QuadGT_Patch[prog].res_amp[4] << 1) & BITS1to7;
+
+  data[DELAY_INPUT_MIX_IDX] = QuadGT_Patch[prog].delay_input_mix;
+
+  QuadGT_Encode_16Bit(QuadGT_Patch[prog].delay, &data[DELAY_IDX]);
+
+  //-------------------------------------------------------------------------
+  // Reverb Parameters (0x32 - 0x43)
+  //-------------------------------------------------------------------------
+  data[REVERB_MODE_IDX]   = QuadGT_Patch[prog].reverb_mode;
+
+  //-------------------------------------------------------------------------
+  // Config (0x44)
+  //-------------------------------------------------------------------------
+  data[CONFIG_IDX]    = QuadGT_Patch[prog].config;
+
+  //-------------------------------------------------------------------------
+  // Mix Parameters (0x45 - 
+  //-------------------------------------------------------------------------
+  data[PREPOST_EQ_IDX]    = QuadGT_Patch[prog].prepost_eq & BIT0;
+  data[DIRECT_LEVEL_IDX] |= (QuadGT_Patch[prog].direct_level << 1) & BITS1to7;
+  data[MASTER_EFFECTS_LEVEL_IDX] = QuadGT_Patch[prog].master_effects_level;
+
+  if (QuadGT_Patch[prog].prepost_eq == 0) data[PREAMP_LEVEL_IDX]=QuadGT_Patch[prog].preamp_level;
+  else                                    data[EQ_LEVEL_IDX]=QuadGT_Patch[prog].eq_level;
+
+  if (QuadGT_Patch[prog].config==1)
+  {
+    data[LESLIE_LEVEL_IDX] = QuadGT_Patch[prog].leslie_level;
+  }
+  else if (QuadGT_Patch[prog].config==5)
+  {
+    data[RING_MOD_LEVEL_IDX] = QuadGT_Patch[prog].ring_mod_level;
+  }
+  else
+  {
+    data[PITCH_LEVEL_IDX] = QuadGT_Patch[prog].pitch_level;
+  }
+
+  data[DELAY_LEVEL_IDX ] = QuadGT_Patch[prog].delay_level;
+  data[REVERB_LEVEL_IDX ] = QuadGT_Patch[prog].reverb_level;
+
+  //-------------------------------------------------------------------------
+  // Modulation Parameters (0x50 - 0x67)
+  //-------------------------------------------------------------------------
+  
+  //-------------------------------------------------------------------------
+  // Multi-tap Parameters (0x68 - 0x69)
+  //-------------------------------------------------------------------------
+  
+  //-------------------------------------------------------------------------
+  // Name (0x6A)
+  //-------------------------------------------------------------------------
   memcpy(&data[NAME_IDX], QuadGT_Patch[prog].name, NAME_LENGTH);
 
+  //-------------------------------------------------------------------------
+  // More mix/ring mod/res/pan/eq Parameters (0x78 - 0x7C)
+  //-------------------------------------------------------------------------
+  
+  //-------------------------------------------------------------------------
+  // Pre-amp Parameters (0x7C - 0x7F)
+  //-------------------------------------------------------------------------
+  data[PREAMP_DIST_IDX]  = QuadGT_Patch[prog].dist & BITS0to3;
+  data[PREAMP_COMP_IDX] |= (QuadGT_Patch[prog].comp << 4) & BITS4to6;
+
+  data[MIX_MOD_IDX]      = (QuadGT_Patch[prog].mix_mod      << 6) & BITS6to7;
+  data[EFFECT_LOOP_IDX] |= (QuadGT_Patch[prog].effect_loop  << 5) & BIT5;
+  data[BASS_BOOST_IDX]  |= (QuadGT_Patch[prog].bass_boost   << 4) & BIT4;
+  data[PREAMP_TONE_IDX] |= (QuadGT_Patch[prog].preamp_tone  << 2) & BITS2to3;
+  data[CAB_SIM_IDX]     |= QuadGT_Patch[prog].cab_sim  & BITS0to1;
+
+  data[PREAMP_OD_IDX]         = (QuadGT_Patch[prog].od << 5) & BITS5to7;
+  data[PREAMP_GATE_IDX]      |= (QuadGT_Patch[prog].preamp_gate & BITS0to4);
+
+  data[PREAMP_OUT_LEVEL_IDX] = QuadGT_Patch[prog].preamp_out_level;
+
+  
   return 0;
 }
 
@@ -705,9 +799,9 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Preamp Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].comp             =  (data[PREAMP_COMP_IDX] & BITS4to6) >> 4;
-  QuadGT_Patch[prog].od               =  (data[PREAMP_OD_IDX]   & BITS5to7) >> 5;
-  QuadGT_Patch[prog].dist             =  (data[PREAMP_DIST_IDX] & BITS0to3);
+  QuadGT_Patch[prog].comp             = (data[PREAMP_COMP_IDX] & BITS4to6) >> 4;
+  QuadGT_Patch[prog].od               = (data[PREAMP_OD_IDX]   & BITS5to7) >> 5;
+  QuadGT_Patch[prog].dist             = (data[PREAMP_DIST_IDX] & BITS0to3);
   QuadGT_Patch[prog].preamp_tone      = (data[PREAMP_TONE_IDX] & BITS2to3) >> 2;
   QuadGT_Patch[prog].bass_boost       = data[BASS_BOOST_IDX];
   QuadGT_Patch[prog].cab_sim          = data[CAB_SIM_IDX];
@@ -718,7 +812,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Eq Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].eq_mode=((data[EQ_MODE_IDX]&BIT7)>>7);                    // TBD: What is this?
+  QuadGT_Patch[prog].eq_mode=((data[EQ_MODE_IDX]&BIT7)>>7);                // Eq Mode: Eq or Eq/Resonator
   QuadGT_Patch[prog].geq_preset = (data[EQ_PRESET_IDX]&BITS1to7)>>1;       // User or Preset 1-6
 
   // 3 and 5 Band Eq
@@ -786,6 +880,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   QuadGT_Patch[prog].delay_mode=data[DELAY_MODE_IDX];
   QuadGT_Patch[prog].delay_input=data[DELAY_INPUT_IDX]&BIT0;
+  QuadGT_Patch[prog].delay_input_mix = data[DELAY_INPUT_MIX_IDX];
   QuadGT_Patch[prog].delay=data[DELAY_IDX];
   QuadGT_Patch[prog].delay_feedback=data[DELAY_FEEDBACK_IDX];
   QuadGT_Patch[prog].delay_left=data[DELAY_LEFT_IDX];
@@ -917,22 +1012,28 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
   QuadGT_Display_Update_Patch(prog);
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadPatchAuditionClick
+// Description : Sends the current program to the QuadGT as the edit program
+//               (for auditoning the program).  The program is not saved on
+//               the QuadGT unless the user does so manually
+// Param 1     : Pointer object that generated the event
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::QuadPatchAuditionClick(TObject *Sender)
 {
-  UInt8 data[QUAD_PATCH_SIZE];
+  UInt8 quadgt[QUAD_PATCH_SIZE];
   UInt8 sysex[200];
   UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
   UInt32 sysex_size;
 
-  // Send current patch data to Quad as program 100 (edit buffer)
   // Convert internal format to QuadGT format
-  QuadGT_Convert_Data_From_Internal(prog, data);
+  QuadGT_Convert_Data_From_Internal(prog, quadgt);
 
   // Convert QuadGT format to Sysex
-  sysex_size=QuadGT_Encode_To_Sysex(data, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
+  sysex_size=QuadGT_Encode_To_Sysex(quadgt, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
 
   // Send message
-  Midi_Out_Dump(100, sysex, sysex_size);
+  Midi_Out_Dump(EDIT_BUFFER, sysex, sysex_size);
 }
 //---------------------------------------------------------------------------
 

@@ -214,7 +214,14 @@ UInt8 Midi_Out_Open(int device)
   }
 
 }
-
+//---------------------------------------------------------------------------
+// Name        : Midi_Out_Dump
+// Description : Send a dump sysex message to the device (i.e. send a program
+//               to the device)
+// Param 1     : Program number to send
+// Param 2     : Data to send (does not include Sysex headers)
+// Param 3     : Size of data to send
+//---------------------------------------------------------------------------
 UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size)
 {
   MIDIHDR out;
@@ -309,6 +316,7 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   UInt8 buffer[100];
   UInt8 buf_len=0;
   long int status;
+  UInt8 quadgt[10];
 
   // Build message in buffer
   memcpy(buffer+buf_len, Sysex_Start, sizeof(Sysex_Start));
@@ -329,7 +337,11 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   buffer[buf_len] = page;
   buf_len+=1;
 
-  QuadGT_Encode_To_Sysex((UInt8*)&data,2,&buffer[buf_len],3);
+  //QuadGT_Encode_16Bit(data, quadgt);
+  //QuadGT_Encode_To_Sysex(quadgt,2,&buffer[buf_len],3);
+  *(buffer+buf_len+0)=10>>1;
+  *(buffer+buf_len+1)=0;
+  *(buffer+buf_len+2)=0;
   buf_len+=3;
 
   memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
@@ -508,7 +520,7 @@ void Midi_Sysex_Process(void)
 	   prog = *(sysex.buffer+offset);
 	   offset+=1;
 
-           //FormDebug->LogHex(NULL, "RX "+AnsiString[sysex.length]+": ", sysex.buffer, sysex.length);
+           FormDebug->LogHex(NULL, "RX "+AnsiString(sysex.length)+": ", sysex.buffer, sysex.length);
 	   //FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
 
            if (code == *Sysex_Data_Dump)
@@ -518,6 +530,10 @@ void Midi_Sysex_Process(void)
                QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
                QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
                QuadGT_Display_Update_Patch(prog);
+  
+               //DEBUG: Change name and send straight back to edit buffer (name change not working?)
+               //memcpy(sysex.buffer+offset+NAME_IDX,"EDIT",4);
+               //Midi_Out_Dump(100, sysex.buffer+offset,sysex.length-offset-1);
              }
              else
              {
