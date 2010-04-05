@@ -55,15 +55,6 @@ void __fastcall TMainForm::Init(void)
 
   DisableIO();
 
-
-  FormDebug->Log(MainForm, "Sizes:");
-  FormDebug->Log(MainForm, "UInt8 "+AnsiString(sizeof(UInt8)));
-  FormDebug->Log(MainForm, "UInt16 "+AnsiString(sizeof(UInt16)));
-  FormDebug->Log(MainForm, "UInt32 "+AnsiString(sizeof(UInt32)));
-
-  FormDebug->Log(MainForm, "WORD "+AnsiString(sizeof(WORD)));
-  FormDebug->Log(MainForm, "DWORD "+AnsiString(sizeof(DWORD)));
-
   Midi_Init();
   QuadGT_Init();
 
@@ -140,10 +131,6 @@ void __fastcall TMainForm::MenuFileExitClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
-void __fastcall TMainForm::QuadParamChange(TObject *Sender)
-{
-  QuadGT_Param_Change(Sender);
-}
 
 
 
@@ -330,5 +317,22 @@ void __fastcall TMainForm::TESTClick(TObject *Sender)
 
 
 
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMainForm::ResNumberKeyDown(TObject *Sender, WORD &Key,
+      TShiftState Shift)
+{
+  if (Key == 13)
+  {
+    ResNumberExit(Sender);
+  }
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMainForm::ResNumberExit(TObject *Sender)
+{
+  QuadGT_Display_Update_Resonator((UInt8) StrToInt(QuadPatchNum->Text));
+}
 //---------------------------------------------------------------------------
 

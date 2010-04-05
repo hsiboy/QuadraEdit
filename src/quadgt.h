@@ -379,6 +379,18 @@ typedef struct tQuadGT_Patch
   UInt8 res_decay[NUM_RES];
   UInt8 res_pitch[NUM_RES];
 
+  // Sampling parameters
+  UInt8 sample_start;
+  UInt8 sample_length;
+  UInt8 sample_playback_mode;
+  UInt8 sample_pitch;
+  UInt8 sample_rec_audio_trigger;
+  UInt8 sample_midi_trigger;
+  UInt8 sample_midi_base_note;
+  UInt8 sample_low_midi_note;
+  UInt8 sample_high_midi_note;
+  
+
   // Ring modulator parameters
  
 } tQuadGT_Patch;
@@ -410,6 +422,7 @@ void QuadGT_Display_Update_Reverb(const UInt8 program);
 void QuadGT_Display_Update_Delay(const UInt8 program);
 void QuadGT_Display_Update_Pitch(const UInt8 program);
 void QuadGT_Display_Update_Eq(const UInt8 program);
+void QuadGT_Display_Update_PrePostEq(const UInt8 prog);
 void QuadGT_Display_Update_Mix(const UInt8 program);
 void QuadGT_Display_Update_Mod(const UInt8 program);
 void QuadGT_Display_Update_Preamp(const UInt8 program);

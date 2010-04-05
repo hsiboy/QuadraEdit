@@ -227,6 +227,17 @@ __published:	// IDE-managed Components
     TEdit *Eq3Amp1Val;
     TEdit *Eq3Amp2Val;
     TEdit *Eq3Amp3Val;
+    TRadioGroup *Eq3Mode;
+    TLabel *ResLabel;
+    TMaskEdit *ResNumber;
+    TUpDown *ResUpDown;
+    TTrackBar *ResTune;
+    TTrackBar *ResDecay;
+    TLabel *Label41;
+    TLabel *Label42;
+    TLabel *Label43;
+    TTrackBar *TrackBar1;
+    TRadioGroup *Eq5Mode;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -260,6 +271,10 @@ __published:	// IDE-managed Components
 
     void __fastcall QuadPatchAuditionClick(TObject *Sender);
     void __fastcall VertBarCentChange(TObject *Sender);
+    
+    void __fastcall ResNumberKeyDown(TObject *Sender, WORD &Key,
+          TShiftState Shift);
+    void __fastcall ResNumberExit(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
