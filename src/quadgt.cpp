@@ -785,14 +785,19 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   memcpy(&data[NAME_IDX], QuadGT_Patch[prog].name, NAME_LENGTH);
 
   //-------------------------------------------------------------------------
-  // More mix/ring mod/res/pan/eq Parameters (0x78 - 0x7C)
+  // More mix/ring mod/res/pan Parameters (0x78 - 0x7B)
   //-------------------------------------------------------------------------
+  data[RING_MOD_OUTPUT_MIX_IDX]  = QuadGT_Patch[prog].ring_mod_output_mix;
+  data[RING_MOD_DEL_REV_MIX_IDX]  = QuadGT_Patch[prog].ring_mod_del_rev_mix;
+  data[PAN_SPEED_IDX]  = QuadGT_Patch[prog].pan_speed;
+  data[PAN_DEPTH_IDX]  = QuadGT_Patch[prog].pan_depth;
   
   //-------------------------------------------------------------------------
   // Pre-amp Parameters (0x7C - 0x7F)
   //-------------------------------------------------------------------------
   data[PREAMP_DIST_IDX]  = QuadGT_Patch[prog].dist & BITS0to3;
   data[PREAMP_COMP_IDX] |= (QuadGT_Patch[prog].comp << 4) & BITS4to6;
+  data[EQ_MODE_IDX]     |= (QuadGT_Patch[prog].eq_mode<<7) & BIT7;
 
   data[MIX_MOD_IDX]      = (QuadGT_Patch[prog].mix_mod      << 6) & BITS6to7;
   data[EFFECT_LOOP_IDX] |= (QuadGT_Patch[prog].effect_loop  << 5) & BIT5;
@@ -804,7 +809,6 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[PREAMP_GATE_IDX]      |= (QuadGT_Patch[prog].preamp_gate & BITS0to4);
 
   data[PREAMP_OUT_LEVEL_IDX] = QuadGT_Patch[prog].preamp_out_level;
-
   
   return 0;
 }

@@ -62,6 +62,12 @@
 #define CFG6_RESONATOR_DELAY_REVERB (6)
 #define CFG7_SAMPLING (7)
 
+typedef enum 
+{
+  EQMODE0_EQ,
+  EQMODE1_EQ_PLUS_RESONATOR
+} tEq_Mode;
+
 #define LOW_EQ_FREQ_IDX                 (0x00) // LOW EQ FREQ, 16bits
 #define RES1_TUNE_IDX                   (0x00) // RES 1 TUNE
 #define RES1_DECAY_IDX                  (0x01) // RES 1 DECAY
@@ -233,11 +239,12 @@
 #define MULTITAP_NUMBER_IDX             (0x69) // MULTITAP NUMBER
 #define NAME_IDX                        (0x6A) // 1ST DIGIT NAME
 
-// Mix parameters
+// Ring modulator parameters
 #define RING_MOD_OUTPUT_MIX_IDX         (0x78) // RING MOD OUTPUT MIX
 //#define RES2_AMP_IDX                  (0x78) // RES 2 AMP
 #define RING_MOD_DEL_REV_MIX_IDX        (0x79) // RING MOD DEL/REV MIX
 #define RES3_AMP_IDX                    (0x79) // RES 3 AMP
+
 #define PAN_SPEED_IDX                   (0x7A) // PAN SPEED
 #define PAN_DEPTH_IDX                   (0x7B) // PAN DEPTH
 #define EQ_MODE_IDX                     (0x7C) // EQ-MODE (7)
@@ -258,16 +265,6 @@
 
 #define EDIT_BUFFER   (100)
 #define ALL_PROGS     (101)
-
-//---------------------------------------------------------------------------
-// Macro definitions
-//---------------------------------------------------------------------------
-
-// Unpack a 16 bit value from 2 8 bit values received via SYSEX
-#define UNPACK_16BIT(x) (((UInt16) *(x+1)) + (((UInt16) *(x))<<8))
-
-// TBD: Swap bytes?
-#define PACK_16BIT(x,y) (*(x))= (UInt8)((y)>>8); *((x)+1)=(UInt8)((y) & 0xff)
 
 //---------------------------------------------------------------------------
 // Type definitions
@@ -291,33 +288,34 @@ typedef struct tQuadGT_Patch
   UInt8 cab_sim;
 
   // Eq parameters
-  UInt8 eq_mode;
-  UInt16 low_eq_freq;
-  UInt16 low_eq_amp;
-  UInt16 mid_eq_freq;
-  UInt16 mid_eq_amp;
-  UInt16 mid_eq_q;
-  UInt16 high_eq_freq;
-  UInt16 high_eq_amp;
-  UInt16 low_mid_eq_freq;
-  UInt16 low_mid_eq_amp;
-  UInt16 low_mid_eq_q;
+  UInt8 eq_mode;                   // 0=Eq,  1=Eq+Resonator
+  UInt16 low_eq_freq;              // 20 to 999 Hz
+  UInt16 low_eq_amp;               // -14 to 14 db  (0-560)
+  UInt16 mid_eq_freq;              // 200 to 9999 Hz
+  UInt16 mid_eq_amp;               // -14 to 14 db  (0-560)
+  UInt8  mid_eq_q;                 // 0.2 to 2.55 octaves (20-255)
+  UInt16 high_eq_freq;             // 2000 to 18000 Hz
+  UInt16 high_eq_amp;              // -14 to 14 db  (0-560)
+  UInt16 low_mid_eq_freq;          // 20 to 500 Hz
+  UInt16 low_mid_eq_amp;           // -14 to 14 db  (0-560)
+  UInt8  low_mid_eq_q;
   UInt16 high_mid_eq_freq;
-  UInt16 high_mid_eq_amp;
-  UInt16 high_mid_eq_q;
+  UInt16 high_mid_eq_amp;          // -14 to 14 db  (0-560)
+  UInt8  high_mid_eq_q;
 
+  // Graphic Eq parameters
   UInt8 geq_preset;           // User or preset 1-6
-  SInt8 geq_16hz;                            // -14 - 14
-  SInt8 geq_32hz;                            // -14 - 14
-  SInt8 geq_62hz;                            // -14 - 14
-  SInt8 geq_126hz;                           // -14 - 14
-  SInt8 geq_250hz;                           // -14 - 14
-  SInt8 geq_500hz;                           // -14 - 14
-  SInt8 geq_1khz;                            // -14 - 14
-  SInt8 geq_2khz;                            // -14 - 14
-  SInt8 geq_4khz;                            // -14 - 14
-  SInt8 geq_8khz;                            // -14 - 14
-  SInt8 geq_16khz;                           // -14 - 14
+  SInt8 geq_16hz;                            // -14 to 14
+  SInt8 geq_32hz;                            // -14 to 14
+  SInt8 geq_62hz;                            // -14 to 14
+  SInt8 geq_126hz;                           // -14 to 14
+  SInt8 geq_250hz;                           // -14 to 14
+  SInt8 geq_500hz;                           // -14 to 14
+  SInt8 geq_1khz;                            // -14 to 14
+  SInt8 geq_2khz;                            // -14 to 14
+  SInt8 geq_4khz;                            // -14 to 14
+  SInt8 geq_8khz;                            // -14 to 14
+  SInt8 geq_16khz;                           // -14 to 14
 
   // Pitch parameters
   UInt8 pitch_mode;
@@ -389,9 +387,13 @@ typedef struct tQuadGT_Patch
   UInt8 sample_midi_base_note;
   UInt8 sample_low_midi_note;
   UInt8 sample_high_midi_note;
-  
 
   // Ring modulator parameters
+  UInt8 ring_mod_output_mix;
+  UInt8 ring_mod_del_rev_mix;
+
+  UInt8 pan_speed;
+  UInt8 pan_depth;
  
 } tQuadGT_Patch;
 

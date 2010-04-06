@@ -10,6 +10,10 @@ GUI
 - Disable/enable send/get buttons based on MIDI open status                  -> In prog
 - Split EQ panel in 3band, 5band, graphic and preset                         -> Done except preset
 - Add graphical indications of config (redraw manual)
+- Move resonator panel
+- Add global resonator parameters
+- Add sampling panel
+
 
 MIDI
 - Resolve code for closing MIDI channels                                     -> Done
@@ -25,6 +29,8 @@ QUADRAVERB
 - See if we can request and read the ROM version
 - Message encoder                                                            -> Done
 - Request all patches (handy for testing callback routine)                   -> Done, decode and use
+- Read and write raw SYSEX files
+- Default values in internal data structure
 
 Problems:
 - MIDI close gets continuous MM_LONGDATA messages
