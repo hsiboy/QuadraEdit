@@ -23,6 +23,11 @@ typedef struct tBuffer
 } tBuffer;
 
 //---------------------------------------------------------------------------
+// Constant definitions
+const UInt8 Sysex_Start[]={0xF0};              // SysEx start 
+const UInt8 Sysex_End[]={0xF7};                // SysEx End
+
+//---------------------------------------------------------------------------
 // Variable definitions
 
 //---------------------------------------------------------------------------

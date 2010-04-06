@@ -35,10 +35,6 @@ typedef struct tQueue
 } tQueue;
 
 
-const UInt8 Sysex_Start[]={0xF0};              // SysEx start 
-
-const UInt8 Sysex_End[]={0xF7};                // SysEx End
-
 // Midi handles
 static HMIDIOUT Midi_Out_Handle;
 static HMIDIIN Midi_In_Handle;
@@ -505,6 +501,7 @@ void Midi_Sysex_Process(void)
    sysex = Queue_Pop();
    if (sysex.buffer != NULL)
    {
+     // TBD: Call QuadGT_Sysex_Process here
      if (memcmp(Sysex_Start, sysex.buffer+offset, sizeof(Sysex_Start))==0)
      {
        offset+=sizeof(Sysex_Start);
@@ -547,3 +544,4 @@ void Midi_Sysex_Process(void)
      free(sysex.buffer);
    }
 }
+

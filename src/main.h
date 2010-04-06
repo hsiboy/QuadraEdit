@@ -10,6 +10,7 @@
 #include <Menus.hpp>
 #include <ComCtrls.hpp>
 #include <Mask.hpp>
+#include <Dialogs.hpp>
 //---------------------------------------------------------------------------
 class TMainForm : public TForm
 {
@@ -238,6 +239,8 @@ __published:	// IDE-managed Components
     TLabel *Label43;
     TTrackBar *TrackBar1;
     TRadioGroup *Eq5Mode;
+    TOpenDialog *SysexOpenDialog;
+    TButton *SysexBankLoad;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -275,6 +278,7 @@ __published:	// IDE-managed Components
     void __fastcall ResNumberKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);
     void __fastcall ResNumberExit(TObject *Sender);
+    void __fastcall SysexBankLoadClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

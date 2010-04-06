@@ -1043,6 +1043,54 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
   QuadGT_Display_Update_Patch(prog);
 }
 
+void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
+{
+  UInt8 prog;
+  FILE *sysex_file;
+  tBuffer data;
+  UInt32 size;
+
+  if (!MainForm->SysexOpenDialog->Execute()) return;
+
+  sysex_file = fopen(MainForm->SysexOpenDialog->Files->Strings[0].c_str(),"rb");
+  if (sysex_file == NULL)
+  {
+    FormError->ShowError(ferror(sysex_file),"opening SysEx file");
+    return;
+  }
+
+  // Determine size of the file
+  fseek(sysex_file, 0, SEEK_END);
+  size=ftell(sysex_file);
+  rewind(sysex_file);
+
+  data.buffer=(UInt8 *)malloc(sizeof(UInt8) * size);
+  if (data.buffer == NULL)
+  {
+      FormError->ShowError(1,"allocating memory for SysEx file ");
+  }
+  else
+  {
+    if (fread(data.buffer, 1, size, sysex_file) != size)
+    {
+      FormError->ShowError(ferror(sysex_file),"reading SysEx file ");
+    }
+    else
+    {
+      data.length = size;
+      FormDebug->Log(NULL, "Loaded SYSEX");
+      QuadGT_Sysex_Process(data);
+    }
+  }
+
+  fclose(sysex_file);
+  free(data.buffer);
+
+  prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+  QuadGT_Display_Update_Patch(prog);
+}
+
+//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 // Name        : QuadPatchAuditionClick
 // Description : Sends the current program to the QuadGT as the edit program
@@ -1085,4 +1133,66 @@ void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data)
 void __fastcall TMainForm::VertBarCentChange(TObject *Sender)
 {
   // TBD:???
+}
+
+UInt32 QuadGT_Sysex_Process(tBuffer sysex)
+{
+   UInt32 offset;
+   UInt8 code,prog;
+   UInt8 quadgt[QUAD_PATCH_SIZE];
+   offset=0;
+
+   if (sysex.buffer != NULL)
+   {
+     if (memcmp(Sysex_Start, sysex.buffer+offset, sizeof(Sysex_Start))==0)
+     {
+       offset+=sizeof(Sysex_Start);
+       if (memcmp(Sysex_Alesis, sysex.buffer+offset, sizeof(Sysex_Alesis))==0)
+       {
+         offset+=sizeof(Sysex_Alesis);
+         if ((memcmp(Sysex_QuadGT, sysex.buffer+offset, sizeof(Sysex_QuadGT))==0) ||
+             (memcmp(Sysex_Quad, sysex.buffer+offset, sizeof(Sysex_Quad))==0))
+         {
+           offset+=sizeof(Sysex_QuadGT);
+
+	   code = *(sysex.buffer+offset);
+	   offset+=1;
+	   prog = *(sysex.buffer+offset);
+	   offset+=1;
+
+	   FormDebug->Log(NULL, "Sysex Code: "+AnsiString(code)+"   Prog: "+AnsiString(prog));
+
+           if (code == *Sysex_Data_Dump)
+           {
+             if (prog < QUAD_NUM_PATCH)
+             {
+               QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
+               QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
+               QuadGT_Display_Update_Patch(prog);
+             }
+             else if (prog > QUAD_NUM_PATCH)
+             {
+	       FormDebug->Log(NULL, "Sysex bank, bytes: "+AnsiString(sysex.length-offset));
+               for (prog = 0; prog < QUAD_NUM_PATCH; prog++)
+               {
+                 QuadGT_Decode_From_Sysex(sysex.buffer+offset,147, quadgt, QUAD_PATCH_SIZE);
+                 QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
+
+                 offset+=147;
+               }
+               QuadGT_Display_Update_Patch(0);
+             }
+             else
+             {
+	       FormDebug->Log(NULL, "Data Dump Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
+             }
+           }
+           // TBD: Handle other program types
+	 }
+         else FormDebug->Log(NULL, "Not for Alesis QuadGT\n");
+       }
+       else FormDebug->Log(NULL, "Not for Alesis\n");
+     }
+     else FormDebug->Log(NULL, "No Sysex start\n");
+   }
 }

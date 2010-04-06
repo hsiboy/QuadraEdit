@@ -418,6 +418,8 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
 UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data);
 UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data);
 
+UInt32 QuadGT_Sysex_Process(tBuffer sysex);
+
 void QuadGT_Init(void);
 void QuadGT_Display_Update_Patch(UInt8 program);
 void QuadGT_Display_Update_Reverb(const UInt8 program);

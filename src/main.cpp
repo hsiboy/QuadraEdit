@@ -336,3 +336,4 @@ void __fastcall TMainForm::ResNumberExit(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
+
