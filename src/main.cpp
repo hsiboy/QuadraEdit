@@ -303,16 +303,6 @@ void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMainForm::TESTClick(TObject *Sender)
-{
-  UInt16 val;
-  UInt8 data[]={0x01, 0x01, 0xFF, 0xFF, 0x01, 0x01};
-
-  val = *(UInt16 *) &data[2];
-  FormDebug->Log(Sender,"Test [" + AnsiString(val) + "] ");
-
-}
-//---------------------------------------------------------------------------
 
 
 

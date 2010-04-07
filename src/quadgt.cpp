@@ -1196,3 +1196,54 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
      else FormDebug->Log(NULL, "No Sysex start\n");
    }
 }
+
+void __fastcall TMainForm::TESTClick(TObject *Sender)
+{
+  UInt8 prog;
+  FILE *quadgt_file;
+  tBuffer data;
+  UInt32 size;
+
+  if (!MainForm->SysexOpenDialog->Execute()) return;
+
+  quadgt_file = fopen(MainForm->SysexOpenDialog->Files->Strings[0].c_str(),"rb");
+  if (quadgt_file == NULL)
+  {
+    FormError->ShowError(ferror(quadgt_file),"opening QuadGT file");
+    return;
+  }
+
+  // Determine size of the file
+  fseek(quadgt_file, 0, SEEK_END);
+  size=ftell(quadgt_file);
+  rewind(quadgt_file);
+
+  data.buffer=(UInt8 *)malloc(sizeof(UInt8) * size);
+  if (data.buffer == NULL)
+  {
+      FormError->ShowError(1,"allocating memory for QuadGT file ");
+  }
+  else
+  {
+    if (fread(data.buffer, 1, size, quadgt_file) != size)
+    {
+      FormError->ShowError(ferror(quadgt_file),"reading QuadGT file ");
+    }
+    else
+    {
+      data.length = size;
+      FormDebug->Log(NULL, "Loaded QuadGT");
+
+      for (prog = 0; prog < QUAD_NUM_PATCH; prog++)
+      {
+        QuadGT_Convert_QuadGT_To_Internal(prog, data.buffer+(prog*QUAD_PATCH_SIZE));
+      }
+    }
+  }
+
+  fclose(quadgt_file);
+  free(data.buffer);
+
+  QuadGT_Display_Update_Patch(0);
+}
+//---------------------------------------------------------------------------
