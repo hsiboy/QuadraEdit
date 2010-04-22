@@ -271,21 +271,21 @@ typedef enum
 //---------------------------------------------------------------------------
 
 // Internal data structure for Quadraverb GT parameters
-typedef struct tQuadGT_Patch
+typedef struct
 {
   char  name[NAME_LENGTH+1];
   UInt8 config;
 
   // Preamp parameters
-  UInt8 comp;
-  UInt8 od;
-  UInt8 dist;
-  UInt8 preamp_tone;
-  UInt8 preamp_gate;
-  UInt8 preamp_out_level;
-  UInt8 effect_loop;
-  UInt8 bass_boost;
-  UInt8 cab_sim;
+  UInt8 comp;                      // Compression 0-?
+  UInt8 od;                        // Overdrive 0-?
+  UInt8 dist;                      // Distortion 0-?
+  UInt8 preamp_tone;               // Preamp tone 0-2
+  UInt8 preamp_gate;               // Preamp noise gate level 0-15
+  UInt8 preamp_out_level;          // Preamp output level 0-99
+  UInt8 effect_loop;               // Effect loop on/off 0-1
+  UInt8 bass_boost;                // Bass boost on/off 0-1
+  UInt8 cab_sim;                   // Cabinet simulator 0-2
 
   // Eq parameters
   UInt8 eq_mode;                   // 0=Eq,  1=Eq+Resonator
@@ -395,7 +395,7 @@ typedef struct tQuadGT_Patch
   UInt8 pan_speed;
   UInt8 pan_depth;
  
-} tQuadGT_Patch;
+} tQuadGT_Prog;
 
 //---------------------------------------------------------------------------
 // Constants

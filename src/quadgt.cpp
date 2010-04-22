@@ -14,7 +14,7 @@
 
 #include "quadgt.h"
 
-static tQuadGT_Patch QuadGT_Patch[QUAD_NUM_PATCH];
+static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
 
 // Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
 UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
@@ -23,8 +23,8 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
   UInt32 i,j;
   UInt8 shift;
 
-  // TBD: Safety checks on out_len
   // TBD: Ensure output is correct length
+
   //FormDebug->Log(NULL,"----------------------------------");
   //FormDebug->Log(NULL,"Decode to Quad");
   //FormDebug->LogHex(NULL,AnsiString(length)+" SYSEX",in,length);
@@ -36,6 +36,9 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
         out[j++]=oc;
      }
      oc = in[i];
+
+     // Protect for overflow on output data
+     if (j >= out_len) return(0);
   }
   //FormDebug->LogHex(NULL,AnsiString(j)+" QUAD",out,j);
   
@@ -49,7 +52,6 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   UInt32 i,j;
   UInt8 shift;
 
-  // TBD: Safety checks on out_len
   //FormDebug->Log(NULL,"----------------------------------");
   //FormDebug->Log(NULL,"Encode to SYSEX");
   //FormDebug->LogHex(NULL,AnsiString(length)+" QUAD",in,length);
@@ -72,8 +74,13 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
     lc=cc;
     if (shift != 7) cc=in[++i];
     j++;
+
+    // Protect for overflow on output data
+    if (j >= out_len) return(0);
   }
-  // TBD: Resolve issue with last byte
+
+  // TBD: Resolve issue with last byte being encoded wrongly
+ 
   //FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
   return(j);
 }
@@ -87,11 +94,11 @@ void QuadGT_Init(void)
   for (patch=0; patch<QUAD_NUM_PATCH; patch++)
   {
     // Set all parameters to 0
-    memset(&QuadGT_Patch[patch], 0x00, sizeof(tQuadGT_Patch));
+    memset(&QuadGT_Progs[patch], 0x00, sizeof(tQuadGT_Prog));
 
     // Create a program name
     sprintf(patch_name,"Patch-%2.2d",patch);
-    strcpy(QuadGT_Patch[patch].name,patch_name);
+    strcpy(QuadGT_Progs[patch].name,patch_name);
   }
 
 }
@@ -104,10 +111,10 @@ void QuadGT_Display_Update_Patch(UInt8 prog)
   MainForm->QuadPatchNum->Text=AnsiString(prog);
 
   /* Program name */
-  MainForm->EditQuadPatchName->Text=AnsiString(QuadGT_Patch[prog].name);
+  MainForm->EditQuadPatchName->Text=AnsiString(QuadGT_Progs[prog].name);
 
   /* Configuration */
-  MainForm->QuadConfig->ItemIndex=QuadGT_Patch[prog].config;
+  MainForm->QuadConfig->ItemIndex=QuadGT_Progs[prog].config;
 
   QuadGT_Display_Update_Reverb(prog);
   QuadGT_Display_Update_Delay(prog);
@@ -119,32 +126,39 @@ void QuadGT_Display_Update_Patch(UInt8 prog)
   QuadGT_Display_Update_Resonator(prog);
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Display_Update_Reverb
+// Description : Update the on screen display of the reverb parameters for
+//               the given program based on the data in QuadGT_Progs
+// Parameter 1 : Program number for which display is to be updated
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Display_Update_Reverb(const UInt8 prog)
 {
   UInt8 val;
 
-  if (QuadGT_Patch[prog].config==0)
+  if (QuadGT_Progs[prog].config==0)
   {
     MainForm->QuadReverb->Visible=true;
     MainForm->ReverbInput1->Visible=true;
     MainForm->ReverbInMix->Visible=true;
   }
-  else if ((QuadGT_Patch[prog].config==1) || (QuadGT_Patch[prog].config==5) || (QuadGT_Patch[prog].config==6))
+  else if ((QuadGT_Progs[prog].config==1) || (QuadGT_Progs[prog].config==5) || (QuadGT_Progs[prog].config==6))
   {
     MainForm->QuadReverb->Visible=true;
     MainForm->ReverbInput1->Visible=true;
     MainForm->ReverbInMix->Visible=true;
     // TBD: Disable input 1, selection 3
   }
-  else if ((QuadGT_Patch[prog].config==2) || (QuadGT_Patch[prog].config==7))
+  else if ((QuadGT_Progs[prog].config==2) || (QuadGT_Progs[prog].config==7))
   {
     MainForm->QuadReverb->Visible=false;
   }
-  else if (QuadGT_Patch[prog].config==3)
+  else if (QuadGT_Progs[prog].config==3)
   {
     MainForm->QuadReverb->Visible=false;
   }
-  else if (QuadGT_Patch[prog].config==4)
+  else if (QuadGT_Progs[prog].config==4)
   {
     MainForm->QuadReverb->Visible=true;
     MainForm->ReverbInput1->Visible=FALSE;
@@ -153,29 +167,29 @@ void QuadGT_Display_Update_Reverb(const UInt8 prog)
 
   if (MainForm->QuadReverb->Visible == true)
   {
-    MainForm->ReverbType->ItemIndex = QuadGT_Patch[prog].reverb_mode;
+    MainForm->ReverbType->ItemIndex = QuadGT_Progs[prog].reverb_mode;
 
     // TBD: Scale translate all these for screen display
 
-    MainForm->ReverbInput1->ItemIndex = QuadGT_Patch[prog].reverb_input_1;
-    MainForm->ReverbInput2->ItemIndex = QuadGT_Patch[prog].reverb_input_2;
-    MainForm->ReverbInMix->Position = QuadGT_Patch[prog].reverb_input_mix;
+    MainForm->ReverbInput1->ItemIndex = QuadGT_Progs[prog].reverb_input_1;
+    MainForm->ReverbInput2->ItemIndex = QuadGT_Progs[prog].reverb_input_2;
+    MainForm->ReverbInMix->Position = QuadGT_Progs[prog].reverb_input_mix;
 
-    MainForm->ReverbPreDelay->Position = QuadGT_Patch[prog].reverb_predelay;
-    MainForm->ReverbPreMix->Position = QuadGT_Patch[prog].reverb_predelay_mix;
+    MainForm->ReverbPreDelay->Position = QuadGT_Progs[prog].reverb_predelay;
+    MainForm->ReverbPreMix->Position = QuadGT_Progs[prog].reverb_predelay_mix;
 
-    MainForm->ReverbDecay->Position = QuadGT_Patch[prog].reverb_decay;
-    MainForm->ReverbDiffusion->Position = QuadGT_Patch[prog].reverb_diffusion;
+    MainForm->ReverbDecay->Position = QuadGT_Progs[prog].reverb_decay;
+    MainForm->ReverbDiffusion->Position = QuadGT_Progs[prog].reverb_diffusion;
 
-    MainForm->ReverbLowDecay->Position = QuadGT_Patch[prog].reverb_low_decay;
-    MainForm->ReverbHighDecay->Position = QuadGT_Patch[prog].reverb_high_decay;
+    MainForm->ReverbLowDecay->Position = QuadGT_Progs[prog].reverb_low_decay;
+    MainForm->ReverbHighDecay->Position = QuadGT_Progs[prog].reverb_high_decay;
 
-    MainForm->ReverbDensity->Position = QuadGT_Patch[prog].reverb_density;
+    MainForm->ReverbDensity->Position = QuadGT_Progs[prog].reverb_density;
 
-    MainForm->ReverbGateOn->Checked = (QuadGT_Patch[prog].reverb_gate==1) ? TRUE : FALSE;
-    MainForm->ReverbGateHold->Position = QuadGT_Patch[prog].reverb_gate_hold;
-    MainForm->ReverbGateRelease->Position = QuadGT_Patch[prog].reverb_gate_release;
-    MainForm->ReverbGateLevel->Position = QuadGT_Patch[prog].reverb_gated_level;
+    MainForm->ReverbGateOn->Checked = (QuadGT_Progs[prog].reverb_gate==1) ? TRUE : FALSE;
+    MainForm->ReverbGateHold->Position = QuadGT_Progs[prog].reverb_gate_hold;
+    MainForm->ReverbGateRelease->Position = QuadGT_Progs[prog].reverb_gate_release;
+    MainForm->ReverbGateLevel->Position = QuadGT_Progs[prog].reverb_gated_level;
   }
 }
 
@@ -183,9 +197,9 @@ void QuadGT_Display_Update_Delay(const UInt8 prog)
 {
   UInt8 mode;
 
-  mode=QuadGT_Patch[prog].delay_mode;
+  mode=QuadGT_Progs[prog].delay_mode;
   MainForm->DelayMode->ItemIndex=mode;
-  MainForm->DelayInput->ItemIndex=QuadGT_Patch[prog].delay_input;
+  MainForm->DelayInput->ItemIndex=QuadGT_Progs[prog].delay_input;
 
   // Mono
   if (mode ==0)
@@ -194,8 +208,8 @@ void QuadGT_Display_Update_Delay(const UInt8 prog)
     MainForm->DelayRight->Visible=FALSE;
     MainForm->DelayRightFeedback->Visible=FALSE;
 
-    MainForm->DelayDelay->Position=QuadGT_Patch[prog].delay;
-    MainForm->DelayFeedback->Position=QuadGT_Patch[prog].delay_feedback;
+    MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay;
+    MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_feedback;
 
   }
 
@@ -206,10 +220,10 @@ void QuadGT_Display_Update_Delay(const UInt8 prog)
     MainForm->DelayRight->Visible=TRUE;
     MainForm->DelayRightFeedback->Visible=TRUE;
 
-    MainForm->DelayDelay->Position=QuadGT_Patch[prog].delay_left;
-    MainForm->DelayFeedback->Position=QuadGT_Patch[prog].delay_left_feedback;
-    MainForm->DelayRight->Position=QuadGT_Patch[prog].delay_right;
-    MainForm->DelayRightFeedback->Position=QuadGT_Patch[prog].delay_right_feedback;
+    MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay_left;
+    MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_left_feedback;
+    MainForm->DelayRight->Position=QuadGT_Progs[prog].delay_right;
+    MainForm->DelayRightFeedback->Position=QuadGT_Progs[prog].delay_right_feedback;
   }
 
   // Ping Pong
@@ -229,45 +243,45 @@ void QuadGT_Display_Update_Delay(const UInt8 prog)
 
 void QuadGT_Display_Update_Pitch(const UInt8 prog)
 {
-  if ((QuadGT_Patch[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) ||
-      (QuadGT_Patch[prog].config==CFG3_5BANDEQ_PITCH_DELAY))
+  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) ||
+      (QuadGT_Progs[prog].config==CFG3_5BANDEQ_PITCH_DELAY))
   {
     MainForm->QuadPitch->Visible=TRUE;
     MainForm->QuadLeslie->Visible=FALSE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
 
-    MainForm->PitchMode->ItemIndex = QuadGT_Patch[prog].pitch_mode;
-    MainForm->PitchInput->ItemIndex = QuadGT_Patch[prog].pitch_input;
-    MainForm->PitchWave->ItemIndex = QuadGT_Patch[prog].lfo_waveform;
-    MainForm->PitchSpeed->Position = QuadGT_Patch[prog].lfo_speed;
-    MainForm->PitchDepth->Position = QuadGT_Patch[prog].lfo_depth;
-    MainForm->PitchFeedback->Position = QuadGT_Patch[prog].pitch_feedback;
+    MainForm->PitchMode->ItemIndex = QuadGT_Progs[prog].pitch_mode;
+    MainForm->PitchInput->ItemIndex = QuadGT_Progs[prog].pitch_input;
+    MainForm->PitchWave->ItemIndex = QuadGT_Progs[prog].lfo_waveform;
+    MainForm->PitchSpeed->Position = QuadGT_Progs[prog].lfo_speed;
+    MainForm->PitchDepth->Position = QuadGT_Progs[prog].lfo_depth;
+    MainForm->PitchFeedback->Position = QuadGT_Progs[prog].pitch_feedback;
   }
-  else if (QuadGT_Patch[prog].config==CFG1_LESLIE_DELAY_REVERB)
+  else if (QuadGT_Progs[prog].config==CFG1_LESLIE_DELAY_REVERB)
   {
     MainForm->QuadPitch->Visible=FALSE;
     MainForm->QuadLeslie->Visible=TRUE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
   }
-  else if ((QuadGT_Patch[prog].config==CFG2_GEQ_DELAY) || 
-           (QuadGT_Patch[prog].config==CFG6_RESONATOR_DELAY_REVERB) || 
-           (QuadGT_Patch[prog].config==CFG7_SAMPLING))
+  else if ((QuadGT_Progs[prog].config==CFG2_GEQ_DELAY) || 
+           (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB) || 
+           (QuadGT_Progs[prog].config==CFG7_SAMPLING))
   {
     MainForm->QuadPitch->Visible=FALSE;
     MainForm->QuadLeslie->Visible=FALSE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
   }
-  else if (QuadGT_Patch[prog].config==CFG4_3BANDEQ_REVERB)
+  else if (QuadGT_Progs[prog].config==CFG4_3BANDEQ_REVERB)
   {
     MainForm->QuadPitch->Visible=FALSE;
     MainForm->QuadLeslie->Visible=FALSE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=TRUE;
   }
-  else if (QuadGT_Patch[prog].config==CFG5_RINGMOD_DELAY_REVERB)
+  else if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {
     MainForm->QuadPitch->Visible=FALSE;
     MainForm->QuadLeslie->Visible=FALSE;
@@ -280,23 +294,23 @@ void QuadGT_Display_Update_Pitch(const UInt8 prog)
 void QuadGT_Display_Update_Eq(const UInt8 prog)
 {
   // 3 Band Eq
-  if ((QuadGT_Patch[prog].config==0) || (QuadGT_Patch[prog].config==4))
+  if ((QuadGT_Progs[prog].config==0) || (QuadGT_Progs[prog].config==4))
   {
     MainForm->PanelQuadEq3->Visible=TRUE;
 
-    MainForm->EqFreq1->Position = QuadGT_Patch[prog].low_eq_freq;
-    MainForm->EqAmp1->Position = -1 * (QuadGT_Patch[prog].low_eq_amp - MainForm->EqAmp1->Max);
-    MainForm->Eq3Amp1Val->Text = AnsiString(((double)(QuadGT_Patch[prog].low_eq_amp - MainForm->EqAmp1->Max))/20.0);
+    MainForm->EqFreq1->Position = QuadGT_Progs[prog].low_eq_freq;
+    MainForm->EqAmp1->Position = -1 * (QuadGT_Progs[prog].low_eq_amp - MainForm->EqAmp1->Max);
+    MainForm->Eq3Amp1Val->Text = AnsiString(((double)(QuadGT_Progs[prog].low_eq_amp - MainForm->EqAmp1->Max))/20.0);
 
-    MainForm->EqFreq2->Position = QuadGT_Patch[prog].mid_eq_freq;
-    MainForm->EqAmp2->Position = -1 * (QuadGT_Patch[prog].mid_eq_amp - MainForm->EqAmp2->Max);
-    MainForm->Eq3Amp2Val->Text = AnsiString(((double)(QuadGT_Patch[prog].mid_eq_amp - MainForm->EqAmp2->Max))/20.0);
-    MainForm->EqQ2->Position = QuadGT_Patch[prog].mid_eq_q;
+    MainForm->EqFreq2->Position = QuadGT_Progs[prog].mid_eq_freq;
+    MainForm->EqAmp2->Position = -1 * (QuadGT_Progs[prog].mid_eq_amp - MainForm->EqAmp2->Max);
+    MainForm->Eq3Amp2Val->Text = AnsiString(((double)(QuadGT_Progs[prog].mid_eq_amp - MainForm->EqAmp2->Max))/20.0);
+    MainForm->EqQ2->Position = QuadGT_Progs[prog].mid_eq_q;
 
-    MainForm->EqFreq3->Position = QuadGT_Patch[prog].high_eq_freq;
-    MainForm->EqAmp3->Position = -1 * (QuadGT_Patch[prog].high_eq_amp - MainForm->EqAmp3->Max);
-    MainForm->Eq3Amp3Val->Text = AnsiString(((double)(QuadGT_Patch[prog].high_eq_amp - MainForm->EqAmp3->Max))/20.0);
-    if (QuadGT_Patch[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) MainForm->Eq3Mode->Visible=TRUE;
+    MainForm->EqFreq3->Position = QuadGT_Progs[prog].high_eq_freq;
+    MainForm->EqAmp3->Position = -1 * (QuadGT_Progs[prog].high_eq_amp - MainForm->EqAmp3->Max);
+    MainForm->Eq3Amp3Val->Text = AnsiString(((double)(QuadGT_Progs[prog].high_eq_amp - MainForm->EqAmp3->Max))/20.0);
+    if (QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) MainForm->Eq3Mode->Visible=TRUE;
     else                                                       MainForm->Eq3Mode->Visible=FALSE;
   }
   else
@@ -305,32 +319,32 @@ void QuadGT_Display_Update_Eq(const UInt8 prog)
   }
 
   // 5 Band Eq
-  if (QuadGT_Patch[prog].config==3) 
+  if (QuadGT_Progs[prog].config==3) 
   {
     MainForm->QuadEq5->Visible=TRUE;
 
-    MainForm->Eq5Freq1->Position = QuadGT_Patch[prog].low_eq_freq;
-    MainForm->Eq5Amp1->Position = -1 * (QuadGT_Patch[prog].low_eq_amp - MainForm->Eq5Amp1->Max);
-    MainForm->Eq5Amp1Val->Text = AnsiString(((double)(QuadGT_Patch[prog].low_eq_amp - MainForm->Eq5Amp1->Max))/20.0);
+    MainForm->Eq5Freq1->Position = QuadGT_Progs[prog].low_eq_freq;
+    MainForm->Eq5Amp1->Position = -1 * (QuadGT_Progs[prog].low_eq_amp - MainForm->Eq5Amp1->Max);
+    MainForm->Eq5Amp1Val->Text = AnsiString(((double)(QuadGT_Progs[prog].low_eq_amp - MainForm->Eq5Amp1->Max))/20.0);
 
-    MainForm->Eq5Freq2->Position = QuadGT_Patch[prog].low_mid_eq_freq;
-    MainForm->Eq5Amp2->Position = -1 * (QuadGT_Patch[prog].low_mid_eq_amp - MainForm->Eq5Amp2->Max);
-    MainForm->Eq5Amp2Val->Text = AnsiString((double)(QuadGT_Patch[prog].low_mid_eq_amp - MainForm->Eq5Amp2->Max)/20.0);
-    MainForm->Eq5Q2->Position = QuadGT_Patch[prog].low_mid_eq_q;
+    MainForm->Eq5Freq2->Position = QuadGT_Progs[prog].low_mid_eq_freq;
+    MainForm->Eq5Amp2->Position = -1 * (QuadGT_Progs[prog].low_mid_eq_amp - MainForm->Eq5Amp2->Max);
+    MainForm->Eq5Amp2Val->Text = AnsiString((double)(QuadGT_Progs[prog].low_mid_eq_amp - MainForm->Eq5Amp2->Max)/20.0);
+    MainForm->Eq5Q2->Position = QuadGT_Progs[prog].low_mid_eq_q;
 
-    MainForm->Eq5Freq3->Position = QuadGT_Patch[prog].mid_eq_freq;
-    MainForm->Eq5Amp3->Position = -1 * (QuadGT_Patch[prog].mid_eq_amp - MainForm->Eq5Amp3->Max);
-    MainForm->Eq5Amp3Val->Text = AnsiString((double)(QuadGT_Patch[prog].mid_eq_amp - MainForm->Eq5Amp3->Max)/20.0);
-    MainForm->Eq5Q3->Position = QuadGT_Patch[prog].mid_eq_q;
+    MainForm->Eq5Freq3->Position = QuadGT_Progs[prog].mid_eq_freq;
+    MainForm->Eq5Amp3->Position = -1 * (QuadGT_Progs[prog].mid_eq_amp - MainForm->Eq5Amp3->Max);
+    MainForm->Eq5Amp3Val->Text = AnsiString((double)(QuadGT_Progs[prog].mid_eq_amp - MainForm->Eq5Amp3->Max)/20.0);
+    MainForm->Eq5Q3->Position = QuadGT_Progs[prog].mid_eq_q;
 
-    MainForm->Eq5Freq4->Position = QuadGT_Patch[prog].high_mid_eq_freq;
-    MainForm->Eq5Amp4->Position = -1 * (QuadGT_Patch[prog].high_mid_eq_amp - MainForm->Eq5Amp4->Max);
-    MainForm->Eq5Amp4Val->Text = AnsiString((double)(QuadGT_Patch[prog].high_mid_eq_amp - MainForm->Eq5Amp4->Max)/20.0);
-    MainForm->Eq5Q4->Position = QuadGT_Patch[prog].high_mid_eq_q;
+    MainForm->Eq5Freq4->Position = QuadGT_Progs[prog].high_mid_eq_freq;
+    MainForm->Eq5Amp4->Position = -1 * (QuadGT_Progs[prog].high_mid_eq_amp - MainForm->Eq5Amp4->Max);
+    MainForm->Eq5Amp4Val->Text = AnsiString((double)(QuadGT_Progs[prog].high_mid_eq_amp - MainForm->Eq5Amp4->Max)/20.0);
+    MainForm->Eq5Q4->Position = QuadGT_Progs[prog].high_mid_eq_q;
 
-    MainForm->Eq5Freq5->Position = QuadGT_Patch[prog].high_eq_freq;
-    MainForm->Eq5Amp5->Position = -1 * (QuadGT_Patch[prog].high_eq_amp - MainForm->Eq5Amp5->Max);
-    MainForm->Eq5Amp5Val->Text = AnsiString((double)(QuadGT_Patch[prog].high_eq_amp - MainForm->Eq5Amp5->Max)/20.0);
+    MainForm->Eq5Freq5->Position = QuadGT_Progs[prog].high_eq_freq;
+    MainForm->Eq5Amp5->Position = -1 * (QuadGT_Progs[prog].high_eq_amp - MainForm->Eq5Amp5->Max);
+    MainForm->Eq5Amp5Val->Text = AnsiString((double)(QuadGT_Progs[prog].high_eq_amp - MainForm->Eq5Amp5->Max)/20.0);
   }
   else 
   {
@@ -338,22 +352,22 @@ void QuadGT_Display_Update_Eq(const UInt8 prog)
   }
 
   // Graphic Eq
-  if (QuadGT_Patch[prog].config==2) 
+  if (QuadGT_Progs[prog].config==2) 
   {
     MainForm->QuadGraphEq->Visible=TRUE;
 
-    MainForm->GEQPreset->ItemIndex =QuadGT_Patch[prog].geq_preset;
-    MainForm->GEQ_16Hz->Position =-1*QuadGT_Patch[prog].geq_16hz  ;
-    MainForm->GEQ_32Hz->Position =-1*QuadGT_Patch[prog].geq_32hz  ;
-    MainForm->GEQ_62Hz->Position =-1*QuadGT_Patch[prog].geq_62hz  ;
-    MainForm->GEQ_126Hz->Position=-1*QuadGT_Patch[prog].geq_126hz ;
-    MainForm->GEQ_250Hz->Position=-1*QuadGT_Patch[prog].geq_250hz ;
-    MainForm->GEQ_500Hz->Position=-1*QuadGT_Patch[prog].geq_500hz ;
-    MainForm->GEQ_1KHz->Position =-1*QuadGT_Patch[prog].geq_1khz  ;
-    MainForm->GEQ_2KHz->Position =-1*QuadGT_Patch[prog].geq_2khz  ;
-    MainForm->GEQ_4KHz->Position =-1*QuadGT_Patch[prog].geq_4khz  ;
-    MainForm->GEQ_8KHz->Position =-1*QuadGT_Patch[prog].geq_8khz  ;
-    MainForm->GEQ_16KHz->Position=-1*QuadGT_Patch[prog].geq_16khz ;
+    MainForm->GEQPreset->ItemIndex =QuadGT_Progs[prog].geq_preset;
+    MainForm->GEQ_16Hz->Position =-1*QuadGT_Progs[prog].geq_16hz  ;
+    MainForm->GEQ_32Hz->Position =-1*QuadGT_Progs[prog].geq_32hz  ;
+    MainForm->GEQ_62Hz->Position =-1*QuadGT_Progs[prog].geq_62hz  ;
+    MainForm->GEQ_126Hz->Position=-1*QuadGT_Progs[prog].geq_126hz ;
+    MainForm->GEQ_250Hz->Position=-1*QuadGT_Progs[prog].geq_250hz ;
+    MainForm->GEQ_500Hz->Position=-1*QuadGT_Progs[prog].geq_500hz ;
+    MainForm->GEQ_1KHz->Position =-1*QuadGT_Progs[prog].geq_1khz  ;
+    MainForm->GEQ_2KHz->Position =-1*QuadGT_Progs[prog].geq_2khz  ;
+    MainForm->GEQ_4KHz->Position =-1*QuadGT_Progs[prog].geq_4khz  ;
+    MainForm->GEQ_8KHz->Position =-1*QuadGT_Progs[prog].geq_8khz  ;
+    MainForm->GEQ_16KHz->Position=-1*QuadGT_Progs[prog].geq_16khz ;
 
   }
   else
@@ -369,12 +383,12 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
   UInt8 val;
 
   // Direct level
-  MainForm->MixDirect->Position=MainForm->MixDirect->Max - QuadGT_Patch[prog].direct_level;
+  MainForm->MixDirect->Position=MainForm->MixDirect->Max - QuadGT_Progs[prog].direct_level;
 
   // Master Fx Level
-  if (QuadGT_Patch[prog].config != 7)
+  if (QuadGT_Progs[prog].config != 7)
   {
-    val=QuadGT_Patch[prog].master_effects_level;
+    val=QuadGT_Progs[prog].master_effects_level;
     MainForm->MixMaster->Position=99-val;
     MainForm->MixMaster->Visible=TRUE;
   }
@@ -384,15 +398,15 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
   }
 
   // Pre or Post Eq
-  MainForm->PrePostEq->ItemIndex=QuadGT_Patch[prog].prepost_eq;
+  MainForm->PrePostEq->ItemIndex=QuadGT_Progs[prog].prepost_eq;
  
   QuadGT_Display_Update_PrePostEq(prog);
 
   // Pitch Level
-  if ( (QuadGT_Patch[prog].config == CFG0_EQ_PITCH_DELAY_REVERB) ||
-       (QuadGT_Patch[prog].config == CFG3_5BANDEQ_PITCH_DELAY))
+  if ( (QuadGT_Progs[prog].config == CFG0_EQ_PITCH_DELAY_REVERB) ||
+       (QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY))
   {
-    val=QuadGT_Patch[prog].pitch_level;
+    val=QuadGT_Progs[prog].pitch_level;
     MainForm->MixPitch->Position=99-val;
 
     MainForm->MixPitch->Visible=TRUE;
@@ -403,15 +417,15 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
   }
 
   // Delay Level
-  val=QuadGT_Patch[prog].delay_level;
+  val=QuadGT_Progs[prog].delay_level;
   MainForm->MixDelay->Position=99-val;
 
   // Reverb Level
-  val=QuadGT_Patch[prog].reverb_level;
+  val=QuadGT_Progs[prog].reverb_level;
   MainForm->MixReverb->Position=99-val;
 
   // Modulation (on/off)
-  val=QuadGT_Patch[prog].mix_mod;
+  val=QuadGT_Progs[prog].mix_mod;
   if (val == 0) MainForm->Modulation->Checked=FALSE;
   else MainForm->Modulation->Checked=TRUE;
 
@@ -421,7 +435,7 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
   // Leslie Level
 
   // Leslie Level
-  if (QuadGT_Patch[prog].config == CFG1_LESLIE_DELAY_REVERB)
+  if (QuadGT_Progs[prog].config == CFG1_LESLIE_DELAY_REVERB)
   {
     MainForm->MixLeslieRingModReson->Visible=TRUE;
     MainForm->LeslieRingModReson->Caption="Leslie";
@@ -429,7 +443,7 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
   }
 
   // Ring Level
-  else if (QuadGT_Patch[prog].config == CFG5_RINGMOD_DELAY_REVERB)
+  else if (QuadGT_Progs[prog].config == CFG5_RINGMOD_DELAY_REVERB)
   {
     MainForm->MixLeslieRingModReson->Visible=TRUE;
     MainForm->LeslieRingModReson->Caption="RingMod";
@@ -437,7 +451,7 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
   }
   
   // Resonator Level
-  else if (QuadGT_Patch[prog].config == CFG6_RESONATOR_DELAY_REVERB)
+  else if (QuadGT_Progs[prog].config == CFG6_RESONATOR_DELAY_REVERB)
   {
     MainForm->MixLeslieRingModReson->Visible=TRUE;
     MainForm->LeslieRingModReson->Caption="Reson.";
@@ -454,7 +468,7 @@ void QuadGT_Display_Update_Mix(const UInt8 prog)
 void QuadGT_Display_Update_Mod(const UInt8 prog)
 {
   // Modulation
-  switch (QuadGT_Patch[prog].config)
+  switch (QuadGT_Progs[prog].config)
   {
     case 1:
     case 2:
@@ -462,9 +476,9 @@ void QuadGT_Display_Update_Mod(const UInt8 prog)
     case 4:
     case 5:
     case 6:
-      MainForm->QuadModSource1->ItemIndex=QuadGT_Patch[prog].mod_source[0];
-      MainForm->QuadModTarget1->ItemIndex=QuadGT_Patch[prog].mod_target[0];
-      MainForm->QuadModAmp1->Position=QuadGT_Patch[prog].mod_amp[0]-99;
+      MainForm->QuadModSource1->ItemIndex=QuadGT_Progs[prog].mod_source[0];
+      MainForm->QuadModTarget1->ItemIndex=QuadGT_Progs[prog].mod_target[0];
+      MainForm->QuadModAmp1->Position=QuadGT_Progs[prog].mod_amp[0]-99;
       break;
 
     case 7:
@@ -478,34 +492,34 @@ void QuadGT_Display_Update_Preamp(const UInt8 prog)
   UInt8 val;
 
   // Compression (0-7)
-  MainForm->PreComp->Position=MainForm->PreComp->Max-QuadGT_Patch[prog].comp;
+  MainForm->PreComp->Position=MainForm->PreComp->Max-QuadGT_Progs[prog].comp;
   MainForm->BarChange(MainForm->PreComp);
-  //FormDebug->Log(NULL,"  Compression: "+AnsiString(QuadGT_Patch[prog].comp));
+  //FormDebug->Log(NULL,"  Compression: "+AnsiString(QuadGT_Progs[prog].comp));
 
   // Overdrive (0-7)
-  MainForm->PreOd->Position=MainForm->PreOd->Max-QuadGT_Patch[prog].od;
-  //FormDebug->Log(NULL,"  OD: "+AnsiString(QuadGT_Patch[prog].od));
+  MainForm->PreOd->Position=MainForm->PreOd->Max-QuadGT_Progs[prog].od;
+  //FormDebug->Log(NULL,"  OD: "+AnsiString(QuadGT_Progs[prog].od));
   MainForm->BarChange(MainForm->PreOd);
 
   // Distortion (0-8)
-  MainForm->PreDist->Position=MainForm->PreDist->Max-QuadGT_Patch[prog].dist;
-  //FormDebug->Log(NULL,"  Dist: "+AnsiString(QuadGT_Patch[prog].dist));
+  MainForm->PreDist->Position=MainForm->PreDist->Max-QuadGT_Progs[prog].dist;
+  //FormDebug->Log(NULL,"  Dist: "+AnsiString(QuadGT_Progs[prog].dist));
   MainForm->BarChange(MainForm->PreDist);
 
   // Tone (0-2)
-  MainForm->PreTone->ItemIndex=QuadGT_Patch[prog].preamp_tone;
+  MainForm->PreTone->ItemIndex=QuadGT_Progs[prog].preamp_tone;
 
   // Bass Boost (0-1)
-  MainForm->BassBoost->Checked = QuadGT_Patch[prog].bass_boost == 1 ? TRUE : FALSE;
+  MainForm->BassBoost->Checked = QuadGT_Progs[prog].bass_boost == 1 ? TRUE : FALSE;
 
   // Cab sim (0-2)
-  MainForm->CabSim->ItemIndex=QuadGT_Patch[prog].cab_sim;
+  MainForm->CabSim->ItemIndex=QuadGT_Progs[prog].cab_sim;
   
   // Effect Loop (0-1)
-  MainForm->EffectLoopIn->Checked = QuadGT_Patch[prog].effect_loop == 1 ? TRUE : FALSE;
+  MainForm->EffectLoopIn->Checked = QuadGT_Progs[prog].effect_loop == 1 ? TRUE : FALSE;
 
   // Noise Gate (0-17)
-  MainForm->PreGate->Position=MainForm->PreGate->Max-QuadGT_Patch[prog].preamp_gate;
+  MainForm->PreGate->Position=MainForm->PreGate->Max-QuadGT_Progs[prog].preamp_gate;
   //FormDebug->Log(NULL,"Gate: "+AnsiString(val));
 
   /* Preamp Output Level (0-99) */
@@ -515,7 +529,7 @@ void QuadGT_Display_Update_Preamp(const UInt8 prog)
   }
   else
   {
-    MainForm->PreOutLevel->Position = MainForm->PreOutLevel->Max-QuadGT_Patch[prog].preamp_out_level;
+    MainForm->PreOutLevel->Position = MainForm->PreOutLevel->Max-QuadGT_Progs[prog].preamp_out_level;
     MainForm->PreOutLevel->Visible = TRUE;
     //FormDebug->Log(NULL, "Preamp output level :"+AnsiString(val));
   }
@@ -540,7 +554,7 @@ void QuadGT_Display_Update_PrePostEq(UInt8 prog)
   // Preamp Level
   if (MainForm->PrePostEq->ItemIndex==0)
   {
-    MainForm->MixPreampEq->Position=99-QuadGT_Patch[prog].preamp_level;
+    MainForm->MixPreampEq->Position=99-QuadGT_Progs[prog].preamp_level;
     MainForm->MixPreampEq->Visible=TRUE;
     MainForm->PreAmpEq->Visible=TRUE;
     MainForm->PreAmpEq->Caption="Preamp";
@@ -548,7 +562,7 @@ void QuadGT_Display_Update_PrePostEq(UInt8 prog)
   // Eq Level
   else
   {
-    MainForm->MixPreampEq->Position=99-QuadGT_Patch[prog].eq_level;
+    MainForm->MixPreampEq->Position=99-QuadGT_Progs[prog].eq_level;
     MainForm->MixPreampEq->Visible=TRUE;
     MainForm->PreAmpEq->Visible=TRUE;
     MainForm->PreAmpEq->Caption=" Eq ";
@@ -562,94 +576,94 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
 
   if (Sender == MainForm->QuadConfig)
   {
-    QuadGT_Patch[prog].config=MainForm->QuadConfig->ItemIndex;
+    QuadGT_Progs[prog].config=MainForm->QuadConfig->ItemIndex;
     QuadGT_Display_Update_Patch(prog);
   }
-  else if (Sender == MainForm->PreComp) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].comp);
-  else if (Sender == MainForm->PreOd) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].od);
-  else if (Sender == MainForm->PreDist) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].dist);
+  else if (Sender == MainForm->PreComp) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].comp);
+  else if (Sender == MainForm->PreOd) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].od);
+  else if (Sender == MainForm->PreDist) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].dist);
   else if (Sender == MainForm->EditQuadPatchName)
   {
-    strncpy(QuadGT_Patch[prog].name,MainForm->EditQuadPatchName->Text.c_str(),NAME_LENGTH);
+    strncpy(QuadGT_Progs[prog].name,MainForm->EditQuadPatchName->Text.c_str(),NAME_LENGTH);
   }
 
   // 3 Band Eq
   // TBD: EqFreq1 EqFreq2 EqQ2 EqFreq3
   else if (Sender == MainForm->Eq3Mode)
   {
-    QuadGT_Patch[prog].eq_mode = MainForm->Eq3Mode->ItemIndex;
+    QuadGT_Progs[prog].eq_mode = MainForm->Eq3Mode->ItemIndex;
     QuadGT_Display_Update_Eq(prog);
     QuadGT_Display_Update_Resonator(prog);
   }
   else if (Sender == MainForm->EqAmp1)
   {
-    QuadGT_Patch[prog].low_eq_amp = -1 * MainForm->EqAmp1->Position + MainForm->EqAmp1->Max;
-    MainForm->Eq3Amp1Val->Text = AnsiString(((double)(QuadGT_Patch[prog].low_eq_amp - MainForm->EqAmp1->Max))/20.0);
+    QuadGT_Progs[prog].low_eq_amp = -1 * MainForm->EqAmp1->Position + MainForm->EqAmp1->Max;
+    MainForm->Eq3Amp1Val->Text = AnsiString(((double)(QuadGT_Progs[prog].low_eq_amp - MainForm->EqAmp1->Max))/20.0);
   }
   else if (Sender == MainForm->EqAmp2)
   {
-    QuadGT_Patch[prog].mid_eq_amp = -1 * MainForm->EqAmp2->Position + MainForm->EqAmp2->Max;
-    MainForm->Eq3Amp2Val->Text = AnsiString(((double)(QuadGT_Patch[prog].mid_eq_amp - MainForm->EqAmp2->Max))/20.0);
+    QuadGT_Progs[prog].mid_eq_amp = -1 * MainForm->EqAmp2->Position + MainForm->EqAmp2->Max;
+    MainForm->Eq3Amp2Val->Text = AnsiString(((double)(QuadGT_Progs[prog].mid_eq_amp - MainForm->EqAmp2->Max))/20.0);
   }
   else if (Sender == MainForm->EqAmp3)
   {
-    QuadGT_Patch[prog].high_eq_amp = -1 * MainForm->EqAmp3->Position + MainForm->EqAmp3->Max;
-    MainForm->Eq3Amp3Val->Text = AnsiString(((double)(QuadGT_Patch[prog].high_eq_amp - MainForm->EqAmp3->Max))/20.0);
+    QuadGT_Progs[prog].high_eq_amp = -1 * MainForm->EqAmp3->Position + MainForm->EqAmp3->Max;
+    MainForm->Eq3Amp3Val->Text = AnsiString(((double)(QuadGT_Progs[prog].high_eq_amp - MainForm->EqAmp3->Max))/20.0);
   }
 
   // 5 Band Eq
   else if (Sender == MainForm->Eq5Mode)
   {
-    QuadGT_Patch[prog].eq_mode = MainForm->Eq5Mode->ItemIndex;
+    QuadGT_Progs[prog].eq_mode = MainForm->Eq5Mode->ItemIndex;
     QuadGT_Display_Update_Eq(prog);
     QuadGT_Display_Update_Resonator(prog);
   }
-  else if (Sender == MainForm->Eq5Amp1) EqBarChange(MainForm->Eq5Amp1, MainForm->Eq5Amp1Val, &QuadGT_Patch[prog].low_eq_amp);
-  else if (Sender == MainForm->Eq5Amp2) EqBarChange(MainForm->Eq5Amp2, MainForm->Eq5Amp2Val, &QuadGT_Patch[prog].low_mid_eq_amp);
-  else if (Sender == MainForm->Eq5Amp3) EqBarChange(MainForm->Eq5Amp3, MainForm->Eq5Amp3Val, &QuadGT_Patch[prog].mid_eq_amp);
-  else if (Sender == MainForm->Eq5Amp4) EqBarChange(MainForm->Eq5Amp4, MainForm->Eq5Amp4Val, &QuadGT_Patch[prog].high_mid_eq_amp);
-  else if (Sender == MainForm->Eq5Amp5) EqBarChange(MainForm->Eq5Amp5, MainForm->Eq5Amp5Val, &QuadGT_Patch[prog].high_eq_amp);
+  else if (Sender == MainForm->Eq5Amp1) EqBarChange(MainForm->Eq5Amp1, MainForm->Eq5Amp1Val, &QuadGT_Progs[prog].low_eq_amp);
+  else if (Sender == MainForm->Eq5Amp2) EqBarChange(MainForm->Eq5Amp2, MainForm->Eq5Amp2Val, &QuadGT_Progs[prog].low_mid_eq_amp);
+  else if (Sender == MainForm->Eq5Amp3) EqBarChange(MainForm->Eq5Amp3, MainForm->Eq5Amp3Val, &QuadGT_Progs[prog].mid_eq_amp);
+  else if (Sender == MainForm->Eq5Amp4) EqBarChange(MainForm->Eq5Amp4, MainForm->Eq5Amp4Val, &QuadGT_Progs[prog].high_mid_eq_amp);
+  else if (Sender == MainForm->Eq5Amp5) EqBarChange(MainForm->Eq5Amp5, MainForm->Eq5Amp5Val, &QuadGT_Progs[prog].high_eq_amp);
 
   // Mix parameters
-  else if (Sender == MainForm->MixDirect) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].direct_level);
-  else if (Sender == MainForm->MixMaster) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].master_effects_level);
-  else if (Sender == MainForm->MixPitch) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].pitch_level);
+  else if (Sender == MainForm->MixDirect) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].direct_level);
+  else if (Sender == MainForm->MixMaster) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].master_effects_level);
+  else if (Sender == MainForm->MixPitch) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].pitch_level);
   else if (Sender == MainForm->PrePostEq) 
   {
-    QuadGT_Patch[prog].prepost_eq=MainForm->PrePostEq->ItemIndex;
+    QuadGT_Progs[prog].prepost_eq=MainForm->PrePostEq->ItemIndex;
     QuadGT_Display_Update_PrePostEq(prog);
   }
   else if (Sender == MainForm->MixPreampEq) 
   {
-    if (QuadGT_Patch[prog].prepost_eq==0) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].preamp_level);
-    else                                  VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].eq_level);
+    if (QuadGT_Progs[prog].prepost_eq==0) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].preamp_level);
+    else                                  VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].eq_level);
   }
-  else if (Sender == MainForm->MixDelay) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].delay_level);
-  else if (Sender == MainForm->MixReverb) VertBarChange((TTrackBar *)Sender, &QuadGT_Patch[prog].reverb_level);
-  else if (Sender == MainForm->Modulation) QuadGT_Patch[prog].mix_mod=MainForm->Modulation->Checked;
+  else if (Sender == MainForm->MixDelay) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].delay_level);
+  else if (Sender == MainForm->MixReverb) VertBarChange((TTrackBar *)Sender, &QuadGT_Progs[prog].reverb_level);
+  else if (Sender == MainForm->Modulation) QuadGT_Progs[prog].mix_mod=MainForm->Modulation->Checked;
 }
 
 void __fastcall TMainForm::DelayModeClick(TObject *Sender)
 {
   UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
-  QuadGT_Patch[prog].delay_mode=MainForm->DelayMode->ItemIndex;
+  QuadGT_Progs[prog].delay_mode=MainForm->DelayMode->ItemIndex;
   QuadGT_Display_Update_Delay(prog);
 }
 //---------------------------------------------------------------------------
 
 void QuadGT_Display_Update_Resonator(const UInt8 prog)
 {
-  if ((QuadGT_Patch[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) && (QuadGT_Patch[prog].eq_mode == 1))
+  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) && (QuadGT_Progs[prog].eq_mode == 1))
   {
     // 2 Resonators
     MainForm->QuadResonator->Visible=TRUE;
   }
-  else if ((QuadGT_Patch[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Patch[prog].eq_mode == 1))
+  else if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Progs[prog].eq_mode == 1))
   {
     // 5 Resonators
     MainForm->QuadResonator->Visible=TRUE;
   }
-  else if (QuadGT_Patch[prog].config==CFG6_RESONATOR_DELAY_REVERB)
+  else if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
   {
     // 5 Resonators
     MainForm->QuadResonator->Visible=TRUE;
@@ -672,34 +686,34 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   // Eq/Res/Sample/Tap1 Parameters (0x00 - 0x19)
   //-------------------------------------------------------------------------
   // TBD: Select Resonator * or Eq
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].low_eq_freq, &data[LOW_EQ_FREQ_IDX]);
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].low_eq_amp, &data[LOW_EQ_AMP_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_eq_freq, &data[LOW_EQ_FREQ_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_eq_amp, &data[LOW_EQ_AMP_IDX]);
 
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].mid_eq_freq, &data[MID_EQ_FREQ_IDX]);
-  data[MID_EQ_BW_IDX] = QuadGT_Patch[prog].mid_eq_q;
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].mid_eq_amp, &data[MID_EQ_AMP_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].mid_eq_freq, &data[MID_EQ_FREQ_IDX]);
+  data[MID_EQ_BW_IDX] = QuadGT_Progs[prog].mid_eq_q;
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].mid_eq_amp, &data[MID_EQ_AMP_IDX]);
 
   // TBD: Select Resonator * or Eq
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].high_eq_freq, &data[HIGH_EQ_FREQ_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_eq_freq, &data[HIGH_EQ_FREQ_IDX]);
 
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].high_eq_amp, &data[HIGH_EQ_AMP_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_eq_amp, &data[HIGH_EQ_AMP_IDX]);
 
   // TBD: Select Leslie or Tap 1
   // TBD: Encode
 
   // TBD: Select Resonator ** or Eq
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].low_mid_eq_freq, &data[LOW_MID_EQ_FREQ_IDX]);
-  data[LOW_MID_EQ_BW_IDX] = QuadGT_Patch[prog].low_mid_eq_q;
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].low_mid_eq_amp, &data[LOW_MID_EQ_AMP_IDX]);
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].high_mid_eq_freq, &data[HIGH_MID_EQ_FREQ_IDX]);
-  data[HIGH_MID_EQ_BW_IDX] = QuadGT_Patch[prog].high_mid_eq_q;
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].high_mid_eq_amp, &data[HIGH_MID_EQ_AMP_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_mid_eq_freq, &data[LOW_MID_EQ_FREQ_IDX]);
+  data[LOW_MID_EQ_BW_IDX] = QuadGT_Progs[prog].low_mid_eq_q;
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_mid_eq_amp, &data[LOW_MID_EQ_AMP_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_mid_eq_freq, &data[HIGH_MID_EQ_FREQ_IDX]);
+  data[HIGH_MID_EQ_BW_IDX] = QuadGT_Progs[prog].high_mid_eq_q;
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_mid_eq_amp, &data[HIGH_MID_EQ_AMP_IDX]);
 
   // Select Sampling or Tap 1
   // Note: Tap 1 Delay is a split parameter
-  if (QuadGT_Patch[prog].config == CFG7_SAMPLING) 
+  if (QuadGT_Progs[prog].config == CFG7_SAMPLING) 
   {
-    data[SAMPLE_LENGTH_IDX] = QuadGT_Patch[prog].sample_length;
+    data[SAMPLE_LENGTH_IDX] = QuadGT_Progs[prog].sample_length;
   }
   else 
   {
@@ -711,65 +725,65 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Pitch Parameters (0x1A - 
   //-------------------------------------------------------------------------
-  data[PITCH_MODE_IDX]   = QuadGT_Patch[prog].pitch_mode;
+  data[PITCH_MODE_IDX]   = QuadGT_Progs[prog].pitch_mode;
 
-  data[PITCH_INPUT_IDX]  = QuadGT_Patch[prog].pitch_input & BIT0;
-  data[RES4_AMP_IDX]    |= (QuadGT_Patch[prog].res_amp[3] << 1) & BITS1to7;
+  data[PITCH_INPUT_IDX]  = QuadGT_Progs[prog].pitch_input & BIT0;
+  data[RES4_AMP_IDX]    |= (QuadGT_Progs[prog].res_amp[3] << 1) & BITS1to7;
 
-  data[LFO_WAVEFORM_IDX] = QuadGT_Patch[prog].lfo_waveform & BIT0;
-  data[EQ_PRESET_IDX]   |= (QuadGT_Patch[prog].geq_preset << 1) & BITS1to7;
+  data[LFO_WAVEFORM_IDX] = QuadGT_Progs[prog].lfo_waveform & BIT0;
+  data[EQ_PRESET_IDX]   |= (QuadGT_Progs[prog].geq_preset << 1) & BITS1to7;
 
-  data[LFO_SPEED_IDX] = QuadGT_Patch[prog].lfo_speed;
+  data[LFO_SPEED_IDX] = QuadGT_Progs[prog].lfo_speed;
 
-  data[LFO_DEPTH_IDX] = QuadGT_Patch[prog].lfo_depth;
+  data[LFO_DEPTH_IDX] = QuadGT_Progs[prog].lfo_depth;
 
   //-------------------------------------------------------------------------
   // Delay Parameters (0x27 - 
   //-------------------------------------------------------------------------
-  data[DELAY_MODE_IDX]   = QuadGT_Patch[prog].delay_mode;
+  data[DELAY_MODE_IDX]   = QuadGT_Progs[prog].delay_mode;
 
-  data[DELAY_INPUT_IDX]  = QuadGT_Patch[prog].delay_input & BIT0;
-  data[RES5_AMP_IDX]    |= (QuadGT_Patch[prog].res_amp[4] << 1) & BITS1to7;
+  data[DELAY_INPUT_IDX]  = QuadGT_Progs[prog].delay_input & BIT0;
+  data[RES5_AMP_IDX]    |= (QuadGT_Progs[prog].res_amp[4] << 1) & BITS1to7;
 
-  data[DELAY_INPUT_MIX_IDX] = QuadGT_Patch[prog].delay_input_mix;
+  data[DELAY_INPUT_MIX_IDX] = QuadGT_Progs[prog].delay_input_mix;
 
-  QuadGT_Encode_16Bit(QuadGT_Patch[prog].delay, &data[DELAY_IDX]);
+  QuadGT_Encode_16Bit(QuadGT_Progs[prog].delay, &data[DELAY_IDX]);
 
   //-------------------------------------------------------------------------
   // Reverb Parameters (0x32 - 0x43)
   //-------------------------------------------------------------------------
-  data[REVERB_MODE_IDX]   = QuadGT_Patch[prog].reverb_mode;
+  data[REVERB_MODE_IDX]   = QuadGT_Progs[prog].reverb_mode;
 
   //-------------------------------------------------------------------------
   // Config (0x44)
   //-------------------------------------------------------------------------
-  data[CONFIG_IDX]    = QuadGT_Patch[prog].config;
+  data[CONFIG_IDX]    = QuadGT_Progs[prog].config;
 
   //-------------------------------------------------------------------------
   // Mix Parameters (0x45 - 
   //-------------------------------------------------------------------------
-  data[PREPOST_EQ_IDX]    = QuadGT_Patch[prog].prepost_eq & BIT0;
-  data[DIRECT_LEVEL_IDX] |= (QuadGT_Patch[prog].direct_level << 1) & BITS1to7;
-  data[MASTER_EFFECTS_LEVEL_IDX] = QuadGT_Patch[prog].master_effects_level;
+  data[PREPOST_EQ_IDX]    = QuadGT_Progs[prog].prepost_eq & BIT0;
+  data[DIRECT_LEVEL_IDX] |= (QuadGT_Progs[prog].direct_level << 1) & BITS1to7;
+  data[MASTER_EFFECTS_LEVEL_IDX] = QuadGT_Progs[prog].master_effects_level;
 
-  if (QuadGT_Patch[prog].prepost_eq == 0) data[PREAMP_LEVEL_IDX]=QuadGT_Patch[prog].preamp_level;
-  else                                    data[EQ_LEVEL_IDX]=QuadGT_Patch[prog].eq_level;
+  if (QuadGT_Progs[prog].prepost_eq == 0) data[PREAMP_LEVEL_IDX]=QuadGT_Progs[prog].preamp_level;
+  else                                    data[EQ_LEVEL_IDX]=QuadGT_Progs[prog].eq_level;
 
-  if (QuadGT_Patch[prog].config==1)
+  if (QuadGT_Progs[prog].config==1)
   {
-    data[LESLIE_LEVEL_IDX] = QuadGT_Patch[prog].leslie_level;
+    data[LESLIE_LEVEL_IDX] = QuadGT_Progs[prog].leslie_level;
   }
-  else if (QuadGT_Patch[prog].config==5)
+  else if (QuadGT_Progs[prog].config==5)
   {
-    data[RING_MOD_LEVEL_IDX] = QuadGT_Patch[prog].ring_mod_level;
+    data[RING_MOD_LEVEL_IDX] = QuadGT_Progs[prog].ring_mod_level;
   }
   else
   {
-    data[PITCH_LEVEL_IDX] = QuadGT_Patch[prog].pitch_level;
+    data[PITCH_LEVEL_IDX] = QuadGT_Progs[prog].pitch_level;
   }
 
-  data[DELAY_LEVEL_IDX ] = QuadGT_Patch[prog].delay_level;
-  data[REVERB_LEVEL_IDX ] = QuadGT_Patch[prog].reverb_level;
+  data[DELAY_LEVEL_IDX ] = QuadGT_Progs[prog].delay_level;
+  data[REVERB_LEVEL_IDX ] = QuadGT_Progs[prog].reverb_level;
 
   //-------------------------------------------------------------------------
   // Modulation Parameters (0x50 - 0x67)
@@ -782,33 +796,33 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Name (0x6A)
   //-------------------------------------------------------------------------
-  memcpy(&data[NAME_IDX], QuadGT_Patch[prog].name, NAME_LENGTH);
+  memcpy(&data[NAME_IDX], QuadGT_Progs[prog].name, NAME_LENGTH);
 
   //-------------------------------------------------------------------------
   // More mix/ring mod/res/pan Parameters (0x78 - 0x7B)
   //-------------------------------------------------------------------------
-  data[RING_MOD_OUTPUT_MIX_IDX]  = QuadGT_Patch[prog].ring_mod_output_mix;
-  data[RING_MOD_DEL_REV_MIX_IDX]  = QuadGT_Patch[prog].ring_mod_del_rev_mix;
-  data[PAN_SPEED_IDX]  = QuadGT_Patch[prog].pan_speed;
-  data[PAN_DEPTH_IDX]  = QuadGT_Patch[prog].pan_depth;
+  data[RING_MOD_OUTPUT_MIX_IDX]  = QuadGT_Progs[prog].ring_mod_output_mix;
+  data[RING_MOD_DEL_REV_MIX_IDX]  = QuadGT_Progs[prog].ring_mod_del_rev_mix;
+  data[PAN_SPEED_IDX]  = QuadGT_Progs[prog].pan_speed;
+  data[PAN_DEPTH_IDX]  = QuadGT_Progs[prog].pan_depth;
   
   //-------------------------------------------------------------------------
   // Pre-amp Parameters (0x7C - 0x7F)
   //-------------------------------------------------------------------------
-  data[PREAMP_DIST_IDX]  = QuadGT_Patch[prog].dist & BITS0to3;
-  data[PREAMP_COMP_IDX] |= (QuadGT_Patch[prog].comp << 4) & BITS4to6;
-  data[EQ_MODE_IDX]     |= (QuadGT_Patch[prog].eq_mode<<7) & BIT7;
+  data[PREAMP_DIST_IDX]  = QuadGT_Progs[prog].dist & BITS0to3;
+  data[PREAMP_COMP_IDX] |= (QuadGT_Progs[prog].comp << 4) & BITS4to6;
+  data[EQ_MODE_IDX]     |= (QuadGT_Progs[prog].eq_mode<<7) & BIT7;
 
-  data[MIX_MOD_IDX]      = (QuadGT_Patch[prog].mix_mod      << 6) & BITS6to7;
-  data[EFFECT_LOOP_IDX] |= (QuadGT_Patch[prog].effect_loop  << 5) & BIT5;
-  data[BASS_BOOST_IDX]  |= (QuadGT_Patch[prog].bass_boost   << 4) & BIT4;
-  data[PREAMP_TONE_IDX] |= (QuadGT_Patch[prog].preamp_tone  << 2) & BITS2to3;
-  data[CAB_SIM_IDX]     |= QuadGT_Patch[prog].cab_sim  & BITS0to1;
+  data[MIX_MOD_IDX]      = (QuadGT_Progs[prog].mix_mod      << 6) & BITS6to7;
+  data[EFFECT_LOOP_IDX] |= (QuadGT_Progs[prog].effect_loop  << 5) & BIT5;
+  data[BASS_BOOST_IDX]  |= (QuadGT_Progs[prog].bass_boost   << 4) & BIT4;
+  data[PREAMP_TONE_IDX] |= (QuadGT_Progs[prog].preamp_tone  << 2) & BITS2to3;
+  data[CAB_SIM_IDX]     |= QuadGT_Progs[prog].cab_sim  & BITS0to1;
 
-  data[PREAMP_OD_IDX]         = (QuadGT_Patch[prog].od << 5) & BITS5to7;
-  data[PREAMP_GATE_IDX]      |= (QuadGT_Patch[prog].preamp_gate & BITS0to4);
+  data[PREAMP_OD_IDX]         = (QuadGT_Progs[prog].od << 5) & BITS5to7;
+  data[PREAMP_GATE_IDX]      |= (QuadGT_Progs[prog].preamp_gate & BITS0to4);
 
-  data[PREAMP_OUT_LEVEL_IDX] = QuadGT_Patch[prog].preamp_out_level;
+  data[PREAMP_OUT_LEVEL_IDX] = QuadGT_Progs[prog].preamp_out_level;
   
   return 0;
 }
@@ -822,161 +836,161 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
-  QuadGT_Patch[prog].config= data[CONFIG_IDX];
-  memcpy(QuadGT_Patch[prog].name, &data[NAME_IDX], NAME_LENGTH);
-  QuadGT_Patch[prog].name[NAME_LENGTH]=0;
+  QuadGT_Progs[prog].config= data[CONFIG_IDX];
+  memcpy(QuadGT_Progs[prog].name, &data[NAME_IDX], NAME_LENGTH);
+  QuadGT_Progs[prog].name[NAME_LENGTH]=0;
 
 
   //-------------------------------------------------------------------------
   // Preamp Parameters (0x7C - 0x7F)
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].comp             = (data[PREAMP_COMP_IDX] & BITS4to6) >> 4;
-  QuadGT_Patch[prog].od               = (data[PREAMP_OD_IDX]   & BITS5to7) >> 5;
-  QuadGT_Patch[prog].dist             = (data[PREAMP_DIST_IDX] & BITS0to3);
-  QuadGT_Patch[prog].preamp_tone      = (data[PREAMP_TONE_IDX] & BITS2to3) >> 2;
-  QuadGT_Patch[prog].bass_boost       = data[BASS_BOOST_IDX];
-  QuadGT_Patch[prog].cab_sim          = data[CAB_SIM_IDX];
-  QuadGT_Patch[prog].effect_loop      = data[EFFECT_LOOP_IDX];
-  QuadGT_Patch[prog].preamp_gate      = (data[PREAMP_GATE_IDX] & BITS0to4);
-  QuadGT_Patch[prog].preamp_out_level = data[PREAMP_OUT_LEVEL_IDX];
+  QuadGT_Progs[prog].comp             = (data[PREAMP_COMP_IDX] & BITS4to6) >> 4;
+  QuadGT_Progs[prog].od               = (data[PREAMP_OD_IDX]   & BITS5to7) >> 5;
+  QuadGT_Progs[prog].dist             = (data[PREAMP_DIST_IDX] & BITS0to3);
+  QuadGT_Progs[prog].preamp_tone      = (data[PREAMP_TONE_IDX] & BITS2to3) >> 2;
+  QuadGT_Progs[prog].bass_boost       = data[BASS_BOOST_IDX];
+  QuadGT_Progs[prog].cab_sim          = data[CAB_SIM_IDX];
+  QuadGT_Progs[prog].effect_loop      = data[EFFECT_LOOP_IDX];
+  QuadGT_Progs[prog].preamp_gate      = (data[PREAMP_GATE_IDX] & BITS0to4);
+  QuadGT_Progs[prog].preamp_out_level = data[PREAMP_OUT_LEVEL_IDX];
 
   //-------------------------------------------------------------------------
   // Eq Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].eq_mode=((data[EQ_MODE_IDX]&BIT7)>>7);                // Eq Mode: Eq or Eq/Resonator
-  QuadGT_Patch[prog].geq_preset = (data[EQ_PRESET_IDX]&BITS1to7)>>1;       // User or Preset 1-6
+  QuadGT_Progs[prog].eq_mode=((data[EQ_MODE_IDX]&BIT7)>>7);                // Eq Mode: Eq or Eq/Resonator
+  QuadGT_Progs[prog].geq_preset = (data[EQ_PRESET_IDX]&BITS1to7)>>1;       // User or Preset 1-6
 
   // 3 and 5 Band Eq
-  if ( (QuadGT_Patch[prog].config==0) || (QuadGT_Patch[prog].config==4) ||
-       (QuadGT_Patch[prog].config==3))
+  if ( (QuadGT_Progs[prog].config==0) || (QuadGT_Progs[prog].config==4) ||
+       (QuadGT_Progs[prog].config==3))
   {
-    QuadGT_Patch[prog].low_eq_freq   = QuadGT_Decode_16Bit(&data[LOW_EQ_FREQ_IDX]);
-    FormDebug->Log(NULL, "LOW FREQ="+AnsiString(QuadGT_Patch[prog].low_eq_freq)+"Hz");
-    QuadGT_Patch[prog].low_eq_amp    = QuadGT_Decode_16Bit(&data[LOW_EQ_AMP_IDX]);
-    QuadGT_Patch[prog].mid_eq_freq   = QuadGT_Decode_16Bit(&data[MID_EQ_FREQ_IDX]);
-    FormDebug->Log(NULL, "MID FREQ="+AnsiString(QuadGT_Patch[prog].mid_eq_freq)+"Hz");
-    QuadGT_Patch[prog].mid_eq_amp    = QuadGT_Decode_16Bit(&data[MID_EQ_AMP_IDX]);
-    QuadGT_Patch[prog].mid_eq_q      = data[MID_EQ_BW_IDX];
-    QuadGT_Patch[prog].high_eq_freq  = QuadGT_Decode_16Bit(&data[HIGH_EQ_FREQ_IDX]);
-    FormDebug->Log(NULL, "HIGH FREQ="+AnsiString(QuadGT_Patch[prog].high_eq_freq)+"Hz");
-    QuadGT_Patch[prog].high_eq_amp   = QuadGT_Decode_16Bit(&data[HIGH_EQ_AMP_IDX]);
+    QuadGT_Progs[prog].low_eq_freq   = QuadGT_Decode_16Bit(&data[LOW_EQ_FREQ_IDX]);
+    FormDebug->Log(NULL, "LOW FREQ="+AnsiString(QuadGT_Progs[prog].low_eq_freq)+"Hz");
+    QuadGT_Progs[prog].low_eq_amp    = QuadGT_Decode_16Bit(&data[LOW_EQ_AMP_IDX]);
+    QuadGT_Progs[prog].mid_eq_freq   = QuadGT_Decode_16Bit(&data[MID_EQ_FREQ_IDX]);
+    FormDebug->Log(NULL, "MID FREQ="+AnsiString(QuadGT_Progs[prog].mid_eq_freq)+"Hz");
+    QuadGT_Progs[prog].mid_eq_amp    = QuadGT_Decode_16Bit(&data[MID_EQ_AMP_IDX]);
+    QuadGT_Progs[prog].mid_eq_q      = data[MID_EQ_BW_IDX];
+    QuadGT_Progs[prog].high_eq_freq  = QuadGT_Decode_16Bit(&data[HIGH_EQ_FREQ_IDX]);
+    FormDebug->Log(NULL, "HIGH FREQ="+AnsiString(QuadGT_Progs[prog].high_eq_freq)+"Hz");
+    QuadGT_Progs[prog].high_eq_amp   = QuadGT_Decode_16Bit(&data[HIGH_EQ_AMP_IDX]);
   }
 
   // 5 Band Eq only
-  if (QuadGT_Patch[prog].config==3)
+  if (QuadGT_Progs[prog].config==3)
   {
     // TBD
-    QuadGT_Patch[prog].low_mid_eq_freq   = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_FREQ_IDX]);
-    FormDebug->Log(NULL, "LOW MID FREQ="+AnsiString(QuadGT_Patch[prog].low_mid_eq_freq)+"Hz");
-    QuadGT_Patch[prog].low_mid_eq_amp    = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_AMP_IDX]);
-    FormDebug->Log(NULL, "LOW MID AMP="+AnsiString(QuadGT_Patch[prog].low_mid_eq_amp));
-    QuadGT_Patch[prog].low_mid_eq_q      = data[LOW_MID_EQ_BW_IDX];
-    FormDebug->Log(NULL, "LOW MID Q="+AnsiString(QuadGT_Patch[prog].low_mid_eq_q));
+    QuadGT_Progs[prog].low_mid_eq_freq   = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_FREQ_IDX]);
+    FormDebug->Log(NULL, "LOW MID FREQ="+AnsiString(QuadGT_Progs[prog].low_mid_eq_freq)+"Hz");
+    QuadGT_Progs[prog].low_mid_eq_amp    = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_AMP_IDX]);
+    FormDebug->Log(NULL, "LOW MID AMP="+AnsiString(QuadGT_Progs[prog].low_mid_eq_amp));
+    QuadGT_Progs[prog].low_mid_eq_q      = data[LOW_MID_EQ_BW_IDX];
+    FormDebug->Log(NULL, "LOW MID Q="+AnsiString(QuadGT_Progs[prog].low_mid_eq_q));
 
-    QuadGT_Patch[prog].high_mid_eq_freq   = QuadGT_Decode_16Bit(&data[HIGH_MID_EQ_FREQ_IDX]);
-    FormDebug->Log(NULL, "HIGH MID FREQ="+AnsiString(QuadGT_Patch[prog].high_mid_eq_freq)+"Hz");
-    QuadGT_Patch[prog].high_mid_eq_amp    = QuadGT_Decode_16Bit(&data[HIGH_MID_EQ_AMP_IDX]);
-    QuadGT_Patch[prog].high_mid_eq_q      = data[HIGH_MID_EQ_BW_IDX];
+    QuadGT_Progs[prog].high_mid_eq_freq   = QuadGT_Decode_16Bit(&data[HIGH_MID_EQ_FREQ_IDX]);
+    FormDebug->Log(NULL, "HIGH MID FREQ="+AnsiString(QuadGT_Progs[prog].high_mid_eq_freq)+"Hz");
+    QuadGT_Progs[prog].high_mid_eq_amp    = QuadGT_Decode_16Bit(&data[HIGH_MID_EQ_AMP_IDX]);
+    QuadGT_Progs[prog].high_mid_eq_q      = data[HIGH_MID_EQ_BW_IDX];
   }
 
   // Graphic Eq
-  if (QuadGT_Patch[prog].config==2)
+  if (QuadGT_Progs[prog].config==2)
   {
-    QuadGT_Patch[prog].geq_16hz   = data[GEQ_16HZ_IDX]-14;
-    QuadGT_Patch[prog].geq_32hz   = data[GEQ_32HZ_IDX]-14;
-    QuadGT_Patch[prog].geq_62hz   = data[GEQ_62HZ_IDX]-14;
-    QuadGT_Patch[prog].geq_126hz  = data[GEQ_126HZ_IDX]-14;
-    QuadGT_Patch[prog].geq_250hz  = data[GEQ_250HZ_IDX]-14;
-    QuadGT_Patch[prog].geq_500hz  = data[GEQ_500HZ_IDX]-14;
-    QuadGT_Patch[prog].geq_1khz   = data[GEQ_1KHZ_IDX]-14;
-    QuadGT_Patch[prog].geq_2khz   = data[GEQ_2KHZ_IDX]-14;
-    QuadGT_Patch[prog].geq_4khz   = data[GEQ_4KHZ_IDX]-14;
-    QuadGT_Patch[prog].geq_8khz   = data[GEQ_8KHZ_IDX]-14;
-    QuadGT_Patch[prog].geq_16khz  = data[GEQ_16KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_16hz   = data[GEQ_16HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_32hz   = data[GEQ_32HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_62hz   = data[GEQ_62HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_126hz  = data[GEQ_126HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_250hz  = data[GEQ_250HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_500hz  = data[GEQ_500HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_1khz   = data[GEQ_1KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_2khz   = data[GEQ_2KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_4khz   = data[GEQ_4KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_8khz   = data[GEQ_8KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_16khz  = data[GEQ_16KHZ_IDX]-14;
   }
 
 
   //-------------------------------------------------------------------------
   // Pitch Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].pitch_mode    = data[PITCH_MODE_IDX];
-  QuadGT_Patch[prog].pitch_input   = data[PITCH_INPUT_IDX] & BIT0;
-  QuadGT_Patch[prog].lfo_waveform  = data[LFO_WAVEFORM_IDX] & BIT0;
-  QuadGT_Patch[prog].lfo_speed     = data[LFO_SPEED_IDX];
-  QuadGT_Patch[prog].lfo_depth     = data[LFO_DEPTH_IDX];
-  QuadGT_Patch[prog].pitch_feedback= data[PITCH_FEEDBACK_IDX];
+  QuadGT_Progs[prog].pitch_mode    = data[PITCH_MODE_IDX];
+  QuadGT_Progs[prog].pitch_input   = data[PITCH_INPUT_IDX] & BIT0;
+  QuadGT_Progs[prog].lfo_waveform  = data[LFO_WAVEFORM_IDX] & BIT0;
+  QuadGT_Progs[prog].lfo_speed     = data[LFO_SPEED_IDX];
+  QuadGT_Progs[prog].lfo_depth     = data[LFO_DEPTH_IDX];
+  QuadGT_Progs[prog].pitch_feedback= data[PITCH_FEEDBACK_IDX];
 
   //-------------------------------------------------------------------------
   // Delay Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].delay_mode=data[DELAY_MODE_IDX];
-  QuadGT_Patch[prog].delay_input=data[DELAY_INPUT_IDX]&BIT0;
-  QuadGT_Patch[prog].delay_input_mix = data[DELAY_INPUT_MIX_IDX];
-  QuadGT_Patch[prog].delay=data[DELAY_IDX];
-  QuadGT_Patch[prog].delay_feedback=data[DELAY_FEEDBACK_IDX];
-  QuadGT_Patch[prog].delay_left=data[DELAY_LEFT_IDX];
-  QuadGT_Patch[prog].delay_left_feedback=data[DELAY_LEFT_FEEDBACK_IDX];
-  QuadGT_Patch[prog].delay_right=data[DELAY_RIGHT_IDX];
-  QuadGT_Patch[prog].delay_right_feedback=data[DELAY_RIGHT_FEEDBACK_IDX];
+  QuadGT_Progs[prog].delay_mode=data[DELAY_MODE_IDX];
+  QuadGT_Progs[prog].delay_input=data[DELAY_INPUT_IDX]&BIT0;
+  QuadGT_Progs[prog].delay_input_mix = data[DELAY_INPUT_MIX_IDX];
+  QuadGT_Progs[prog].delay=data[DELAY_IDX];
+  QuadGT_Progs[prog].delay_feedback=data[DELAY_FEEDBACK_IDX];
+  QuadGT_Progs[prog].delay_left=data[DELAY_LEFT_IDX];
+  QuadGT_Progs[prog].delay_left_feedback=data[DELAY_LEFT_FEEDBACK_IDX];
+  QuadGT_Progs[prog].delay_right=data[DELAY_RIGHT_IDX];
+  QuadGT_Progs[prog].delay_right_feedback=data[DELAY_RIGHT_FEEDBACK_IDX];
 
   //-------------------------------------------------------------------------
   // Reverb Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].reverb_mode = data[REVERB_MODE_IDX];
-  QuadGT_Patch[prog].reverb_input_1	        = data[REVERB_INPUT_1_IDX];
-  QuadGT_Patch[prog].reverb_input_2	        = data[REVERB_INPUT_2_IDX];
-  QuadGT_Patch[prog].reverb_input_mix	        = data[REVERB_INPUT_MIX_IDX];
-  QuadGT_Patch[prog].reverb_predelay	        = data[REVERB_PREDELAY_IDX];
-  QuadGT_Patch[prog].reverb_predelay_mix	= data[REVERB_PREDELAY_MIX_IDX];
-  QuadGT_Patch[prog].reverb_decay	        = data[REVERB_DECAY_IDX];
-  QuadGT_Patch[prog].reverb_diffusion	        = data[REVERB_DIFFUSION_IDX];
-  QuadGT_Patch[prog].reverb_low_decay	        = data[REVERB_LOW_DECAY_IDX];
-  QuadGT_Patch[prog].reverb_high_decay	        = data[REVERB_HIGH_DECAY_IDX];
-  QuadGT_Patch[prog].reverb_density	        = data[REVERB_DENSITY_IDX];
-  QuadGT_Patch[prog].reverb_gate	        = data[REVERB_GATE_IDX];
-  QuadGT_Patch[prog].reverb_gate_hold	        = data[REVERB_GATE_HOLD_IDX];
-  QuadGT_Patch[prog].reverb_gate_release	= data[REVERB_GATE_RELEASE_IDX];
-  QuadGT_Patch[prog].reverb_gated_level	        = data[REVERB_GATED_LEVEL_IDX];
+  QuadGT_Progs[prog].reverb_mode = data[REVERB_MODE_IDX];
+  QuadGT_Progs[prog].reverb_input_1	        = data[REVERB_INPUT_1_IDX];
+  QuadGT_Progs[prog].reverb_input_2	        = data[REVERB_INPUT_2_IDX];
+  QuadGT_Progs[prog].reverb_input_mix	        = data[REVERB_INPUT_MIX_IDX];
+  QuadGT_Progs[prog].reverb_predelay	        = data[REVERB_PREDELAY_IDX];
+  QuadGT_Progs[prog].reverb_predelay_mix	= data[REVERB_PREDELAY_MIX_IDX];
+  QuadGT_Progs[prog].reverb_decay	        = data[REVERB_DECAY_IDX];
+  QuadGT_Progs[prog].reverb_diffusion	        = data[REVERB_DIFFUSION_IDX];
+  QuadGT_Progs[prog].reverb_low_decay	        = data[REVERB_LOW_DECAY_IDX];
+  QuadGT_Progs[prog].reverb_high_decay	        = data[REVERB_HIGH_DECAY_IDX];
+  QuadGT_Progs[prog].reverb_density	        = data[REVERB_DENSITY_IDX];
+  QuadGT_Progs[prog].reverb_gate	        = data[REVERB_GATE_IDX];
+  QuadGT_Progs[prog].reverb_gate_hold	        = data[REVERB_GATE_HOLD_IDX];
+  QuadGT_Progs[prog].reverb_gate_release	= data[REVERB_GATE_RELEASE_IDX];
+  QuadGT_Progs[prog].reverb_gated_level	        = data[REVERB_GATED_LEVEL_IDX];
 
   //-------------------------------------------------------------------------
   // Mix Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].prepost_eq=data[PREPOST_EQ_IDX] & BIT0;
-  QuadGT_Patch[prog].direct_level=(data[DIRECT_LEVEL_IDX ] & BITS1to7) >> 1;
-  QuadGT_Patch[prog].master_effects_level=data[MASTER_EFFECTS_LEVEL_IDX ];
+  QuadGT_Progs[prog].prepost_eq=data[PREPOST_EQ_IDX] & BIT0;
+  QuadGT_Progs[prog].direct_level=(data[DIRECT_LEVEL_IDX ] & BITS1to7) >> 1;
+  QuadGT_Progs[prog].master_effects_level=data[MASTER_EFFECTS_LEVEL_IDX ];
 
-  if (QuadGT_Patch[prog].prepost_eq == 0) QuadGT_Patch[prog].preamp_level=data[PREAMP_LEVEL_IDX];
-  else                                    QuadGT_Patch[prog].eq_level=data[EQ_LEVEL_IDX];
+  if (QuadGT_Progs[prog].prepost_eq == 0) QuadGT_Progs[prog].preamp_level=data[PREAMP_LEVEL_IDX];
+  else                                    QuadGT_Progs[prog].eq_level=data[EQ_LEVEL_IDX];
 
-  if (QuadGT_Patch[prog].config==1)
+  if (QuadGT_Progs[prog].config==1)
   {
-    QuadGT_Patch[prog].leslie_level=data[LESLIE_LEVEL_IDX];
+    QuadGT_Progs[prog].leslie_level=data[LESLIE_LEVEL_IDX];
   }
-  else if (QuadGT_Patch[prog].config==5)
+  else if (QuadGT_Progs[prog].config==5)
   {
-    QuadGT_Patch[prog].ring_mod_level=data[RING_MOD_LEVEL_IDX];
+    QuadGT_Progs[prog].ring_mod_level=data[RING_MOD_LEVEL_IDX];
   }
   else
   {
-    QuadGT_Patch[prog].pitch_level=data[PITCH_LEVEL_IDX];
+    QuadGT_Progs[prog].pitch_level=data[PITCH_LEVEL_IDX];
   }
 
-  QuadGT_Patch[prog].delay_level=data[DELAY_LEVEL_IDX ];
-  QuadGT_Patch[prog].reverb_level=data[REVERB_LEVEL_IDX ];
-  QuadGT_Patch[prog].mix_mod=(data[MIX_MOD_IDX] & BITS6to7) >> 6;
-  // TBD: MOD_DEPTH what is IDX?
-  // TBD: MOD_SPEED what is IDX?
+  QuadGT_Progs[prog].delay_level=data[DELAY_LEVEL_IDX ];
+  QuadGT_Progs[prog].reverb_level=data[REVERB_LEVEL_IDX ];
+  QuadGT_Progs[prog].mix_mod=(data[MIX_MOD_IDX] & BITS6to7) >> 6;
+  // TBD: MOD_DEPTH what is IDX?  Same as LFO?
+  // TBD: MOD_SPEED what is IDX?  Same as LFO?
 
   //-------------------------------------------------------------------------
   // Modulation Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Patch[prog].mod_source[0]=data[MOD1_SOURCE_IDX];
-  QuadGT_Patch[prog].mod_target[0]=data[MOD1_TARGET_IDX];
-  QuadGT_Patch[prog].mod_amp[0]   =data[MOD1_AMP_IDX];
+  QuadGT_Progs[prog].mod_source[0]=data[MOD1_SOURCE_IDX];
+  QuadGT_Progs[prog].mod_target[0]=data[MOD1_TARGET_IDX];
+  QuadGT_Progs[prog].mod_amp[0]   =data[MOD1_AMP_IDX];
 
-  QuadGT_Patch[prog].mod_source[1]=data[MOD2_SOURCE_IDX];
-  QuadGT_Patch[prog].mod_target[1]=data[MOD2_TARGET_IDX];
-  QuadGT_Patch[prog].mod_amp[1]   =data[MOD2_AMP_IDX];
+  QuadGT_Progs[prog].mod_source[1]=data[MOD2_SOURCE_IDX];
+  QuadGT_Progs[prog].mod_target[1]=data[MOD2_TARGET_IDX];
+  QuadGT_Progs[prog].mod_amp[1]   =data[MOD2_AMP_IDX];
 
   //-------------------------------------------------------------------------
   // Resonator Parameters
@@ -986,6 +1000,13 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   return 0;
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadSaveBankClick
+// Description : Save an entire bank of programs to a .bnk file (internal
+//               data format as raw binary) on disk.
+// Parameter 1 : Pointer to object that generated the event (In, unused)
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
 {
   UInt8 prog;
@@ -1001,7 +1022,7 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
 
   for(prog=0; prog<QUAD_NUM_PATCH; prog++)
   {
-    if (fwrite(&QuadGT_Patch[prog], sizeof(tQuadGT_Patch), 1, bank_file) != 1)
+    if (fwrite(&QuadGT_Progs[prog], sizeof(tQuadGT_Prog), 1, bank_file) != 1)
     {
       FormError->ShowError(ferror(bank_file),"writing bank file ");
       break;
@@ -1012,11 +1033,18 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
 
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadBankLoadClick
+// Description : Load an entire bank of programs from a .bnk file (internal
+//               data format as raw binary) on disk.
+// Parameter 1 : Pointer to object that generated the event (In, unused)
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
 {
   UInt8 prog;
   FILE *bank_file;
-  tQuadGT_Patch quadgt_patch[QUAD_NUM_PATCH];
+  tQuadGT_Prog quadgt_patch[QUAD_NUM_PATCH];
 
   bank_file = fopen("quadgt.bnk","rb");
   if (bank_file == NULL)
@@ -1026,7 +1054,7 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
   }
   for(prog=0; prog<QUAD_NUM_PATCH; prog++)
   {
-    if (fread(&quadgt_patch[prog], sizeof(tQuadGT_Patch), 1, bank_file) != 1)
+    if (fread(&quadgt_patch[prog], sizeof(tQuadGT_Prog), 1, bank_file) != 1)
     {
       FormError->ShowError(ferror(bank_file),"reading bank file ");
       break;
@@ -1036,13 +1064,22 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
   fclose(bank_file);
   if (prog >= QUAD_NUM_PATCH)
   {
-    memcpy(QuadGT_Patch, quadgt_patch, sizeof(QuadGT_Patch));
+    memcpy(QuadGT_Progs, quadgt_patch, sizeof(QuadGT_Progs));
   }
 
   prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
   QuadGT_Display_Update_Patch(prog);
 }
 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : Load an entire bank of programs from a raw binary dump of a 
+//               complete SYSEX on disk.
+// Parameter 1 : 
+// Parameter 2 : 
+// Parameters  : NONE.
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
 {
   UInt8 prog;
@@ -1091,7 +1128,6 @@ void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
 // Name        : QuadPatchAuditionClick
 // Description : Sends the current program to the QuadGT as the edit program
 //               (for auditoning the program).  The program is not saved on
@@ -1135,6 +1171,17 @@ void __fastcall TMainForm::VertBarCentChange(TObject *Sender)
   // TBD:???
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Sysex_Process
+// Description : Process a Sysex message from an Alesis Quadraverb or 
+//               QuadraverbGT.  Checks that message has valid SysEx headers,
+//               has an Alesis manufacturers code, a Quad or QuadGT device
+//               code
+// Parameter 1 : 
+// Parameter 2 : 
+// Parameters  : NONE.
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 UInt32 QuadGT_Sysex_Process(tBuffer sysex)
 {
    UInt32 offset;
@@ -1144,6 +1191,7 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
 
    if (sysex.buffer != NULL)
    {
+     FormDebug->Log(NULL, "Sysex Process");
      if (memcmp(Sysex_Start, sysex.buffer+offset, sizeof(Sysex_Start))==0)
      {
        offset+=sizeof(Sysex_Start);
@@ -1166,13 +1214,14 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
            {
              if (prog < QUAD_NUM_PATCH)
              {
+	       FormDebug->Log(NULL, "RX: Sysex quad patch, bytes: "+AnsiString(sysex.length-offset));
                QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
                QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
                QuadGT_Display_Update_Patch(prog);
              }
              else if (prog > QUAD_NUM_PATCH)
              {
-	       FormDebug->Log(NULL, "Sysex bank, bytes: "+AnsiString(sysex.length-offset));
+	       FormDebug->Log(NULL, "RX: Sysex bank, bytes: "+AnsiString(sysex.length-offset));
                for (prog = 0; prog < QUAD_NUM_PATCH; prog++)
                {
                  QuadGT_Decode_From_Sysex(sysex.buffer+offset,147, quadgt, QUAD_PATCH_SIZE);

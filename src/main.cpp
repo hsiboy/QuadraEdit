@@ -60,6 +60,8 @@ void __fastcall TMainForm::Init(void)
 
   QuadGT_Display_Update_Patch((UInt8) StrToInt(QuadPatchNum->Text));
 
+  DeviceOpenClick(NULL);
+
 }
 //---------------------------------------------------------------------------
 

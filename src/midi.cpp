@@ -501,46 +501,7 @@ void Midi_Sysex_Process(void)
    sysex = Queue_Pop();
    if (sysex.buffer != NULL)
    {
-     // TBD: Call QuadGT_Sysex_Process here
-     if (memcmp(Sysex_Start, sysex.buffer+offset, sizeof(Sysex_Start))==0)
-     {
-       offset+=sizeof(Sysex_Start);
-       if (memcmp(Sysex_Alesis, sysex.buffer+offset, sizeof(Sysex_Alesis))==0)
-       {
-         offset+=sizeof(Sysex_Alesis);
-         if (memcmp(Sysex_QuadGT, sysex.buffer+offset, sizeof(Sysex_QuadGT))==0)
-         {
-           offset+=sizeof(Sysex_QuadGT);
-
-	   code = *(sysex.buffer+offset);
-	   offset+=1;
-	   prog = *(sysex.buffer+offset);
-	   offset+=1;
-
-           FormDebug->LogHex(NULL, "RX "+AnsiString(sysex.length)+": ", sysex.buffer, sysex.length);
-	   //FormDebug->Log(NULL, "Code: "+AnsiString(code)+"  Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
-
-           if (code == *Sysex_Data_Dump)
-           {
-             if (prog < QUAD_NUM_PATCH)
-             {
-               QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
-               QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
-               QuadGT_Display_Update_Patch(prog);
-  
-               //DEBUG: Change name and send straight back to edit buffer (name change not working?)
-               //memcpy(sysex.buffer+offset+NAME_IDX,"EDIT",4);
-               //Midi_Out_Dump(100, sysex.buffer+offset,sysex.length-offset-1);
-             }
-             else
-             {
-	       FormDebug->Log(NULL, "Data Dump Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
-             }
-           }
-           // TBD: Handle other program types
-	 }
-       }
-     }
+     QuadGT_Sysex_Process(sysex);
      free(sysex.buffer);
    }
 }
