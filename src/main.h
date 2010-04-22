@@ -279,6 +279,7 @@ __published:	// IDE-managed Components
           TShiftState Shift);
     void __fastcall ResNumberExit(TObject *Sender);
     void __fastcall SysexBankLoadClick(TObject *Sender);
+    
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

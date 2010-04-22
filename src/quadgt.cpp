@@ -493,26 +493,23 @@ void QuadGT_Display_Update_Preamp(const UInt8 prog)
 
   // Compression (0-7)
   MainForm->PreComp->Position=MainForm->PreComp->Max-QuadGT_Progs[prog].comp;
-  MainForm->BarChange(MainForm->PreComp);
-  //FormDebug->Log(NULL,"  Compression: "+AnsiString(QuadGT_Progs[prog].comp));
+  MainForm->PreComp->Position = MainForm->PreComp->Max - QuadGT_Progs[prog].comp;
 
   // Overdrive (0-7)
   MainForm->PreOd->Position=MainForm->PreOd->Max-QuadGT_Progs[prog].od;
-  //FormDebug->Log(NULL,"  OD: "+AnsiString(QuadGT_Progs[prog].od));
-  MainForm->BarChange(MainForm->PreOd);
+  MainForm->PreOd->Position = MainForm->PreOd->Max - QuadGT_Progs[prog].od;
 
   // Distortion (0-8)
   MainForm->PreDist->Position=MainForm->PreDist->Max-QuadGT_Progs[prog].dist;
-  //FormDebug->Log(NULL,"  Dist: "+AnsiString(QuadGT_Progs[prog].dist));
-  MainForm->BarChange(MainForm->PreDist);
+  MainForm->PreDist->Position = MainForm->PreDist->Max - QuadGT_Progs[prog].dist;
 
-  // Tone (0-2)
+  // Tone (0-2 Flat, Presence, Bright)
   MainForm->PreTone->ItemIndex=QuadGT_Progs[prog].preamp_tone;
 
-  // Bass Boost (0-1)
+  // Bass Boost (0-1 On, Off)
   MainForm->BassBoost->Checked = QuadGT_Progs[prog].bass_boost == 1 ? TRUE : FALSE;
 
-  // Cab sim (0-2)
+  // Cab sim (0-2 Off, Cab 1, Cab 2)
   MainForm->CabSim->ItemIndex=QuadGT_Progs[prog].cab_sim;
   
   // Effect Loop (0-1)
@@ -520,7 +517,6 @@ void QuadGT_Display_Update_Preamp(const UInt8 prog)
 
   // Noise Gate (0-17)
   MainForm->PreGate->Position=MainForm->PreGate->Max-QuadGT_Progs[prog].preamp_gate;
-  //FormDebug->Log(NULL,"Gate: "+AnsiString(val));
 
   /* Preamp Output Level (0-99) */
   if (MainForm->QuadConfig->ItemIndex == CFG7_SAMPLING)
@@ -531,7 +527,6 @@ void QuadGT_Display_Update_Preamp(const UInt8 prog)
   {
     MainForm->PreOutLevel->Position = MainForm->PreOutLevel->Max-QuadGT_Progs[prog].preamp_out_level;
     MainForm->PreOutLevel->Visible = TRUE;
-    //FormDebug->Log(NULL, "Preamp output level :"+AnsiString(val));
   }
 
 }

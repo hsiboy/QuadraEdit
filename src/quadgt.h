@@ -255,7 +255,7 @@ typedef enum
 #define MIX_MOD_IDX                     (0x7D) // MIX MODULATION (6-7)
 #define EFFECT_LOOP_IDX                 (0x7D) // EFFECT LOOP (5)
 #define BASS_BOOST_IDX                  (0x7D) // BASS BOOST (4)
-#define PREAMP_TONE_IDX                 (0x7D) // AMP TONE (3-2)
+#define PREAMP_TONE_IDX                 (0x7D) // PREAMP TONE (3-2)
 #define CAB_SIM_IDX                     (0x7D) // CAB (1-0)
 #define PREAMP_OD_IDX                   (0x7E) // OVERDRIVE (7-5)
 #define PREAMP_GATE_IDX                 (0x7E) // NOISE GATE (4-0)
@@ -280,12 +280,12 @@ typedef struct
   UInt8 comp;                      // Compression 0-?
   UInt8 od;                        // Overdrive 0-?
   UInt8 dist;                      // Distortion 0-?
-  UInt8 preamp_tone;               // Preamp tone 0-2
+  UInt8 preamp_tone;               // Preamp tone 0-2 (Flat, Prescence, Bright)
   UInt8 preamp_gate;               // Preamp noise gate level 0-15
   UInt8 preamp_out_level;          // Preamp output level 0-99
   UInt8 effect_loop;               // Effect loop on/off 0-1
   UInt8 bass_boost;                // Bass boost on/off 0-1
-  UInt8 cab_sim;                   // Cabinet simulator 0-2
+  UInt8 cab_sim;                   // Cabinet simulator 0-2 (Off, Cab 1, Cab 2)
 
   // Eq parameters
   UInt8 eq_mode;                   // 0=Eq,  1=Eq+Resonator
