@@ -16,6 +16,19 @@
 
 static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
 
+void save_patch(UInt8 *data, UInt32 length, char *fname)
+{
+  FILE *handle;
+  int i;
+  handle= fopen(fname,"w");
+
+  for (i=0; i<length; i++)
+  {
+    fprintf(handle,"%2.2X ",*(data+i));
+  }
+  fclose(handle);
+}
+
 // Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
 UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
 {
@@ -23,6 +36,7 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
   UInt32 i,j;
   UInt8 shift;
 
+  save_patch(in,length,"patch_in.syx");
   // TBD: Ensure output is correct length
 
   //FormDebug->Log(NULL,"----------------------------------");
@@ -677,6 +691,8 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
+  save_patch(data,QUAD_PATCH_SIZE,"patch_out.qgt");
+
   //-------------------------------------------------------------------------
   // Eq/Res/Sample/Tap1 Parameters (0x00 - 0x19)
   //-------------------------------------------------------------------------
@@ -733,7 +749,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[LFO_DEPTH_IDX] = QuadGT_Progs[prog].lfo_depth;
 
   //-------------------------------------------------------------------------
-  // Delay Parameters (0x27 - 
+  // Delay Parameters (0x27 - 0x31)
   //-------------------------------------------------------------------------
   data[DELAY_MODE_IDX]   = QuadGT_Progs[prog].delay_mode;
 
@@ -831,6 +847,8 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
+  save_patch(data,QUAD_PATCH_SIZE,"patch_in.qgt");
+
   QuadGT_Progs[prog].config= data[CONFIG_IDX];
   memcpy(QuadGT_Progs[prog].name, &data[NAME_IDX], NAME_LENGTH);
   QuadGT_Progs[prog].name[NAME_LENGTH]=0;
@@ -872,9 +890,8 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
 
   // 5 Band Eq only
-  if (QuadGT_Progs[prog].config==3)
+  //if (QuadGT_Progs[prog].config==3)
   {
-    // TBD
     QuadGT_Progs[prog].low_mid_eq_freq   = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_FREQ_IDX]);
     FormDebug->Log(NULL, "LOW MID FREQ="+AnsiString(QuadGT_Progs[prog].low_mid_eq_freq)+"Hz");
     QuadGT_Progs[prog].low_mid_eq_amp    = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_AMP_IDX]);
@@ -991,6 +1008,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   // Resonator Parameters
   //-------------------------------------------------------------------------
   //TBD: Determine which set of parameters are used in which mode
+  QuadGT_Progs[prog].res_amp[4] = (data[RES5_AMP_IDX] & BITS1to7) >> 1;
 
   return 0;
 }
@@ -1133,7 +1151,7 @@ void __fastcall TMainForm::QuadPatchAuditionClick(TObject *Sender)
 {
   UInt8 quadgt[QUAD_PATCH_SIZE];
   UInt8 sysex[200];
-  UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+  UInt8 prog=(UInt8)StrToInt(QuadPatchNum->Text);
   UInt32 sysex_size;
 
   // Convert internal format to QuadGT format
@@ -1145,8 +1163,30 @@ void __fastcall TMainForm::QuadPatchAuditionClick(TObject *Sender)
   // Send message
   Midi_Out_Dump(EDIT_BUFFER, sysex, sysex_size);
 }
-//---------------------------------------------------------------------------
 
+//---------------------------------------------------------------------------
+// Name        : QuadPatchWriteClick
+// Description : Sends the current program to the QuadGT 
+// Param 1     : Pointer object that generated the event
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::QuadPatchWriteClick(TObject *Sender)
+{
+  UInt8 prog;
+  long int status;
+  UInt8 quadgt[QUAD_PATCH_SIZE];
+  UInt8 sysex[200];
+  UInt32 sysex_size;
+
+  prog = (UInt8) StrToInt(QuadPatchNum->Text);
+
+  // Convert internal format to QuadGT format
+  QuadGT_Convert_Data_From_Internal(prog, quadgt);
+
+  // Convert QuadGT format to Sysex
+  sysex_size=QuadGT_Encode_To_Sysex(quadgt, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
+
+  save_patch(sysex, sysex_size, "patch_out.syx");
+}
 //---------------------------------------------------------------------------
 UInt16 QuadGT_Decode_16Bit(UInt8 *data)
 {
@@ -1172,8 +1212,7 @@ void __fastcall TMainForm::VertBarCentChange(TObject *Sender)
 //               QuadraverbGT.  Checks that message has valid SysEx headers,
 //               has an Alesis manufacturers code, a Quad or QuadGT device
 //               code
-// Parameter 1 : 
-// Parameter 2 : 
+// Parameter 1 : Buffer full of raw sysex data
 // Parameters  : NONE.
 // Returns     : NONE.
 //---------------------------------------------------------------------------

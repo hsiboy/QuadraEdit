@@ -493,11 +493,9 @@ unsigned int Midi_Out_Close(void)
 void Midi_Sysex_Process(void)
 {
    tBuffer sysex;
-   UInt32 offset;
    UInt8 code,prog;
    UInt8 quadgt[QUAD_PATCH_SIZE];
 
-   offset=0;
    sysex = Queue_Pop();
    if (sysex.buffer != NULL)
    {

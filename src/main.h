@@ -280,6 +280,7 @@ __published:	// IDE-managed Components
     void __fastcall ResNumberExit(TObject *Sender);
     void __fastcall SysexBankLoadClick(TObject *Sender);
     
+    void __fastcall QuadPatchWriteClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
