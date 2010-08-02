@@ -46,8 +46,10 @@
 #define BITS0to6     (0x7F)
 #define BITS1to7     (0xFE)
 
-#define QUAD_PATCH_SIZE   (128)
+#define QUAD_PATCH_SIZE   (128)   // Number of bytes per patch in QuadGT (8 bit) format
 #define QUAD_NUM_PATCH    (100)
+
+#define SYSEX_PATCH_SIZE   (144)   // Number of bytes per patch in SysEx (7 bit) format
 
 #define NUM_MOD           (8)
 #define NUM_RES           (5)
@@ -418,7 +420,7 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
 UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data);
 UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data);
 
-UInt32 QuadGT_Sysex_Process(tBuffer sysex);
+void QuadGT_Sysex_Process(tBuffer sysex);
 
 void QuadGT_Init(void);
 void QuadGT_Display_Update_Patch(UInt8 program);

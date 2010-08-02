@@ -219,7 +219,7 @@ __published:	// IDE-managed Components
     TTrackBar *ChorusDepth;
     TRadioGroup *ChorusOnOff;
     TRadioGroup *ChorusWave;
-    TButton *TEST;
+    TButton *RawQuadGtBankLoad;
     TEdit *Eq5Amp1Val;
     TEdit *Eq5Amp2Val;
     TEdit *Eq5Amp3Val;
@@ -241,6 +241,8 @@ __published:	// IDE-managed Components
     TRadioGroup *Eq5Mode;
     TOpenDialog *SysexOpenDialog;
     TButton *SysexBankLoad;
+    TOpenDialog *QuadGtOpenDialog;
+    TOpenDialog *InternalOpenDialog;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -269,7 +271,7 @@ __published:	// IDE-managed Components
     void __fastcall QuadPatchNumExit(TObject *Sender);
     void __fastcall QuadBankSaveClick(TObject *Sender);
     void __fastcall QuadBankLoadClick(TObject *Sender);
-    void __fastcall TESTClick(TObject *Sender);
+    void __fastcall QuadGtBankLoadClick(TObject *Sender);
     void __fastcall DelayModeClick(TObject *Sender);
 
     void __fastcall QuadPatchAuditionClick(TObject *Sender);

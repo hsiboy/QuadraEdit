@@ -156,20 +156,6 @@ void __fastcall TMainForm::RadioReverbClick(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
-void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
-{
-  UInt8 patch;
-  long int status;
-
-  patch = (UInt8) StrToInt(QuadPatchNum->Text);
-  status=Midi_Out_Dump_Req(patch);
-
-  if (status != 0)
-  {
-     FormError->ShowError(status, "sending SYSEX to Midi output device");
-  }
-
-}
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::DeviceCloseClick(TObject *Sender)
 {

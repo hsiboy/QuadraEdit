@@ -16,10 +16,11 @@
 
 static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
 
+// DEBUG: Save a patch to a an ASCII hex disk file for analysis
 void save_patch(UInt8 *data, UInt32 length, char *fname)
 {
   FILE *handle;
-  int i;
+  UInt32 i;
   handle= fopen(fname,"w");
 
   for (i=0; i<length; i++)
@@ -36,7 +37,9 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
   UInt32 i,j;
   UInt8 shift;
 
-  save_patch(in,length,"patch_in.syx");
+  // DEBUG: Write the patch in sysex format to a disk file
+  save_patch(in,length,"patch_in_sysex.txt");
+
   // TBD: Ensure output is correct length
 
   //FormDebug->Log(NULL,"----------------------------------");
@@ -96,6 +99,10 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   // TBD: Resolve issue with last byte being encoded wrongly
  
   //FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
+  
+  // DEBUG: Write the patch in sysex format to a disk file
+  save_patch(out,j,"patch_out_sysex.txt");
+
   return(j);
 }
 
@@ -117,6 +124,13 @@ void QuadGT_Init(void)
 
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Display_Update_Patch
+// Description : Update the on screen display of the parameters for
+//               the given program based on the data in QuadGT_Progs
+// Parameter 1 : Program number for which display is to be updated
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Display_Update_Patch(UInt8 prog)
 {
   UInt8 config;
@@ -691,7 +705,8 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
-  save_patch(data,QUAD_PATCH_SIZE,"patch_out.qgt");
+  // DEBUG: Write the patch in QuadGT format to a disk file
+  save_patch(data,QUAD_PATCH_SIZE,"patch_outquadgt.txt");
 
   //-------------------------------------------------------------------------
   // Eq/Res/Sample/Tap1 Parameters (0x00 - 0x19)
@@ -847,7 +862,8 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
-  save_patch(data,QUAD_PATCH_SIZE,"patch_in.qgt");
+  // DEBUG: Write the patch in QuadGT format to a disk file
+  save_patch(data,QUAD_PATCH_SIZE,"patch_inquadgt.txt");
 
   QuadGT_Progs[prog].config= data[CONFIG_IDX];
   memcpy(QuadGT_Progs[prog].name, &data[NAME_IDX], NAME_LENGTH);
@@ -1014,6 +1030,55 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 }
 
 //---------------------------------------------------------------------------
+// Name        : QuadPatchWriteClick
+// Description : Write the cyurrent patch to the QuadGT via MIDI
+// Param 1     : Pointer object that generated the event
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::QuadPatchWriteClick(TObject *Sender)
+{
+  UInt8 prog;
+  long int status;
+  UInt8 quadgt[QUAD_PATCH_SIZE];
+  UInt8 sysex[SYSEX_PATCH_SIZE];
+  UInt32 sysex_size;
+
+  prog = (UInt8) StrToInt(QuadPatchNum->Text);
+
+  // Convert internal format to QuadGT format
+  QuadGT_Convert_Data_From_Internal(prog, quadgt);
+
+  // Convert QuadGT format to Sysex
+  sysex_size=QuadGT_Encode_To_Sysex(quadgt, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
+
+  // Send message
+  if (sysex_size > 0)
+  {
+    Midi_Out_Dump(prog, sysex, sysex_size);
+  }
+}
+
+//---------------------------------------------------------------------------
+// Name        : QuadPatchReadClick
+// Description : Read a single patch from the QuadGT via MIDI
+// Parameter 1 : Pointer to object that generated the event (In, unused)
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
+{
+  UInt8 patch;
+  long int status;
+
+  patch = (UInt8) StrToInt(QuadPatchNum->Text);
+  status=Midi_Out_Dump_Req(patch);
+
+  if (status != 0)
+  {
+     FormError->ShowError(status, "sending SYSEX to Midi output device");
+  }
+
+}
+
+//---------------------------------------------------------------------------
 // Name        : QuadSaveBankClick
 // Description : Save an entire bank of programs to a .bnk file (internal
 //               data format as raw binary) on disk.
@@ -1026,7 +1091,10 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
   FILE *bank_file;
   size_t val;
 
-  bank_file = fopen("quadgt.bnk","wb");
+  if (!MainForm->InternalOpenDialog->Execute()) return;
+
+  bank_file = fopen(MainForm->InternalOpenDialog->Files->Strings[0].c_str(),"wb");
+
   if (bank_file == NULL)
   {
     FormError->ShowError(ferror(bank_file),"opening bank file");
@@ -1059,7 +1127,10 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
   FILE *bank_file;
   tQuadGT_Prog quadgt_patch[QUAD_NUM_PATCH];
 
-  bank_file = fopen("quadgt.bnk","rb");
+  if (!MainForm->InternalOpenDialog->Execute()) return;
+
+  bank_file = fopen(MainForm->InternalOpenDialog->Files->Strings[0].c_str(),"rb");
+
   if (bank_file == NULL)
   {
     FormError->ShowError(ferror(bank_file),"opening bank file");
@@ -1085,12 +1156,10 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-// Name        : 
+// Name        : SysexBankLoadClick
 // Description : Load an entire bank of programs from a raw binary dump of a 
 //               complete SYSEX on disk.
-// Parameter 1 : 
-// Parameter 2 : 
-// Parameters  : NONE.
+// Parameter 1 : Pointer to object that generated the event (In, unused)
 // Returns     : NONE.
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
@@ -1165,35 +1234,14 @@ void __fastcall TMainForm::QuadPatchAuditionClick(TObject *Sender)
 }
 
 //---------------------------------------------------------------------------
-// Name        : QuadPatchWriteClick
-// Description : Sends the current program to the QuadGT 
-// Param 1     : Pointer object that generated the event
-//---------------------------------------------------------------------------
-void __fastcall TMainForm::QuadPatchWriteClick(TObject *Sender)
-{
-  UInt8 prog;
-  long int status;
-  UInt8 quadgt[QUAD_PATCH_SIZE];
-  UInt8 sysex[200];
-  UInt32 sysex_size;
-
-  prog = (UInt8) StrToInt(QuadPatchNum->Text);
-
-  // Convert internal format to QuadGT format
-  QuadGT_Convert_Data_From_Internal(prog, quadgt);
-
-  // Convert QuadGT format to Sysex
-  sysex_size=QuadGT_Encode_To_Sysex(quadgt, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
-
-  save_patch(sysex, sysex_size, "patch_out.syx");
-}
-//---------------------------------------------------------------------------
+//Decode two bytes of QuadreverbGT binary data to an internal format 16bit UInt
 UInt16 QuadGT_Decode_16Bit(UInt8 *data)
 {
   //FormDebug->Log(NULL, "Decode "+AnsiString(*data)+", "+AnsiString(*(data+1)));
   return( (UInt16) *(data + 1)  + ((UInt16) *(data)<<8));
 }
 
+// Encode an internal format 16 bit UInt to two bytes of QuadGT format data (8 bits each)
 void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data)
 {
   *data= (UInt8)(word>>8); 
@@ -1216,7 +1264,7 @@ void __fastcall TMainForm::VertBarCentChange(TObject *Sender)
 // Parameters  : NONE.
 // Returns     : NONE.
 //---------------------------------------------------------------------------
-UInt32 QuadGT_Sysex_Process(tBuffer sysex)
+void QuadGT_Sysex_Process(tBuffer sysex)
 {
    UInt32 offset;
    UInt8 code,prog;
@@ -1229,9 +1277,13 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
      if (memcmp(Sysex_Start, sysex.buffer+offset, sizeof(Sysex_Start))==0)
      {
        offset+=sizeof(Sysex_Start);
+
+       // SysEx contains Alesis data
        if (memcmp(Sysex_Alesis, sysex.buffer+offset, sizeof(Sysex_Alesis))==0)
        {
          offset+=sizeof(Sysex_Alesis);
+
+         // SysEx contains Quadraverb or QuadraverbGT data
          if ((memcmp(Sysex_QuadGT, sysex.buffer+offset, sizeof(Sysex_QuadGT))==0) ||
              (memcmp(Sysex_Quad, sysex.buffer+offset, sizeof(Sysex_Quad))==0))
          {
@@ -1246,6 +1298,7 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
 
            if (code == *Sysex_Data_Dump)
            {
+             // SysEx contains a single patch
              if (prog < QUAD_NUM_PATCH)
              {
 	       FormDebug->Log(NULL, "RX: Sysex quad patch, bytes: "+AnsiString(sysex.length-offset));
@@ -1253,6 +1306,8 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
                QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
                QuadGT_Display_Update_Patch(prog);
              }
+
+             // Sysex contains a bank of patches
              else if (prog > QUAD_NUM_PATCH)
              {
 	       FormDebug->Log(NULL, "RX: Sysex bank, bytes: "+AnsiString(sysex.length-offset));
@@ -1270,9 +1325,9 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
 	       FormDebug->Log(NULL, "Data Dump Program: "+AnsiString(prog)+"   Bytes: "+AnsiString(sysex.length-offset));
              }
            }
-           // TBD: Handle other program types
+           // TBD: Handle other SysEx data types
 	 }
-         else FormDebug->Log(NULL, "Not for Alesis QuadGT\n");
+         else FormDebug->Log(NULL, "Not for Alesis Quad/QuadGT\n");
        }
        else FormDebug->Log(NULL, "Not for Alesis\n");
      }
@@ -1280,16 +1335,17 @@ UInt32 QuadGT_Sysex_Process(tBuffer sysex)
    }
 }
 
-void __fastcall TMainForm::TESTClick(TObject *Sender)
+void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
 {
   UInt8 prog;
   FILE *quadgt_file;
   tBuffer data;
   UInt32 size;
 
-  if (!MainForm->SysexOpenDialog->Execute()) return;
+  if (!MainForm->QuadGtOpenDialog->Execute()) return;
 
-  quadgt_file = fopen(MainForm->SysexOpenDialog->Files->Strings[0].c_str(),"rb");
+  quadgt_file = fopen(MainForm->QuadGtOpenDialog->Files->Strings[0].c_str(),"rb");
+
   if (quadgt_file == NULL)
   {
     FormError->ShowError(ferror(quadgt_file),"opening QuadGT file");
