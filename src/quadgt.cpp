@@ -1313,10 +1313,10 @@ void QuadGT_Sysex_Process(tBuffer sysex)
 	       FormDebug->Log(NULL, "RX: Sysex bank, bytes: "+AnsiString(sysex.length-offset));
                for (prog = 0; prog < QUAD_NUM_PATCH; prog++)
                {
-                 QuadGT_Decode_From_Sysex(sysex.buffer+offset,147, quadgt, QUAD_PATCH_SIZE);
+                 QuadGT_Decode_From_Sysex(sysex.buffer+offset, SYSEX_PATCH_SIZE, quadgt, QUAD_PATCH_SIZE);
                  QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
 
-                 offset+=147;
+                 offset+= SYSEX_PATCH_SIZE;
                }
                QuadGT_Display_Update_Patch(0);
              }

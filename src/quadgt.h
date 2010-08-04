@@ -49,7 +49,7 @@
 #define QUAD_PATCH_SIZE   (128)   // Number of bytes per patch in QuadGT (8 bit) format
 #define QUAD_NUM_PATCH    (100)
 
-#define SYSEX_PATCH_SIZE   (144)   // Number of bytes per patch in SysEx (7 bit) format
+#define SYSEX_PATCH_SIZE   (147)   // Number of bytes per patch in SysEx (7 bit) format
 
 #define NUM_MOD           (8)
 #define NUM_RES           (5)
