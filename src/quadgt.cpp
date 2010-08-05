@@ -93,7 +93,10 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
     j++;
 
     // Protect for overflow on output data
-    if (j >= out_len) return(0);
+    if (j > out_len) {
+      FormDebug->Log(NULL,"Encode to SYSEX: OVERFLOW "+AnsiString(i)+" "+AnsiString(j));
+      return(0);
+    }
   }
 
   // TBD: Resolve issue with last byte being encoded wrongly
@@ -102,6 +105,10 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   
   // DEBUG: Write the patch in sysex format to a disk file
   save_patch(out,j,"patch_out_sysex.txt");
+  FormDebug->Log(NULL,"Encode to SYSEX: OK");
+
+  //DEBUG: Return 0 so MIDI write doesnt occur
+  return(0);
 
   return(j);
 }
@@ -705,9 +712,6 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 {
   if (prog >= QUAD_NUM_PATCH) return 1;
 
-  // DEBUG: Write the patch in QuadGT format to a disk file
-  save_patch(data,QUAD_PATCH_SIZE,"patch_outquadgt.txt");
-
   //-------------------------------------------------------------------------
   // Eq/Res/Sample/Tap1 Parameters (0x00 - 0x19)
   //-------------------------------------------------------------------------
@@ -725,26 +729,54 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_eq_amp, &data[HIGH_EQ_AMP_IDX]);
 
   // TBD: Select Leslie or Tap 1
+  // Note: Tap 1 Delay is a split parameter
   // TBD: Encode
 
-  // TBD: Select Resonator ** or Eq
-  QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_mid_eq_freq, &data[LOW_MID_EQ_FREQ_IDX]);
-  data[LOW_MID_EQ_BW_IDX] = QuadGT_Progs[prog].low_mid_eq_q;
-  QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_mid_eq_amp, &data[LOW_MID_EQ_AMP_IDX]);
-  QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_mid_eq_freq, &data[HIGH_MID_EQ_FREQ_IDX]);
-  data[HIGH_MID_EQ_BW_IDX] = QuadGT_Progs[prog].high_mid_eq_q;
-  QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_mid_eq_amp, &data[HIGH_MID_EQ_AMP_IDX]);
+  if (QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) 
+  {
+    QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_mid_eq_freq, &data[LOW_MID_EQ_FREQ_IDX]);
+    data[LOW_MID_EQ_BW_IDX] = QuadGT_Progs[prog].low_mid_eq_q;
+    QuadGT_Encode_16Bit(QuadGT_Progs[prog].low_mid_eq_amp, &data[LOW_MID_EQ_AMP_IDX]);
+    QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_mid_eq_freq, &data[HIGH_MID_EQ_FREQ_IDX]);
+    data[HIGH_MID_EQ_BW_IDX] = QuadGT_Progs[prog].high_mid_eq_q;
+    QuadGT_Encode_16Bit(QuadGT_Progs[prog].high_mid_eq_amp, &data[HIGH_MID_EQ_AMP_IDX]);
+  }
 
   // Select Sampling or Tap 1
   // Note: Tap 1 Delay is a split parameter
   if (QuadGT_Progs[prog].config == CFG7_SAMPLING) 
   {
-    data[SAMPLE_LENGTH_IDX] = QuadGT_Progs[prog].sample_length;
+    data[SAMPLE_START_IDX]           = QuadGT_Progs[prog].sample_start;
+    data[SAMPLE_LENGTH_IDX]          = QuadGT_Progs[prog].sample_length;
+    data[SAMPLE_PLAYBACK_MODE_IDX]   = QuadGT_Progs[prog].sample_playback_mode;
+    data[SAMPLE_PITCH_IDX]           = QuadGT_Progs[prog].sample_pitch;
+    data[SAMPLE_REC_AUDIO_TRIG_IDX]  = QuadGT_Progs[prog].sample_rec_audio_trigger;
+    data[SAMPLE_MIDI_TRIG_IDX]       = QuadGT_Progs[prog].sample_midi_trigger;
+    data[SAMPLE_MIDI_BASE_NOTE_IDX]  = QuadGT_Progs[prog].sample_midi_base_note;
+    data[SAMPLE_LOW_MIDI_NOTE_IDX]   = QuadGT_Progs[prog].sample_low_midi_note;
+    data[SAMPLE_HIGH_MIDI_NOTE_IDX]  = QuadGT_Progs[prog].sample_high_midi_note;
   }
   else 
   {
-    //data[TAP1_DELAY_LSB_IDX]   = TBD;
-    //data[TAP1_DELAY_MSB_IDX]   = TBD;
+    QuadGT_Encode_16Bit_Split(QuadGT_Progs[prog].tap1_delay, &data[TAP1_DELAY_MSB_IDX],
+                                                             &data[TAP1_DELAY_LSB_IDX]);
+    data[TAP1_VOLUME_IDX] = QuadGT_Progs[prog].tap1_volume;
+    data[TAP1_PAN_IDX] = QuadGT_Progs[prog].tap1_pan;
+
+    data[DETUNE_AMOUNT_IDX] = QuadGT_Progs[prog].detune_amount;
+
+    // TBD: if leslie
+    // {
+    //   data[LESLIE_MOTOR_IDX] = QuadGT_Progs[prog].leslie_motor;
+    // }
+    // else
+    {
+      data[TAP2_DELAY_IDX] = QuadGT_Progs[prog].tap2_delay;
+    }
+    data[LESLIE_SPEED_IDX] = QuadGT_Progs[prog].leslie_speed;
+    data[TAP2_VOLUME_IDX] = QuadGT_Progs[prog].tap2_volume;
+    data[TAP3_FEEDBACK_IDX] = QuadGT_Progs[prog].tap3_feedback;
+    data[TAP4_DELAY_IDX] = QuadGT_Progs[prog].tap4_delay;
   }
 
 
@@ -850,6 +882,9 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 
   data[PREAMP_OUT_LEVEL_IDX] = QuadGT_Progs[prog].preamp_out_level;
   
+  // DEBUG: Write the patch in QuadGT format to a disk file
+  save_patch(data,QUAD_PATCH_SIZE,"patch_outquadgt.txt");
+
   return 0;
 }
 
@@ -906,7 +941,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
 
   // 5 Band Eq only
-  //if (QuadGT_Progs[prog].config==3)
+  if (QuadGT_Progs[prog].config==3)
   {
     QuadGT_Progs[prog].low_mid_eq_freq   = QuadGT_Decode_16Bit(&data[LOW_MID_EQ_FREQ_IDX]);
     FormDebug->Log(NULL, "LOW MID FREQ="+AnsiString(QuadGT_Progs[prog].low_mid_eq_freq)+"Hz");
@@ -937,6 +972,40 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
     QuadGT_Progs[prog].geq_16khz  = data[GEQ_16KHZ_IDX]-14;
   }
 
+  if (QuadGT_Progs[prog].config == CFG7_SAMPLING) 
+  {
+    QuadGT_Progs[prog].sample_start            = data[SAMPLE_START_IDX]; 
+    QuadGT_Progs[prog].sample_length           = data[SAMPLE_LENGTH_IDX]; 
+    QuadGT_Progs[prog].sample_playback_mode    = data[SAMPLE_PLAYBACK_MODE_IDX]; 
+    QuadGT_Progs[prog].sample_pitch            = data[SAMPLE_PITCH_IDX]; 
+    QuadGT_Progs[prog].sample_rec_audio_trigger= data[SAMPLE_REC_AUDIO_TRIG_IDX]; 
+    QuadGT_Progs[prog].sample_midi_trigger     = data[SAMPLE_MIDI_TRIG_IDX]; 
+    QuadGT_Progs[prog].sample_midi_base_note   = data[SAMPLE_MIDI_BASE_NOTE_IDX]; 
+    QuadGT_Progs[prog].sample_low_midi_note    = data[SAMPLE_LOW_MIDI_NOTE_IDX]; 
+    QuadGT_Progs[prog].sample_high_midi_note   = data[SAMPLE_HIGH_MIDI_NOTE_IDX]; 
+  }
+  else
+  {
+    QuadGT_Progs[prog].tap1_delay = QuadGT_Decode_16Bit_Split(&data[TAP1_DELAY_MSB_IDX],
+                                                              &data[TAP1_DELAY_LSB_IDX]);
+    QuadGT_Progs[prog].tap1_volume = data[TAP1_VOLUME_IDX];
+    QuadGT_Progs[prog].tap1_pan    = data[TAP1_PAN_IDX];
+
+    QuadGT_Progs[prog].detune_amount = data[DETUNE_AMOUNT_IDX];
+
+    // TBD: if leslie
+    // {
+    //   QuadGT_Progs[prog].leslie_motor = data[LESLIE_MOTOR_IDX];
+    // }
+    // else
+    {
+      QuadGT_Progs[prog].tap2_delay = data[TAP2_DELAY_IDX];
+    }
+    QuadGT_Progs[prog].leslie_speed = data[LESLIE_SPEED_IDX];
+    QuadGT_Progs[prog].tap2_volume = data[TAP2_VOLUME_IDX];
+    QuadGT_Progs[prog].tap3_feedback = data[TAP3_FEEDBACK_IDX];
+    QuadGT_Progs[prog].tap4_delay = data[TAP4_DELAY_IDX];
+  }
 
   //-------------------------------------------------------------------------
   // Pitch Parameters
@@ -1241,11 +1310,24 @@ UInt16 QuadGT_Decode_16Bit(UInt8 *data)
   return( (UInt16) *(data + 1)  + ((UInt16) *(data)<<8));
 }
 
+UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb)
+{
+  //FormDebug->Log(NULL, "Decode "+AnsiString(*data)+", "+AnsiString(*(data+1)));
+  return( (UInt16) *msb  + ((UInt16) *(lsb)<<8));
+}
+
 // Encode an internal format 16 bit UInt to two bytes of QuadGT format data (8 bits each)
 void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data)
 {
   *data= (UInt8)(word>>8); 
   *(data+1)=(UInt8)(word & 0xff);
+  //FormDebug->Log(NULL, "Encoded "+AnsiString(*data)+", "+AnsiString(*(data+1)));
+}
+
+void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb)
+{
+  *lsb= (UInt8)(word>>8); 
+  *msb=(UInt8)(word & 0xff);
   //FormDebug->Log(NULL, "Encoded "+AnsiString(*data)+", "+AnsiString(*(data+1)));
 }
 

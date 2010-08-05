@@ -97,12 +97,12 @@ typedef enum
 #define LESLIE_HIGH_ROTOR_LEVEL_IDX     (0x0D) // LESLIE HIGH ROTOR LEVEL
 #define TAP1_DELAY_MSB_IDX              (0x0D) // TAP 1 DELAY MSB NOTE: Split value
 #define LOW_MID_EQ_FREQ_IDX             (0x0E) // LOW MID EQ FREQ, 16bits
-//#define RES1_TUNE_IDX                 (0x0E) // RES 1 TUNE
-//#define RES1_DECAY_IDX                (0x0F) // RES 1 DECAY
+#define RES1_TUNE_IDX_B                 (0x0E) // RES 1 TUNE - Alternative
+#define RES1_DECAY_IDX_B                (0x0F) // RES 1 DECAY - Alternative
 #define LOW_MID_EQ_BW_IDX               (0x10) // LOW MID EQ BANDWIDTH
-//#define RES2_TUNE_IDX                 (0x10) // RES 2 TUNE
+#define RES2_TUNE_IDX_B                 (0x10) // RES 2 TUNE - Alternative
 #define LOW_MID_EQ_AMP_IDX              (0x11) // LOW MID EQ AMP, 16bits
-//#define RES2_DECAY_IDX                (0x11) // RES 2 DECAY
+#define RES2_DECAY_IDX_B                (0x11) // RES 2 DECAY - Alternative
 #define RES3_TUNE_IDX                   (0x12) // RES 3 TUNE
 #define HIGH_MID_EQ_FREQ_IDX            (0x13) // HIGH MID EQ FREQ, 16bits
 #define RES3_DECAY_IDX                  (0x13) // RES 3 DECAY
@@ -201,7 +201,7 @@ typedef enum
 #define RING_MOD_LEVEL_IDX              (0x48) // RING MOD LEVEL
 #define DELAY_LEVEL_IDX                 (0x49) // DELAY LEVEL
 #define REVERB_LEVEL_IDX                (0x4A) // REVERB LEVEL
-//#define RES1_AMP_IDX                  (0x4A) // RES 1 AMP
+#define RES1_AMP_IDX_B                  (0x4A) // RES 1 AMP - Alternative
 #define RES1_PITCH_IDX                  (0x4B) // RES PITCH 1
 #define TAP8_DELAY_IDX                  (0x4B) // TAP 8 DELAY, 16bits
 #define RES2_PITCH_IDX                  (0x4C) // RES PITCH 2
@@ -243,7 +243,7 @@ typedef enum
 
 // Ring modulator parameters
 #define RING_MOD_OUTPUT_MIX_IDX         (0x78) // RING MOD OUTPUT MIX
-//#define RES2_AMP_IDX                  (0x78) // RES 2 AMP
+#define RES2_AMP_IDX_B                  (0x78) // RES 2 AMP - Alternative
 #define RING_MOD_DEL_REV_MIX_IDX        (0x79) // RING MOD DEL/REV MIX
 #define RES3_AMP_IDX                    (0x79) // RES 3 AMP
 
@@ -326,6 +326,8 @@ typedef struct
   UInt8 lfo_speed;
   UInt8 lfo_depth;
   UInt8 pitch_feedback;
+  UInt8 trigger_flange;
+  UInt8 detune_amount;
 
   // Delay parameters
   UInt8  delay_mode;
@@ -337,6 +339,42 @@ typedef struct
   UInt16 delay_left_feedback;
   UInt16 delay_right;
   UInt16 delay_right_feedback;
+
+  // Multi tap delay parameters
+  UInt8  tap1_delay;
+  UInt8  tap2_delay;
+  UInt8  tap3_delay;
+  UInt8  tap4_delay;
+  UInt8  tap5_delay;
+  UInt8  tap6_delay;
+  UInt8  tap7_delay;
+  UInt8  tap8_delay;
+  UInt8  tap1_volume;
+  UInt8  tap2_volume;
+  UInt8  tap3_volume;
+  UInt8  tap4_volume;
+  UInt8  tap5_volume;
+  UInt8  tap6_volume;
+  UInt8  tap7_volume;
+  UInt8  tap8_volume;
+  UInt8  tap1_panning;
+  UInt8  tap2_panning;
+  UInt8  tap3_panning;
+  UInt8  tap4_panning;
+  UInt8  tap5_panning;
+  UInt8  tap6_panning;
+  UInt8  tap7_panning;
+  UInt8  tap8_panning;
+  UInt8  tap1_feedback;
+  UInt8  tap2_feedback;
+  UInt8  tap3_feedback;
+  UInt8  tap4_feedback;
+  UInt8  tap5_feedback;
+  UInt8  tap6_feedback;
+  UInt8  tap7_feedback;
+  UInt8  tap8_feedback;
+  UInt8  tap1_pan;
+  UInt8  master_feedback;
 
   // Reverb parameters
   UInt8 reverb_mode;
@@ -397,6 +435,9 @@ typedef struct
   UInt8 pan_speed;
   UInt8 pan_depth;
  
+  // Leslie parameters
+  UInt8 leslie_speed;
+
 } tQuadGT_Prog;
 
 //---------------------------------------------------------------------------
@@ -435,4 +476,6 @@ void QuadGT_Display_Update_Preamp(const UInt8 program);
 void QuadGT_Display_Update_Resonator(const UInt8 program);
 void QuadGT_Param_Change(TObject * Sender);
 UInt16 QuadGT_Decode_16Bit(UInt8 *data);
+UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb);
 void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data);
+void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb);
