@@ -40,11 +40,6 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
   // DEBUG: Write the patch in sysex format to a disk file
   save_patch(in,length,"patch_in_sysex.txt");
 
-  // TBD: Ensure output is correct length
-
-  //FormDebug->Log(NULL,"----------------------------------");
-  //FormDebug->Log(NULL,"Decode to Quad");
-  //FormDebug->LogHex(NULL,AnsiString(length)+" SYSEX",in,length);
   j=0;
   oc = 0;
   for (i=0; i<length; i++) {
@@ -57,7 +52,6 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
      // Protect for overflow on output data
      if (j >= out_len) return(0);
   }
-  //FormDebug->LogHex(NULL,AnsiString(j)+" QUAD",out,j);
   
   return(j);
 }
@@ -69,9 +63,6 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   UInt32 i,j;
   UInt8 shift;
 
-  //FormDebug->Log(NULL,"----------------------------------");
-  //FormDebug->Log(NULL,"Encode to SYSEX");
-  //FormDebug->LogHex(NULL,AnsiString(length)+" QUAD",in,length);
   i=0;
   j=0;
   lc=0;
@@ -99,16 +90,10 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
     }
   }
 
-  // TBD: Resolve issue with last byte being encoded wrongly
- 
-  //FormDebug->LogHex(NULL,AnsiString(j)+" SYSEX",out,j);
   
   // DEBUG: Write the patch in sysex format to a disk file
   save_patch(out,j,"patch_out_sysex.txt");
   FormDebug->Log(NULL,"Encode to SYSEX: OK "+IntToHex(out[out_len-2],2)+" "+IntToHex(out[out_len-1],2));
-
-  //DEBUG: Return 0 so MIDI write doesnt occur
-  return(0);
 
   return(j);
 }
