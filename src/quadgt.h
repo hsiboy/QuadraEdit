@@ -55,7 +55,7 @@
 #define NUM_RES           (5)
 
 // Possible CONFIG values
-#define CFG0_EQ_PITCH_DELAY_REVERB (0)
+#define CFG0_EQ_PITCH_DELAY_REVERB (0)         // Quad Mode
 #define CFG1_LESLIE_DELAY_REVERB (1)
 #define CFG2_GEQ_DELAY (2)
 #define CFG3_5BANDEQ_PITCH_DELAY (3)
@@ -64,6 +64,7 @@
 #define CFG6_RESONATOR_DELAY_REVERB (6)
 #define CFG7_SAMPLING (7)
 
+// Possible EQ_MODE values
 typedef enum 
 {
   EQMODE0_EQ,
@@ -166,7 +167,7 @@ typedef enum
 #define REVERB_INPUT_2_IDX              (0x35) // REVERB INPUT 2
 #define TAP4_FEEDBACK_IDX               (0x35) // TAP 4 FEEDBACK
 #define REVERB_INPUT_MIX_IDX            (0x36) // REVERB INPUT MIX
-#define TAP5_DELAY,_16bits_IDX          (0x36) // TAP 5 DELAY, 16bits
+#define TAP5_DELAY_IDX                  (0x36) // TAP 5 DELAY, 16bits
 #define REVERB_PREDELAY_IDX             (0x37) // REVERB PREDELAY
 #define REVERB_PREDELAY_MIX_IDX         (0x38) // REVERB PREDELAY MIX
 #define TAP5_VOLUME_IDX                 (0x38) // TAP 5 VOLUME
@@ -357,14 +358,14 @@ typedef struct
   UInt8  tap6_volume;
   UInt8  tap7_volume;
   UInt8  tap8_volume;
-  UInt8  tap1_panning;
-  UInt8  tap2_panning;
-  UInt8  tap3_panning;
-  UInt8  tap4_panning;
-  UInt8  tap5_panning;
-  UInt8  tap6_panning;
-  UInt8  tap7_panning;
-  UInt8  tap8_panning;
+  UInt8  tap1_pan;
+  UInt8  tap2_pan;
+  UInt8  tap3_pan;
+  UInt8  tap4_pan;
+  UInt8  tap5_pan;
+  UInt8  tap6_pan;
+  UInt8  tap7_pan;
+  UInt8  tap8_pan;
   UInt8  tap1_feedback;
   UInt8  tap2_feedback;
   UInt8  tap3_feedback;
@@ -373,7 +374,6 @@ typedef struct
   UInt8  tap6_feedback;
   UInt8  tap7_feedback;
   UInt8  tap8_feedback;
-  UInt8  tap1_pan;
   UInt8  master_feedback;
 
   // Reverb parameters
@@ -406,6 +406,9 @@ typedef struct
   UInt8 mix_mod;
   UInt8 eq_level;
 
+  UInt8 multitap_master_feedback;
+  UInt8 multitap_number;
+
   // Midi modulation parameters
   UInt8 mod_source[NUM_MOD];
   UInt8 mod_target[NUM_MOD];
@@ -416,6 +419,8 @@ typedef struct
   UInt8 res_amp[NUM_RES];
   UInt8 res_decay[NUM_RES];
   UInt8 res_pitch[NUM_RES];
+  UInt8 res_decay_all;
+  UInt8 res_midi_gate;
 
   // Sampling parameters
   UInt8 sample_start;
@@ -431,12 +436,16 @@ typedef struct
   // Ring modulator parameters
   UInt8 ring_mod_output_mix;
   UInt8 ring_mod_del_rev_mix;
+  UInt16 ring_mod_shift;
 
   UInt8 pan_speed;
   UInt8 pan_depth;
  
-  // Leslie parameters
-  UInt8 leslie_speed;
+  // Leslie parameters (For Config = 1 - Leslie, Delay, Reverb)
+  UInt8 leslie_speed;      // 0-1
+  UInt8 leslie_motor;      // 0-1
+  UInt8 leslie_seperation; // 0-99
+  UInt8 leslie_high_rotor_level;
 
 } tQuadGT_Prog;
 

@@ -243,6 +243,8 @@ __published:	// IDE-managed Components
     TButton *SysexBankLoad;
     TOpenDialog *QuadGtOpenDialog;
     TOpenDialog *InternalOpenDialog;
+    TButton *SysexBankRead;
+    TButton *SysexBankWrite;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -283,6 +285,8 @@ __published:	// IDE-managed Components
     void __fastcall SysexBankLoadClick(TObject *Sender);
     
     void __fastcall QuadPatchWriteClick(TObject *Sender);
+    void __fastcall SysexBankReadClick(TObject *Sender);
+    void __fastcall SysexBankWriteClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
