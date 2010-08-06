@@ -105,7 +105,7 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
   
   // DEBUG: Write the patch in sysex format to a disk file
   save_patch(out,j,"patch_out_sysex.txt");
-  FormDebug->Log(NULL,"Encode to SYSEX: OK");
+  FormDebug->Log(NULL,"Encode to SYSEX: OK "+IntToHex(out[out_len-2],2)+" "+IntToHex(out[out_len-1],2));
 
   //DEBUG: Return 0 so MIDI write doesnt occur
   return(0);
@@ -1469,7 +1469,7 @@ void __fastcall TMainForm::QuadPatchWriteClick(TObject *Sender)
 {
   UInt8 prog;
   long int status;
-  UInt8 quadgt[QUAD_PATCH_SIZE];
+  UInt8 quadgt[QUAD_PATCH_SIZE+1];
   UInt8 sysex[SYSEX_PATCH_SIZE];
   UInt32 sysex_size;
 
@@ -1477,6 +1477,7 @@ void __fastcall TMainForm::QuadPatchWriteClick(TObject *Sender)
 
   // Convert internal format to QuadGT format
   QuadGT_Convert_Data_From_Internal(prog, quadgt);
+  quadgt[QUAD_PATCH_SIZE]=0;
 
   // Convert QuadGT format to Sysex
   sysex_size=QuadGT_Encode_To_Sysex(quadgt, QUAD_PATCH_SIZE, sysex, sizeof(sysex));
