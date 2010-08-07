@@ -17,6 +17,8 @@
 
 static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
 
+void RedrawVertBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param, UInt8 offset);
+
 // DEBUG: Save a patch to a an ASCII hex disk file for analysis
 void save_patch(UInt8 *data, UInt32 length, char *fname)
 {
@@ -229,56 +231,65 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
 {
   UInt8 mode;
 
-  mode=QuadGT_Progs[prog].delay_mode;
-  MainForm->DelayMode->ItemIndex=mode;
-  MainForm->DelayInput->ItemIndex=QuadGT_Progs[prog].delay_input;
-
-  if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
+  if (QuadGT_Progs[prog].config==CFG4_3BANDEQ_REVERB) 
   {
-    MainForm->PanelQuadDelay->Left=660;
+    MainForm->PanelQuadDelay->Visible = FALSE;
   }
   else
   {
-    MainForm->PanelQuadDelay->Left=420;
-  }
+    MainForm->PanelQuadDelay->Visible = TRUE;
 
-  // Mono
-  if (mode ==0)
-  {
-    MainForm->DelayTap->Visible=FALSE;
-    MainForm->DelayRight->Visible=FALSE;
-    MainForm->DelayRightFeedback->Visible=FALSE;
+    mode=QuadGT_Progs[prog].delay_mode;
+    MainForm->DelayMode->ItemIndex=mode;
+    MainForm->DelayInput->ItemIndex=QuadGT_Progs[prog].delay_input;
 
-    MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay;
-    MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_feedback;
+    if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
+    {
+      MainForm->PanelQuadDelay->Left=660;
+    }
+    else
+    {
+      MainForm->PanelQuadDelay->Left=420;
+    }
 
-  }
+    // Mono
+    if (mode ==0)
+    {
+      MainForm->DelayTap->Visible=FALSE;
+      MainForm->DelayRight->Visible=FALSE;
+      MainForm->DelayRightFeedback->Visible=FALSE;
 
-  // Stereo
-  else if (mode ==1)
-  {
-    MainForm->DelayTap->Visible=FALSE;
-    MainForm->DelayRight->Visible=TRUE;
-    MainForm->DelayRightFeedback->Visible=TRUE;
+      MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay;
+      MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_feedback;
 
-    MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay_left;
-    MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_left_feedback;
-    MainForm->DelayRight->Position=QuadGT_Progs[prog].delay_right;
-    MainForm->DelayRightFeedback->Position=QuadGT_Progs[prog].delay_right_feedback;
-  }
+    }
 
-  // Ping Pong
-  else if (mode ==2)
-  {
-    MainForm->DelayTap->Visible=FALSE;
-    MainForm->DelayRight->Visible=TRUE;
-    MainForm->DelayRightFeedback->Visible=TRUE;
-  }
+    // Stereo
+    else if (mode ==1)
+    {
+      MainForm->DelayTap->Visible=FALSE;
+      MainForm->DelayRight->Visible=TRUE;
+      MainForm->DelayRightFeedback->Visible=TRUE;
 
-  // Multitap
-  else if (mode ==3)
-  {
-    MainForm->DelayTap->Visible=TRUE;
+      MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay_left;
+      MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_left_feedback;
+      MainForm->DelayRight->Position=QuadGT_Progs[prog].delay_right;
+      MainForm->DelayRightFeedback->Position=QuadGT_Progs[prog].delay_right_feedback;
+    }
+
+    // Ping Pong
+    else if (mode ==2)
+    {
+      MainForm->DelayTap->Visible=FALSE;
+      MainForm->DelayRight->Visible=TRUE;
+      MainForm->DelayRightFeedback->Visible=TRUE;
+    }
+
+    // Multitap
+    else if (mode ==3)
+    {
+      MainForm->DelayTap->Visible=TRUE;
+    }
   }
 }
 
@@ -308,6 +319,8 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadLeslie->Visible=TRUE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
+
+    // TBD: Redraw Leslie parameters
   }
   else if ((QuadGT_Progs[prog].config==CFG2_GEQ_DELAY) || 
            (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB) || 
@@ -324,6 +337,11 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadLeslie->Visible=FALSE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=TRUE;
+
+    // Redraw Chorus parameters
+    RedrawVertBarTextU8(MainForm->ChorusSpeed, MainForm->ChorusSpeedVal, QuadGT_Progs[prog].lfo_speed, 1);
+    RedrawVertBarTextU8(MainForm->ChorusDepth, MainForm->ChorusDepthVal, QuadGT_Progs[prog].lfo_depth, 1);
+
   }
   else if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {
@@ -331,6 +349,8 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadLeslie->Visible=FALSE;
     MainForm->QuadRingMod->Visible=TRUE;
     MainForm->QuadChorus->Visible=FALSE;
+
+    // TBD: Redraw Ring Mod parameters
   }
 
 }
@@ -647,6 +667,13 @@ void QuadGT_Redraw_Preamp(const UInt8 prog)
 }
 
 
+void RedrawVertBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param, UInt8 offset)
+{
+  bar->Position=param+offset;
+  bar->Hint=AnsiString(param+offset);
+  text->Text=AnsiString(param+offset);
+}
+
 //---------------------------------------------------------------------------
 // Name        : EqBarChange
 // Description : Update the parameter, hint text and text field associated 
@@ -676,6 +703,17 @@ void VertBarChange2(TTrackBar *bar, TEdit *text, UInt8* param)
   if (text != NULL)
   {
     text->Text=AnsiString(*param);
+  }
+}
+
+void VertBarChange3(TTrackBar *bar, TEdit *text, UInt8* param, UInt8 offset)
+{
+  FormDebug->Log(NULL, "Invert Position "+AnsiString(bar->Max-bar->Position));
+  *param=(bar->Max - bar->Position);
+  bar->Hint=AnsiString(*param+offset);
+  if (text != NULL)
+  {
+    text->Text=AnsiString(*param+offset);
   }
 }
 
@@ -857,6 +895,9 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->PitchSpeed) VertBarChange2((TTrackBar *)Sender, MainForm->PitchSpeedVal, &QuadGT_Progs[prog].lfo_speed);
   else if (Sender == MainForm->PitchDepth) VertBarChange2((TTrackBar *)Sender, MainForm->PitchDepthVal, &QuadGT_Progs[prog].lfo_depth);
   else if (Sender == MainForm->PitchFeedback) VertBarChange2((TTrackBar *)Sender, MainForm->PitchFeedbackVal, &QuadGT_Progs[prog].pitch_feedback);
+
+  else if (Sender == MainForm->ChorusSpeed) VertBarChange3((TTrackBar *)Sender, MainForm->ChorusSpeedVal, &QuadGT_Progs[prog].lfo_speed, 1);
+  else if (Sender == MainForm->ChorusDepth) VertBarChange3((TTrackBar *)Sender, MainForm->ChorusDepthVal, &QuadGT_Progs[prog].lfo_depth, 1);
 
   // Midi Modulation Parameters
   else if (Sender == MainForm->ModNumber) QuadGT_Redraw_Mod(prog);

@@ -282,6 +282,8 @@ __published:	// IDE-managed Components
     TMaskEdit *ModSource;
     TUpDown *UpDownModSource;
     TLabel *Label44;
+    TEdit *ChorusDepthVal;
+    TEdit *ChorusSpeedVal;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
