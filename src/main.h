@@ -284,6 +284,17 @@ __published:	// IDE-managed Components
     TLabel *Label44;
     TEdit *ChorusDepthVal;
     TEdit *ChorusSpeedVal;
+    TEdit *ReverbInMixVal;
+    TEdit *ReverbPreMixVal;
+    TEdit *ReverbPreDelayVal;
+    TEdit *ReverbDensityVal;
+    TEdit *ReverbDiffusionVal;
+    TEdit *ReverbDecayVal;
+    TEdit *ReverbGateHoldVal;
+    TEdit *ReverbGateReleaseVal;
+    TEdit *ReverbGateLevelVal;
+    TEdit *ReverbLowDecayVal;
+    TEdit *ReverbHighDecayVal;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
