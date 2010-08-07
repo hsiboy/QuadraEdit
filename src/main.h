@@ -70,11 +70,9 @@ __published:	// IDE-managed Components
     TTimer *TimerProcess;
     TButton *QuadProgWrite;
     TButton *QuadMidiWrite;
-    TComboBox *QuadModSource1;
-    TComboBox *QuadModTarget1;
-    TTrackBar *QuadModAmp1;
+    TComboBox *ModTarget;
+    TTrackBar *ModAmp;
     TPanel *Panel1;
-    TCheckBox *Modulation;
     TRadioGroup *PreTone;
     TLabel *Direct;
     TLabel *Master;
@@ -103,7 +101,7 @@ __published:	// IDE-managed Components
     TLabel *Dist;
     TLabel *LeslieRingModReson;
     TLabel *Gate;
-    TLabel *Out;
+    TLabel *PreOutLabel;
     TGroupBox *Bass;
     TCheckBox *BassBoost;
     TRadioGroup *CabSim;
@@ -237,7 +235,7 @@ __published:	// IDE-managed Components
     TLabel *Label41;
     TLabel *Label42;
     TLabel *Label43;
-    TTrackBar *TrackBar1;
+    TTrackBar *ResAmp;
     TRadioGroup *Eq5Mode;
     TOpenDialog *SysexOpenDialog;
     TButton *SysexBankLoad;
@@ -245,6 +243,45 @@ __published:	// IDE-managed Components
     TOpenDialog *InternalOpenDialog;
     TButton *SysexBankRead;
     TButton *SysexBankWrite;
+    TEdit *Eq5Q2Val;
+    TEdit *Eq5Q3Val;
+    TEdit *Eq5Q4Val;
+    TEdit *Eq5Freq1Val;
+    TEdit *Eq5Freq2Val;
+    TEdit *Eq5Freq3Val;
+    TEdit *Eq5Freq4Val;
+    TEdit *Eq5Freq5Val;
+    TEdit *EqQ2Val;
+    TEdit *PreCompVal;
+    TEdit *PreOdVal;
+    TEdit *PreDistVal;
+    TEdit *PreGateVal;
+    TEdit *PreOutVal;
+    TEdit *EqFreq1Val;
+    TEdit *EqFreq2Val;
+    TEdit *EqFreq3Val;
+    TEdit *ResTuneVal;
+    TEdit *ResDecayVal;
+    TEdit *ResAmpVal;
+    TEdit *MixDirectVal;
+    TEdit *MixMasterVal;
+    TEdit *MixPreampEqVal;
+    TEdit *MixPitchVal;
+    TEdit *MixDelayVal;
+    TEdit *MixReverbVal;
+    TEdit *MixLeslieRingModResonVal;
+    TEdit *ModDepthVal;
+    TEdit *ModSpeedVal;
+    TEdit *ModAmpVal;
+    TEdit *PitchFeedbackVal;
+    TEdit *PitchDepthVal;
+    TEdit *PitchSpeedVal;
+    TRadioButton *MixModNone;
+    TRadioButton *MixModTrem;
+    TRadioButton *MixModPan;
+    TMaskEdit *ModSource;
+    TUpDown *UpDownModSource;
+    TLabel *Label44;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -287,6 +324,8 @@ __published:	// IDE-managed Components
     void __fastcall QuadPatchWriteClick(TObject *Sender);
     void __fastcall SysexBankReadClick(TObject *Sender);
     void __fastcall SysexBankWriteClick(TObject *Sender);
+    
+    
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

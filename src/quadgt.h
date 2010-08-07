@@ -412,7 +412,7 @@ typedef struct
   // Midi modulation parameters
   UInt8 mod_source[NUM_MOD];
   UInt8 mod_target[NUM_MOD];
-  UInt8 mod_amp[NUM_MOD];
+  SInt8 mod_amp[NUM_MOD];
 
   // Resonator parameters
   UInt8 res_tune[NUM_RES];
@@ -473,16 +473,16 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data);
 void QuadGT_Sysex_Process(tBuffer sysex);
 
 void QuadGT_Init(void);
-void QuadGT_Display_Update_Patch(UInt8 program);
-void QuadGT_Display_Update_Reverb(const UInt8 program);
-void QuadGT_Display_Update_Delay(const UInt8 program);
-void QuadGT_Display_Update_Pitch(const UInt8 program);
-void QuadGT_Display_Update_Eq(const UInt8 program);
-void QuadGT_Display_Update_PrePostEq(const UInt8 prog);
-void QuadGT_Display_Update_Mix(const UInt8 program);
-void QuadGT_Display_Update_Mod(const UInt8 program);
-void QuadGT_Display_Update_Preamp(const UInt8 program);
-void QuadGT_Display_Update_Resonator(const UInt8 program);
+void QuadGT_Redraw_Patch(UInt8 program);
+void QuadGT_Redraw_Reverb(const UInt8 program);
+void QuadGT_Redraw_Delay(const UInt8 program);
+void QuadGT_Redraw_Pitch(const UInt8 program);
+void QuadGT_Redraw_Eq(const UInt8 program);
+void QuadGT_Redraw_PrePostEq(const UInt8 prog);
+void QuadGT_Redraw_Mix(const UInt8 program);
+void QuadGT_Redraw_Mod(const UInt8 program);
+void QuadGT_Redraw_Preamp(const UInt8 program);
+void QuadGT_Redraw_Resonator(const UInt8 program);
 void QuadGT_Param_Change(TObject * Sender);
 UInt16 QuadGT_Decode_16Bit(UInt8 *data);
 UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb);
