@@ -241,8 +241,6 @@ __published:	// IDE-managed Components
     TButton *SysexBankLoad;
     TOpenDialog *QuadGtOpenDialog;
     TOpenDialog *InternalOpenDialog;
-    TButton *SysexBankRead;
-    TButton *SysexBankWrite;
     TEdit *Eq5Q2Val;
     TEdit *Eq5Q3Val;
     TEdit *Eq5Q4Val;
@@ -295,6 +293,14 @@ __published:	// IDE-managed Components
     TEdit *ReverbGateLevelVal;
     TEdit *ReverbLowDecayVal;
     TEdit *ReverbHighDecayVal;
+    TLabel *Label45;
+    TLabel *Label46;
+    TLabel *Label47;
+    TLabel *Label48;
+    TEdit *TapDelayVal;
+    TEdit *TapVolVal;
+    TEdit *TapPanVal;
+    TEdit *TapFeedbackVal;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);
@@ -336,7 +342,6 @@ __published:	// IDE-managed Components
     
     void __fastcall QuadPatchWriteClick(TObject *Sender);
     void __fastcall SysexBankReadClick(TObject *Sender);
-    void __fastcall SysexBankWriteClick(TObject *Sender);
     
     
 private:	// User declarations

@@ -322,13 +322,5 @@ void __fastcall TMainForm::SysexBankReadClick(TObject *Sender)
 {
   // TBD    
 }
-//---------------------------------------------------------------------------
-
-void __fastcall TMainForm::SysexBankWriteClick(TObject *Sender)
-{
-  // TBD
-}
-//---------------------------------------------------------------------------
-
 
 

@@ -342,47 +342,19 @@ typedef struct
   UInt16 delay_right_feedback;
 
   // Multi tap delay parameters
-  UInt8  tap1_delay;
-  UInt8  tap2_delay;
-  UInt8  tap3_delay;
-  UInt8  tap4_delay;
-  UInt8  tap5_delay;
-  UInt8  tap6_delay;
-  UInt8  tap7_delay;
-  UInt8  tap8_delay;
-  UInt8  tap1_volume;
-  UInt8  tap2_volume;
-  UInt8  tap3_volume;
-  UInt8  tap4_volume;
-  UInt8  tap5_volume;
-  UInt8  tap6_volume;
-  UInt8  tap7_volume;
-  UInt8  tap8_volume;
-  UInt8  tap1_pan;
-  UInt8  tap2_pan;
-  UInt8  tap3_pan;
-  UInt8  tap4_pan;
-  UInt8  tap5_pan;
-  UInt8  tap6_pan;
-  UInt8  tap7_pan;
-  UInt8  tap8_pan;
-  UInt8  tap1_feedback;
-  UInt8  tap2_feedback;
-  UInt8  tap3_feedback;
-  UInt8  tap4_feedback;
-  UInt8  tap5_feedback;
-  UInt8  tap6_feedback;
-  UInt8  tap7_feedback;
-  UInt8  tap8_feedback;
+  UInt8  tap_delay[8];
+  UInt8  tap_volume[8];
+  UInt8  tap_pan[8];
+  UInt8  tap_feedback[8];
   UInt8  master_feedback;
 
   // Reverb parameters
   UInt8 reverb_mode;
   UInt8 reverb_input_1;                      // 0 - 3
   UInt8 reverb_input_2;                      // 0 - 1
-  UInt8 reverb_input_mix;                    // -99 - 99
+  SInt8 reverb_input_mix;                    // -99 - 99
   UInt8 reverb_predelay;                     // 1 - 140
-  UInt8 reverb_predelay_mix;                 // -99 - 99
+  SInt8 reverb_predelay_mix;                 // -99 - 99
   UInt8 reverb_decay;                        // 0 - 99
   UInt8 reverb_diffusion;                    // 0 - 8
   UInt8 reverb_low_decay;                    // 0 - 60
