@@ -36,8 +36,10 @@ void Midi_Init(void);
 void Queue_Push(tBuffer buffer);
 tBuffer Queue_Pop(void);
 
+int Midi_Get_IO_Dev_List(TComboBox *list);
 void Midi_Get_Dev_Lists(TComboBox *in_list,TComboBox *out_list, TLabel * error_text);
 
+UInt8 Midi_IO_Open(AnsiString device_name);
 UInt8 Midi_Out_Open(int device);
 UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size);
 unsigned int Midi_Out_Dump_Req(UInt8 program);

@@ -55,13 +55,31 @@ static int rx_sysex=0;
 static int rx_msg=0;
 static int rx_other=0;
 
+static TStringList *in_device;  // List of Input Midi Devices
+static TStringList *out_device;  // List of Output Midi Devices
+
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void Midi_Init(void)
 {
   Rx_Msg_Queue.ptr=NULL;
 
+  in_device = new(TStringList);
+  out_device = new(TStringList);
+
   FormDebug->Log(NULL, "MIDI Init done");
 }
 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void Queue_Push(tBuffer buffer)
 {
   tQueue_Entry *entry;
@@ -105,6 +123,12 @@ void Queue_Push(tBuffer buffer)
 }
 
 // Pop entry from head of queue
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 tBuffer Queue_Pop(void)
 {
   tQueue_Entry * head;
@@ -133,6 +157,81 @@ tBuffer Queue_Pop(void)
 }
 
 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+int Midi_Get_IO_Dev_List(TComboBox *list)
+{
+  int devs,i;
+  MMRESULT status;
+  MIDIOUTCAPS caps;
+  MIDIINCAPS incaps;
+
+  /**************************************************************************
+  * Build the list of possible MIDI output devices
+  **************************************************************************/
+  out_device->Clear();
+  devs = midiOutGetNumDevs();
+  if (devs >= 1) {
+    for (i=0; i<devs; i++)
+    {
+      status = midiOutGetDevCaps(i, &caps, sizeof(caps));
+      if (status == MMSYSERR_NOERROR)
+      {
+        out_device->Add(caps.szPname);
+      }
+      else
+      {
+        out_device->Add("MIDI Out "+AnsiString(i+1)+" - ERROR");
+      }
+    }
+  }
+
+  /**************************************************************************
+  * Build the list of possible MIDI input devices
+  **************************************************************************/
+  in_device->Clear();
+  devs = midiInGetNumDevs();
+  if (devs >= 1) {
+    for (i=0; i<devs; i++)
+    {
+      status = midiInGetDevCaps(i, &incaps, sizeof(incaps));
+      if (status == MMSYSERR_NOERROR)
+      {
+        in_device->Add(incaps.szPname);
+      }
+      else
+      {
+        in_device->Add("MIDI In "+AnsiString(i+1)+" - ERROR");
+      }
+    }
+  }
+
+  /**************************************************************************
+  * Build the list of possible MIDI input and output devices
+  **************************************************************************/
+  list->Items->Clear();
+  for (i=0; i<out_device->Count; i++)
+  {
+    if (in_device->IndexOf(out_device->Strings[i]) >= 0)
+    {
+      list->Items->Add(out_device->Strings[i]);
+    }
+  }
+  list->ItemIndex=0;
+
+  return(out_device->Count);
+
+}
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_text)
 {
   int devs,i;
@@ -194,10 +293,62 @@ void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_
   in_list->ItemIndex=0;
 }
 
-UInt8 Midi_Out_Open(int device)
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+UInt8 Midi_IO_Open(AnsiString device_name)
 {
   MMRESULT status;
-  status=midiOutOpen(&Midi_Out_Handle, device, 0, 0, CALLBACK_NULL);
+  int in,out;
+  int rtnval=0;
+
+  in = in_device->IndexOf(device_name);
+  out = out_device->IndexOf(device_name);
+
+  if ((in >= 0) && (out >= 0))
+  {
+  }
+  else
+  {
+    rtnval = 1;
+  }
+
+  if (rtnval == 0)
+  {
+    status=midiOutOpen(&Midi_Out_Handle, out, 0, 0, CALLBACK_NULL);
+    if (status != MMSYSERR_NOERROR)
+    {
+      midiOutClose(Midi_Out_Handle);
+      rtnval = 1;
+    }
+  }
+
+  if (rtnval == 0)
+  {
+    status=midiInOpen(&Midi_In_Handle, in, 0, 0, CALLBACK_NULL);
+    if (status != MMSYSERR_NOERROR)
+    {
+      midiOutClose(Midi_In_Handle);
+      midiOutClose(Midi_Out_Handle);
+      rtnval = 1;
+    }
+  }
+
+  return rtnval;
+}
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+UInt8 Midi_Out_Open(int device_index)
+{
+  MMRESULT status;
+  status=midiOutOpen(&Midi_Out_Handle, device_index, 0, 0, CALLBACK_NULL);
 
   if (status == MMSYSERR_NOERROR)
   {
@@ -263,6 +414,12 @@ UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size)
   return(status);
 
 }
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 unsigned int Midi_Out_Dump_Req(UInt8 program)
 {
   MIDIHDR out;
@@ -306,6 +463,12 @@ unsigned int Midi_Out_Dump_Req(UInt8 program)
 
 }
 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
 {
   MIDIHDR out;
@@ -359,6 +522,12 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   return(status);
 
 }
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void Midi_Out_ShortMsg(const unsigned long message)
 {
   midiOutShortMsg(Midi_Out_Handle, message);
@@ -411,12 +580,18 @@ static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
 
 }
 
-unsigned int Midi_In_Open(int device)
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+unsigned int Midi_In_Open(int device_index)
 {
   UInt8 i;
   MMRESULT status;
 
-  status=midiInOpen(&Midi_In_Handle, device, (DWORD) Midi_In_Callback, 0, CALLBACK_FUNCTION);
+  status=midiInOpen(&Midi_In_Handle, device_index, (DWORD) Midi_In_Callback, 0, CALLBACK_FUNCTION);
   if (status != MMSYSERR_NOERROR)
   {
     return status;
@@ -457,6 +632,12 @@ void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_
   *other_count_ptr=rx_other;
 }
 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 unsigned int Midi_In_Close(void)
 {
   unsigned int status;
@@ -479,6 +660,12 @@ unsigned int Midi_In_Close(void)
   }
   return(status);
 }
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 unsigned int Midi_Out_Close(void)
 {
   unsigned int status;

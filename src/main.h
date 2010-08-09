@@ -139,14 +139,14 @@ __published:	// IDE-managed Components
     TLabel *Label9;
     TRadioGroup *DelayInput;
     TTrackBar *DelayInMix;
-    TLabel *Label10;
-    TTrackBar *DelayDelay;
-    TTrackBar *DelayFeedback;
-    TLabel *Label11;
-    TLabel *Label12;
+    TLabel *DelayInMixLabel;
+    TTrackBar *DelayLeft;
+    TTrackBar *DelayLeftFBack;
+    TLabel *DelayLeftLabel;
+    TLabel *DelayLeftFBackLabel;
     TTrackBar *DelayRight;
     TLabel *Label13;
-    TTrackBar *DelayRightFeedback;
+    TTrackBar *DelayRighFBack;
     TLabel *Label14;
     TGroupBox *DelayTap;
     TLabel *Label15;
@@ -301,6 +301,11 @@ __published:	// IDE-managed Components
     TEdit *TapVolVal;
     TEdit *TapPanVal;
     TEdit *TapFeedbackVal;
+    TEdit *DelayInMixVal;
+    TEdit *DelayLeftVal;
+    TEdit *DelayLeftFBackVal;
+    TEdit *DelayRightVal;
+    TEdit *DelayRightFBackVal;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);

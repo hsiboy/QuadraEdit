@@ -19,10 +19,18 @@ static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
 
 void RedrawHorizBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param);
 void RedrawHorizBarTextS8(TTrackBar *bar, TEdit *text, SInt8 param);
+
 void RedrawVertBarTextS8(TTrackBar *bar, TEdit *text, SInt8 param);
 void RedrawVertBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param, UInt8 offset);
+void RedrawVertBarTextU16(TTrackBar *bar, TEdit *text, UInt16 param, UInt16 offset);
 
-// DEBUG: Save a patch to a an ASCII hex disk file for analysis
+// 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : DEBUG: Save a patch to a an ASCII hex disk file for analysis
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void save_patch(UInt8 *data, UInt32 length, char *fname)
 {
   FILE *handle;
@@ -36,7 +44,13 @@ void save_patch(UInt8 *data, UInt32 length, char *fname)
   fclose(handle);
 }
 
-// Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
+// 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
 {
   UInt8 oc;
@@ -62,7 +76,13 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
   return(j);
 }
 
-// Encode 8bit quadraverb data into low 7 bits for SysEx
+// 
+//---------------------------------------------------------------------------
+// Name        : 
+// Description : Encode 8bit quadraverb data into low 7 bits for SysEx
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len)
 {
   UInt8 lc,cc;
@@ -105,6 +125,12 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
 }
 
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Init
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Init(void)
 {
   UInt8 patch;
@@ -235,9 +261,16 @@ void QuadGT_Redraw_Reverb(const UInt8 prog)
   }
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_Delay
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_Delay(const UInt8 prog)
 {
   UInt8 mode;
+  mode=QuadGT_Progs[prog].delay_mode;
 
   if (QuadGT_Progs[prog].config==CFG4_3BANDEQ_REVERB) 
   {
@@ -246,10 +279,6 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
   else
   {
     MainForm->PanelQuadDelay->Visible = TRUE;
-
-    mode=QuadGT_Progs[prog].delay_mode;
-    MainForm->DelayMode->ItemIndex=mode;
-    MainForm->DelayInput->ItemIndex=QuadGT_Progs[prog].delay_input;
 
     if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
     {
@@ -260,41 +289,53 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
       MainForm->PanelQuadDelay->Left=420;
     }
 
-    // Mono
-    if (mode ==0)
+    if (QuadGT_Progs[prog].config==CFG3_5BANDEQ_PITCH_DELAY)
+    {
+      // Add "Multitap" to list of possibilities
+      int i=MainForm->DelayMode->Items->IndexOf("Multitap");
+      if (i >= 0) MainForm->DelayMode->Items->Add("Multitap");
+    }
+    else
+    {
+      // Remove "Multitap" from list of possibilities
+      int i=MainForm->DelayMode->Items->IndexOf("Multitap");
+      if (i >= 0) MainForm->DelayMode->Items->Delete(i);
+      if (mode == DELAYMODE3_MULTITAP)
+      {
+        mode=QuadGT_Progs[prog].delay_mode=DELAYMODE0_MONO;
+      }
+    }
+
+    // Mono or pingpong
+    if ((mode == DELAYMODE0_MONO) || (mode == DELAYMODE2_PINGPONG))
     {
       MainForm->DelayTap->Visible=FALSE;
       MainForm->DelayRight->Visible=FALSE;
-      MainForm->DelayRightFeedback->Visible=FALSE;
+      MainForm->DelayRightVal->Visible=FALSE;
+      MainForm->DelayRighFBack->Visible=FALSE;
+      MainForm->DelayRightFBackVal->Visible=FALSE;
 
-      MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay;
-      MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_feedback;
-
+      // Change left delay labels to suit mono
+      MainForm->DelayLeftLabel->Caption="Delay";
+      MainForm->DelayLeftFBackLabel->Caption="FBack";
     }
 
     // Stereo
-    else if (mode ==1)
+    else if (mode == DELAYMODE1_STEREO)
     {
       MainForm->DelayTap->Visible=FALSE;
       MainForm->DelayRight->Visible=TRUE;
-      MainForm->DelayRightFeedback->Visible=TRUE;
+      MainForm->DelayRightVal->Visible=TRUE;
+      MainForm->DelayRighFBack->Visible=TRUE;
+      MainForm->DelayRightFBackVal->Visible=TRUE;
 
-      MainForm->DelayDelay->Position=QuadGT_Progs[prog].delay_left;
-      MainForm->DelayFeedback->Position=QuadGT_Progs[prog].delay_left_feedback;
-      MainForm->DelayRight->Position=QuadGT_Progs[prog].delay_right;
-      MainForm->DelayRightFeedback->Position=QuadGT_Progs[prog].delay_right_feedback;
-    }
-
-    // Ping Pong
-    else if (mode ==2)
-    {
-      MainForm->DelayTap->Visible=FALSE;
-      MainForm->DelayRight->Visible=TRUE;
-      MainForm->DelayRightFeedback->Visible=TRUE;
+      // Change left delay labels to suit stereo
+      MainForm->DelayLeftLabel->Caption="L.Delay";
+      MainForm->DelayLeftFBackLabel->Caption="L.FBack";
     }
 
     // Multitap
-    else if (mode ==3)
+    else if (mode == DELAYMODE3_MULTITAP)
     {
       MainForm->DelayTap->Visible=TRUE;
     }
@@ -302,27 +343,41 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
   
   if (MainForm->PanelQuadDelay->Visible == TRUE)
   {
-    if (MainForm->DelayTap->Visible==TRUE)
+    MainForm->DelayMode->ItemIndex=mode;
+    MainForm->DelayInput->ItemIndex=QuadGT_Progs[prog].delay_input;
+    RedrawVertBarTextS8(MainForm->DelayInMix, MainForm->DelayInMixVal, QuadGT_Progs[prog].delay_input_mix);
+ 
+    if ((mode == DELAYMODE0_MONO) || (mode == DELAYMODE2_PINGPONG))
+    {
+      RedrawVertBarTextU16(MainForm->DelayLeft, MainForm->DelayLeftVal, QuadGT_Progs[prog].delay_left,0);
+      RedrawVertBarTextU8(MainForm->DelayLeftFBack, MainForm->DelayLeftFBackVal, QuadGT_Progs[prog].delay_left_feedback,0);
+      // TBD: Set different max delay times dependenat on delay mode and configuration
+    }
+    else if (mode == DELAYMODE1_STEREO)
+    {
+      RedrawVertBarTextU16(MainForm->DelayLeft, MainForm->DelayLeftVal, QuadGT_Progs[prog].delay_left,0);
+      RedrawVertBarTextU8(MainForm->DelayLeftFBack, MainForm->DelayLeftFBackVal, QuadGT_Progs[prog].delay_left_feedback,0);
+      RedrawVertBarTextU16(MainForm->DelayRight, MainForm->DelayRightVal, QuadGT_Progs[prog].delay_right,0);
+      RedrawVertBarTextU8(MainForm->DelayRighFBack, MainForm->DelayRightFBackVal, QuadGT_Progs[prog].delay_right_feedback,0);
+    }
+    else if (mode == DELAYMODE3_MULTITAP)
     {
       UInt8 tap = StrToInt(MainForm->TapNumber->Text)-1;
 
-      RedrawVertBarTextU8(MainForm->TapDelay, MainForm->TapDelayVal, QuadGT_Progs[prog].tap_delay[tap], 0);
-      RedrawVertBarTextU8(MainForm->TapPan, MainForm->TapPanVal, QuadGT_Progs[prog].tap_pan[tap], 0);
-      RedrawVertBarTextU8(MainForm->TapVol, MainForm->TapVolVal, QuadGT_Progs[prog].tap_volume[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapDelay,    MainForm->TapDelayVal, QuadGT_Progs[prog].tap_delay[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapPan,      MainForm->TapPanVal, QuadGT_Progs[prog].tap_pan[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapVol,      MainForm->TapVolVal, QuadGT_Progs[prog].tap_volume[tap], 0);
       RedrawVertBarTextU8(MainForm->TapFeedback, MainForm->TapFeedbackVal, QuadGT_Progs[prog].tap_feedback[tap], 0);
-    }
-    else
-    {
-      //TBD: Add Val fields and handle mono, stereo, ping pong
-      //RedrawVertBarTextU8(MainForm->DelayInMix, MainForm->DelayInMixVal, &QuadGT_Progs[prog].delay_input_mix,0);
-      //RedrawVertBarTextU8(MainForm->DelayDelay, MainForm->DelayDelayVal, &QuadGT_Progs[prog].delay,0);
-      //RedrawVertBarTextU8(MainForm->DelayFeedback, MainForm->DelayFeedbackVal, &QuadGT_Progs[prog].delay_feedback,0);
-      //RedrawVertBarTextU8(MainForm->DelayRight, MainForm->DelayRightVal, &QuadGT_Progs[prog].delay_right,0);
-      //RedrawVertBarTextU8(MainForm->DelayRightFeedback, MainForm->DelayRightFeedbackVal, &QuadGT_Progs[prog].delay_right_feedback,0);
     }
   }
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_Pitch
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_Pitch(const UInt8 prog)
 {
   if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) ||
@@ -385,6 +440,12 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
 
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_Eq
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_Eq(const UInt8 prog)
 {
   // 3 Band Eq
@@ -487,6 +548,12 @@ void QuadGT_Redraw_Eq(const UInt8 prog)
   // Resonator
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_Mix
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_Mix(const UInt8 prog)
 {
   UInt8 val;
@@ -635,6 +702,12 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   }
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_Mod
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_Mod(const UInt8 prog)
 {
   UInt8 mod;
@@ -645,6 +718,9 @@ void QuadGT_Redraw_Mod(const UInt8 prog)
     MainForm->ModSource->Text=AnsiString(QuadGT_Progs[prog].mod_source[mod]);
     MainForm->ModTarget->ItemIndex=QuadGT_Progs[prog].mod_target[mod];
     RedrawHorizBarTextS8( MainForm->ModAmp,  MainForm->ModAmpVal,QuadGT_Progs[prog].mod_amp[mod]);
+
+    // TBD: Replace numeric source field with a text list
+    // TBD: Change list of possible targets based on current config
   }
 }
 
@@ -725,6 +801,13 @@ void RedrawVertBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param, UInt8 offset)
   text->Text=AnsiString(param+offset);
 }
 
+void RedrawVertBarTextU16(TTrackBar *bar, TEdit *text, UInt16 param, UInt16 offset)
+{
+  bar->Position=bar->Max-(param+offset);
+  bar->Hint=AnsiString(param+offset);
+  text->Text=AnsiString(param+offset);
+}
+
 //---------------------------------------------------------------------------
 // Name        : EqBarChange
 // Description : Update the parameter, hint text and text field associated 
@@ -766,6 +849,15 @@ void VertBarChangeU8(TTrackBar *bar, TEdit *text, UInt8* param)
   }
 }
 
+void VertBarChangeU16(TTrackBar *bar, TEdit *text, UInt16* param)
+{
+  *param=(bar->Max - bar->Position);
+  bar->Hint=AnsiString(*param);
+  if (text != NULL)
+  {
+    text->Text=AnsiString(*param);
+  }
+}
 void VertBarChangeOffsetU8(TTrackBar *bar, TEdit *text, UInt8* param, UInt8 offset)
 {
   *param=(bar->Max - bar->Position);
@@ -986,16 +1078,16 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->TapVol) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapVolVal, &QuadGT_Progs[prog].tap_volume[tap]);
   else if (Sender == MainForm->TapFeedback) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapFeedbackVal, &QuadGT_Progs[prog].tap_feedback[tap]);
 
-  //TBD: Add Val fields and handle mono, stereo, ping pong
-  //else if (Sender == MainForm->DelayInMix) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayInMixVal, &QuadGT_Progs[prog].delay_input_mix);
-  //else if (Sender == MainForm->DelayDelay) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayDelayVal, &QuadGT_Progs[prog].delay);
-  //else if (Sender == MainForm->DelayFeedback) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayFeedbackVal, &QuadGT_Progs[prog].delay_feedback);
-  //else if (Sender == MainForm->DelayRight) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayRightVal, &QuadGT_Progs[prog].delay_right);
-  //else if (Sender == MainForm->DelayRightFeedback) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayRightFeedbackVal, &QuadGT_Progs[prog].delay_right_feedback);
+  else if (Sender == MainForm->DelayInMix)     VertBarChangeS8((TTrackBar *)Sender, MainForm->DelayInMixVal,     &QuadGT_Progs[prog].delay_input_mix);
+  else if (Sender == MainForm->DelayLeft)      VertBarChangeU16((TTrackBar *)Sender, MainForm->DelayLeftVal,      &QuadGT_Progs[prog].delay_left);
+  else if (Sender == MainForm->DelayLeftFBack) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayLeftFBackVal, &QuadGT_Progs[prog].delay_left_feedback);
+  else if (Sender == MainForm->DelayRight)     VertBarChangeU16((TTrackBar *)Sender, MainForm->DelayRightVal,     &QuadGT_Progs[prog].delay_right);
+  else if (Sender == MainForm->DelayRighFBack) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayRightFBackVal, &QuadGT_Progs[prog].delay_right_feedback);
 }
 
 void __fastcall TMainForm::DelayModeClick(TObject *Sender)
 {
+  //TBD: Move this logic into QuadParamChange
   UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
   QuadGT_Progs[prog].delay_mode=MainForm->DelayMode->ItemIndex;
   QuadGT_Redraw_Delay(prog);
@@ -1259,24 +1351,22 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[DELAY_INPUT_MIX_IDX] = QuadGT_Progs[prog].delay_input_mix;
 
   if ((QuadGT_Progs[prog].delay_mode == 0) ||
+      (QuadGT_Progs[prog].delay_mode == 1) ||
       (QuadGT_Progs[prog].delay_mode == 2))
-  {
-    QuadGT_Encode_16Bit(QuadGT_Progs[prog].delay, &data[DELAY_IDX]);
-    data[DELAY_FEEDBACK_IDX] = QuadGT_Progs[prog].delay_feedback;
-  }
-  else if (QuadGT_Progs[prog].delay_mode == 1)
   {
     QuadGT_Encode_16Bit(QuadGT_Progs[prog].delay_left, &data[DELAY_LEFT_IDX]);
     data[DELAY_LEFT_FEEDBACK_IDX] = QuadGT_Progs[prog].delay_left_feedback;
+
     QuadGT_Encode_16Bit(QuadGT_Progs[prog].delay_right, &data[DELAY_RIGHT_IDX]);
+    data[DELAY_RIGHT_FEEDBACK_IDX] = QuadGT_Progs[prog].delay_right_feedback;
   }
   else if (QuadGT_Progs[prog].delay_mode == 3)
   {
     data[TAP2_PAN_IDX]     = QuadGT_Progs[prog].tap_pan[1];
     data[TAP2_FEEDBACK_IDX]= QuadGT_Progs[prog].tap_feedback[1];
     QuadGT_Encode_16Bit(QuadGT_Progs[prog].tap_delay[2], &data[TAP3_DELAY_IDX]);
-    data[TAP3_VOLUME_IDX]= QuadGT_Progs[prog].tap_volume[2];
-    data[TAP3_PAN_IDX]= QuadGT_Progs[prog].tap_pan[2];
+    data[TAP3_VOLUME_IDX]  = QuadGT_Progs[prog].tap_volume[2];
+    data[TAP3_PAN_IDX]     = QuadGT_Progs[prog].tap_pan[2];
   }
 
   //-------------------------------------------------------------------------
@@ -1666,28 +1756,22 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   QuadGT_Progs[prog].delay_input_mix = data[DELAY_INPUT_MIX_IDX];
 
   if ((QuadGT_Progs[prog].delay_mode == 0) ||
+      (QuadGT_Progs[prog].delay_mode == 1) ||
       (QuadGT_Progs[prog].delay_mode == 2))
   {
-    QuadGT_Progs[prog].delay= QuadGT_Decode_16Bit(&data[DELAY_IDX]);
-    QuadGT_Progs[prog].delay_feedback= data[DELAY_FEEDBACK_IDX];
-  }
-  else if (QuadGT_Progs[prog].delay_mode == 1)
-  {
-    QuadGT_Progs[prog].delay_left= QuadGT_Decode_16Bit(&data[DELAY_LEFT_IDX]);
-    QuadGT_Progs[prog].delay_left_feedback=data[DELAY_LEFT_FEEDBACK_IDX];
-    QuadGT_Progs[prog].delay_right= QuadGT_Decode_16Bit(&data[DELAY_RIGHT_IDX]);
+    QuadGT_Progs[prog].delay_left          = QuadGT_Decode_16Bit(&data[DELAY_LEFT_IDX]);
+    QuadGT_Progs[prog].delay_left_feedback =data[DELAY_LEFT_FEEDBACK_IDX];
+    QuadGT_Progs[prog].delay_right         = QuadGT_Decode_16Bit(&data[DELAY_RIGHT_IDX]);
+    QuadGT_Progs[prog].delay_right_feedback=data[DELAY_RIGHT_FEEDBACK_IDX];
   }
   else if (QuadGT_Progs[prog].delay_mode == 3)
   {
-    QuadGT_Progs[prog].tap_pan[1]    = data[TAP2_PAN_IDX];
-    QuadGT_Progs[prog].tap_feedback[1]= data[TAP2_FEEDBACK_IDX];
-    QuadGT_Progs[prog].tap_delay[2] = QuadGT_Decode_16Bit(&data[TAP3_DELAY_IDX]);
-    QuadGT_Progs[prog].tap_volume[2] = data[TAP3_VOLUME_IDX];
-    QuadGT_Progs[prog].tap_pan[2] = data[TAP3_PAN_IDX];
+    QuadGT_Progs[prog].tap_pan[1]      = data[TAP2_PAN_IDX];
+    QuadGT_Progs[prog].tap_feedback[1] = data[TAP2_FEEDBACK_IDX];
+    QuadGT_Progs[prog].tap_delay[2]    = QuadGT_Decode_16Bit(&data[TAP3_DELAY_IDX]);
+    QuadGT_Progs[prog].tap_volume[2]   = data[TAP3_VOLUME_IDX];
+    QuadGT_Progs[prog].tap_pan[2]      = data[TAP3_PAN_IDX];
   }
-
-  QuadGT_Progs[prog].delay_right=data[DELAY_RIGHT_IDX];
-  QuadGT_Progs[prog].delay_right_feedback=data[DELAY_RIGHT_FEEDBACK_IDX];
 
   //-------------------------------------------------------------------------
   // Mix Parameters
@@ -1852,6 +1936,9 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
     return;
   }
 
+  // TBD: Write a header
+
+  // Write each patch
   for(prog=0; prog<QUAD_NUM_PATCH; prog++)
   {
     if (fwrite(&QuadGT_Progs[prog], sizeof(tQuadGT_Prog), 1, bank_file) != 1)
@@ -1887,6 +1974,9 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
     FormError->ShowError(ferror(bank_file),"opening bank file");
     return;
   }
+
+  // TBD: Read the header and check for validity
+  
   for(prog=0; prog<QUAD_NUM_PATCH; prog++)
   {
     if (fread(&quadgt_patch[prog], sizeof(tQuadGT_Prog), 1, bank_file) != 1)

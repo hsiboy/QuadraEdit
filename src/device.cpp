@@ -25,25 +25,32 @@ void __fastcall TFormDevice::ButtonMidiDevOpenClick(TObject *Sender)
 
    ModalResult=1;
 
-   status=Midi_Out_Open(FormDevice->ComboBoxOutDevs->ItemIndex);
+   //status=Midi_Out_Open(FormDevice->ComboBoxOutDevs->ItemIndex);
+   //if (status != 0)
+   //{
+   //  FormError->ShowError(status,"opening Midi output device");
+   //  MainForm->DisableIO();
+   //}
+   //else
+   //{
+   //  status=Midi_In_Open(FormDevice->ComboBoxInDevs->ItemIndex);
+   //  if (status != 0)
+   //  {
+   //    FormError->ShowError(status,"opening Midi input device");
+   //    MainForm->DisableIO();
+   //  }
+   //  else
+   //  {
+   //    FormDebug->Log(Sender,"Midi devices succesfully opened");
+   //    MainForm->EnableIO();
+   //  }
+   //}
+
+   status=Midi_IO_Open(FormDevice->ComboBoxOutDevs->Items->Strings[FormDevice->ComboBoxOutDevs->ItemIndex]);
    if (status != 0)
    {
-     FormError->ShowError(status,"opening Midi output device");
+     FormError->ShowError(status,"opening Midi device");
      MainForm->DisableIO();
-   }
-   else
-   {
-     status=Midi_In_Open(FormDevice->ComboBoxInDevs->ItemIndex);
-     if (status != 0)
-     {
-       FormError->ShowError(status,"opening Midi input device");
-       MainForm->DisableIO();
-     }
-     else
-     {
-       FormDebug->Log(Sender,"Midi devices succesfully opened");
-       MainForm->EnableIO();
-     }
    }
 }
 //---------------------------------------------------------------------------

@@ -119,7 +119,8 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 void __fastcall TMainForm::DeviceOpenClick(TObject *Sender)
 {
   // Get list of Midi devices
-  Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
+  //Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
+  Midi_Get_IO_Dev_List(FormDevice->ComboBoxInDevs);
 
   FormDevice->ShowModal();
 }

@@ -71,6 +71,15 @@ typedef enum
   EQMODE1_EQ_PLUS_RESONATOR
 } tEq_Mode;
 
+// Possible DELAY_MODE values
+typedef enum
+{
+  DELAYMODE0_MONO,
+  DELAYMODE1_STEREO,
+  DELAYMODE2_PINGPONG,
+  DELAYMODE3_MULTITAP
+} tDelay_Mode;
+
 #define LOW_EQ_FREQ_IDX                 (0x00) // LOW EQ FREQ, 16bits
 #define RES1_TUNE_IDX                   (0x00) // RES 1 TUNE
 #define RES1_DECAY_IDX                  (0x01) // RES 1 DECAY
@@ -145,12 +154,10 @@ typedef enum
 #define DELAY_INPUT_IDX                 (0x28) // DELAY INPUT (0)
 #define RES5_AMP_IDX                    (0x28) // RES 5 AMP (1-7)
 #define DELAY_INPUT_MIX_IDX             (0x29) // DELAY INPUT MIX
-#define DELAY_IDX                       (0x2A) // DELAY, 16bits
-#define DELAY_LEFT_IDX                  (0x2A) // LEFT DELAY, 16bits
+#define DELAY_LEFT_IDX                  (0x2A) // LEFT DELAY, 16bits  (also used for MONO delays)
 #define TAP2_PAN_IDX                    (0x2A) // TAP 2 PAN
 #define TAP2_FEEDBACK_IDX               (0x2B) // TAP 2 FEEDBACK
-#define DELAY_FEEDBACK_IDX              (0x2C) // FEEDBACK
-#define DELAY_LEFT_FEEDBACK_IDX         (0x2C) // LEFT FEEDBACK
+#define DELAY_LEFT_FEEDBACK_IDX         (0x2C) // LEFT FEEDBACK  (also used for MONO delays)
 #define TAP3_DELAY_IDX                  (0x2C) // TAP 3 DELAY, 16bits
 #define DELAY_RIGHT_IDX                 (0x2D) // RIGHT DELAY, 16bits
 #define TAP3_VOLUME_IDX                 (0x2E) // TAP 3 VOLUME
@@ -333,13 +340,11 @@ typedef struct
   // Delay parameters
   UInt8  delay_mode;
   UInt8  delay_input;
-  UInt8  delay_input_mix;                    // -99 - 99
-  UInt16 delay;
-  UInt16 delay_feedback;
-  UInt16 delay_left;
-  UInt16 delay_left_feedback;
+  SInt8  delay_input_mix;                    // -99 - 99
+  UInt16 delay_left;                         // Also used for mono
+  UInt8  delay_left_feedback;                // Also used for mono
   UInt16 delay_right;
-  UInt16 delay_right_feedback;
+  UInt8  delay_right_feedback;
 
   // Multi tap delay parameters
   UInt8  tap_delay[8];
