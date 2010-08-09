@@ -265,7 +265,7 @@ UInt8 Midi_IO_Open(AnsiString device_name)
 
   if (rtnval == 0)
   {
-    status=midiInOpen(&Midi_In_Handle, in, 0, 0, CALLBACK_NULL);
+    status=Midi_In_Open(in);
     if (status != MMSYSERR_NOERROR)
     {
       FormDebug->Log(NULL, "***ERROR: Can't open MIDI input device");
@@ -555,10 +555,10 @@ void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_
 // Parameters  : 
 // Returns     : NONE.
 //---------------------------------------------------------------------------
-unsigned int Midi_In_Close(void)
+unsigned int Midi_IO_Close(void)
 {
   unsigned int status;
-
+  status=midiOutClose(Midi_Out_Handle);
   if (Midi_Open == TRUE)
   {
     Midi_Open=FALSE;
@@ -575,18 +575,6 @@ unsigned int Midi_In_Close(void)
 
 
   }
-  return(status);
-}
-//---------------------------------------------------------------------------
-// Name        : 
-// Description : 
-// Parameters  : 
-// Returns     : NONE.
-//---------------------------------------------------------------------------
-unsigned int Midi_Out_Close(void)
-{
-  unsigned int status;
-  status=midiOutClose(Midi_Out_Handle);
   return(status);
 }
 

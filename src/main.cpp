@@ -119,7 +119,6 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 void __fastcall TMainForm::DeviceOpenClick(TObject *Sender)
 {
   // Get list of Midi devices
-  //Midi_Get_Dev_Lists(FormDevice->ComboBoxInDevs,FormDevice->ComboBoxOutDevs,FormDevice->LabelMidiDevError);
   Midi_Get_IO_Dev_List(FormDevice->ComboBoxInDevs);
 
   FormDevice->ShowModal();
@@ -128,7 +127,7 @@ void __fastcall TMainForm::DeviceOpenClick(TObject *Sender)
 
 void __fastcall TMainForm::MenuFileExitClick(TObject *Sender)
 {
-  Midi_In_Close();
+  DeviceCloseClick(Sender);
   Application->Terminate();
 }
 //---------------------------------------------------------------------------
@@ -162,17 +161,10 @@ void __fastcall TMainForm::DeviceCloseClick(TObject *Sender)
 {
   unsigned int status;
 
-  status=Midi_In_Close();
+  status=Midi_IO_Close();
   if (status != 0)
   {
-    FormError->ShowError(status, "closing Midi input device");
-  }
-
-
-  status=Midi_Out_Close();
-  if (status != 0)
-  {
-    FormError->ShowError(status, "closing Midi output device");
+    FormError->ShowError(status, "closing Midi device");
   }
 
   DisableIO();
@@ -201,7 +193,7 @@ void __fastcall TMainForm::DisableIO(void)
 
 void __fastcall TMainForm::FormClose(TObject *Sender, TCloseAction &Action)
 {
-  Midi_In_Close();
+  DeviceCloseClick(Sender);
   Application->Terminate();
 }
 //---------------------------------------------------------------------------
