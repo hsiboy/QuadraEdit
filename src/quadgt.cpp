@@ -293,13 +293,15 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
     {
       // Add "Multitap" to list of possibilities
       int i=MainForm->DelayMode->Items->IndexOf("Multitap");
-      if (i >= 0) MainForm->DelayMode->Items->Add("Multitap");
+      if (i < 0) MainForm->DelayMode->Items->Add("Multitap");
+      FormDebug->Log(NULL,"Add multitap: "+AnsiString(i));
     }
     else
     {
       // Remove "Multitap" from list of possibilities
       int i=MainForm->DelayMode->Items->IndexOf("Multitap");
       if (i >= 0) MainForm->DelayMode->Items->Delete(i);
+      FormDebug->Log(NULL,"Hide multitap: "+AnsiString(i));
       if (mode == DELAYMODE3_MULTITAP)
       {
         mode=QuadGT_Progs[prog].delay_mode=DELAYMODE0_MONO;
@@ -310,6 +312,7 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
     if ((mode == DELAYMODE0_MONO) || (mode == DELAYMODE2_PINGPONG))
     {
       MainForm->DelayTap->Visible=FALSE;
+      MainForm->DelayNonTap->Visible=TRUE;
       MainForm->DelayRight->Visible=FALSE;
       MainForm->DelayRightVal->Visible=FALSE;
       MainForm->DelayRighFBack->Visible=FALSE;
@@ -324,6 +327,7 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
     else if (mode == DELAYMODE1_STEREO)
     {
       MainForm->DelayTap->Visible=FALSE;
+      MainForm->DelayNonTap->Visible=TRUE;
       MainForm->DelayRight->Visible=TRUE;
       MainForm->DelayRightVal->Visible=TRUE;
       MainForm->DelayRighFBack->Visible=TRUE;
@@ -338,6 +342,7 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
     else if (mode == DELAYMODE3_MULTITAP)
     {
       MainForm->DelayTap->Visible=TRUE;
+      MainForm->DelayNonTap->Visible=FALSE;
     }
   }
   

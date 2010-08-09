@@ -58,6 +58,8 @@ static int rx_other=0;
 static TStringList *in_device;   // List of Input Midi Devices
 static TStringList *out_device;  // List of Output Midi Devices
 
+static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
+                                      DWORD *instance, DWORD *p1, DWORD *p2);
 //---------------------------------------------------------------------------
 // Name        : 
 // Description : 
@@ -237,9 +239,9 @@ int Midi_Get_IO_Dev_List(TComboBox *list)
 //---------------------------------------------------------------------------
 UInt8 Midi_IO_Open(AnsiString device_name)
 {
-  MMRESULT status;
+  MMRESULT status=MMSYSERR_NOERROR;
   int in,out;
-  int rtnval=0;
+  UInt8 i;
 
   in = in_device->IndexOf(device_name);
   out = out_device->IndexOf(device_name);
@@ -249,34 +251,61 @@ UInt8 Midi_IO_Open(AnsiString device_name)
   if ((in < 0) && (out < 0))
   {
     FormDebug->Log(NULL, "***ERROR: Open, no MIDI device available");
-    rtnval = 1;
+    status = 1;
   }
 
-  if (rtnval == 0)
+  if (status == MMSYSERR_NOERROR)
   {
     status=midiOutOpen(&Midi_Out_Handle, out, 0, 0, CALLBACK_NULL);
     if (status != MMSYSERR_NOERROR)
     {
       FormDebug->Log(NULL, "***ERROR: Can't open MIDI output device");
       midiOutClose(Midi_Out_Handle);
-      rtnval = 1;
+      status = 1;
     }
   }
 
-  if (rtnval == 0)
+  if (status == MMSYSERR_NOERROR)
   {
-    status=Midi_In_Open(in);
-    if (status != MMSYSERR_NOERROR)
-    {
-      FormDebug->Log(NULL, "***ERROR: Can't open MIDI input device");
-      midiOutClose(Midi_In_Handle);
-      midiOutClose(Midi_Out_Handle);
-      rtnval = 1;
-    }
+    status=midiInOpen(&Midi_In_Handle, in, (DWORD) Midi_In_Callback, 0, CALLBACK_FUNCTION);
   }
 
-  FormDebug->Log(NULL, "OPEN: "+AnsiString(rtnval));
-  return rtnval;
+  if (status == MMSYSERR_NOERROR)
+  {
+
+    // Setup MIDI in header
+    for (i=0; i<MIDI_IN_NUM_BUF; i++)
+    {
+      Midi_In[i].Hdr.lpData = Midi_In[0].Buffer;
+      Midi_In[i].Hdr.dwBufferLength = sizeof(Midi_In[0].Buffer);
+      Midi_In[i].Hdr.dwBytesRecorded = 0;
+      Midi_In[i].Hdr.dwFlags = 0;
+      status = midiInPrepareHeader(Midi_In_Handle, &Midi_In[i].Hdr, sizeof(Midi_In[i].Hdr));
+     }
+   }
+
+  if (status == MMSYSERR_NOERROR)
+  {
+    // Add a buffer to the MIDI in header
+    status=midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
+  }
+
+  if (status == MMSYSERR_NOERROR)
+  {
+    midiInStart(Midi_In_Handle);
+    Midi_Open=TRUE;
+  }
+
+  if (status != MMSYSERR_NOERROR)
+  {
+    FormDebug->Log(NULL, "***ERROR: Can't open MIDI input device");
+    midiOutClose(Midi_In_Handle);
+    midiOutClose(Midi_Out_Handle);
+    status = 1;
+  }
+
+  FormDebug->Log(NULL, "OPEN: "+AnsiString(status));
+  return status;
 }
 //---------------------------------------------------------------------------
 // Name        : Midi_Out_Dump
@@ -454,7 +483,7 @@ void Midi_Out_ShortMsg(const unsigned long message)
 // Description : Call back routine to process data received from Midi In.
 //---------------------------------------------------------------------------
 static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
-                                  DWORD *instance, DWORD *p1, DWORD *p2)
+                                      DWORD *instance, DWORD *p1, DWORD *p2)
 {
   MIDIHDR *header_ptr;
   UInt32 status;
@@ -497,51 +526,6 @@ static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
 
 }
 
-//---------------------------------------------------------------------------
-// Name        : 
-// Description : 
-// Parameters  : 
-// Returns     : NONE.
-//---------------------------------------------------------------------------
-unsigned int Midi_In_Open(int device_index)
-{
-  UInt8 i;
-  MMRESULT status;
-
-  status=midiInOpen(&Midi_In_Handle, device_index, (DWORD) Midi_In_Callback, 0, CALLBACK_FUNCTION);
-  if (status != MMSYSERR_NOERROR)
-  {
-    return status;
-  }
-
-  // Setup MIDI in header
-  for (i=0; i<MIDI_IN_NUM_BUF; i++)
-  {
-    Midi_In[i].Hdr.lpData = Midi_In[0].Buffer;
-    Midi_In[i].Hdr.dwBufferLength = sizeof(Midi_In[0].Buffer);
-    Midi_In[i].Hdr.dwBytesRecorded = 0;
-    Midi_In[i].Hdr.dwFlags = 0;
-    status = midiInPrepareHeader(Midi_In_Handle, &Midi_In[i].Hdr, sizeof(Midi_In[i].Hdr));
-    if (status != MMSYSERR_NOERROR)
-    {
-      return status;
-    }
-  }
-
-  // Add a buffer to the MIDI in header
-  status=midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
-  if (status != MMSYSERR_NOERROR)
-  {
-    // TBD: Report buffer error details
-    return status;
-  }
-
-  midiInStart(Midi_In_Handle);
-
-  Midi_Open=TRUE;
-  return MMSYSERR_NOERROR;
-}
-
 void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_ptr)
 {
   *msg_count_ptr=rx_msg;
@@ -557,11 +541,14 @@ void Midi_Get_Counts(int *msg_count_ptr, int *sysex_count_ptr, int *other_count_
 //---------------------------------------------------------------------------
 unsigned int Midi_IO_Close(void)
 {
-  unsigned int status;
-  status=midiOutClose(Midi_Out_Handle);
+  unsigned int status=MMSYSERR_NOERROR;
+
   if (Midi_Open == TRUE)
   {
     Midi_Open=FALSE;
+
+    midiOutClose(Midi_Out_Handle);
+
     midiInUnprepareHeader(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
 
     status=midiInStop(Midi_In_Handle);
