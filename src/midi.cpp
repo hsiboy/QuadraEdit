@@ -55,7 +55,7 @@ static int rx_sysex=0;
 static int rx_msg=0;
 static int rx_other=0;
 
-static TStringList *in_device;  // List of Input Midi Devices
+static TStringList *in_device;   // List of Input Midi Devices
 static TStringList *out_device;  // List of Output Midi Devices
 
 //---------------------------------------------------------------------------
@@ -219,78 +219,14 @@ int Midi_Get_IO_Dev_List(TComboBox *list)
     if (in_device->IndexOf(out_device->Strings[i]) >= 0)
     {
       list->Items->Add(out_device->Strings[i]);
+      FormDebug->Log(NULL, "Device "+AnsiString(out_device->Strings[i]));
     }
   }
   list->ItemIndex=0;
 
-  return(out_device->Count);
+  FormDebug->Log(NULL, "Devices "+AnsiString(list->Items->Count));
+  return(list->Items->Count);
 
-}
-//---------------------------------------------------------------------------
-// Name        : 
-// Description : 
-// Parameters  : 
-// Returns     : NONE.
-//---------------------------------------------------------------------------
-void Midi_Get_Dev_Lists(TComboBox *in_list, TComboBox *out_list, TLabel * error_text)
-{
-  int devs,i;
-  MMRESULT status;
-  MIDIOUTCAPS caps;
-  MIDIINCAPS incaps;
-
-  error_text->Caption="";
-  
-  /**************************************************************************
-  * Build the list of possible MIDI output devices
-  **************************************************************************/
-  out_list->Items->Clear();
-  devs = midiOutGetNumDevs();
-  if (devs < 1) {
-    error_text->Caption="No MIDI Output devices available";
-    // TBD: Handle error
-  }
-  else {
-    for (i=0; i<devs; i++)
-    {
-      status = midiOutGetDevCaps(i, &caps, sizeof(caps));
-      if (status == MMSYSERR_NOERROR)
-      {
-        out_list->Items->Add(caps.szPname);
-      }
-      else
-      {
-        out_list->Items->Add("MIDI Out "+AnsiString(i+1)+" - ERROR");
-      }
-    }
-  }
-
-  out_list->ItemIndex=0;
-
-  /**************************************************************************
-  * Build the list of possible MIDI input devices
-  **************************************************************************/
-  in_list->Items->Clear();
-  devs = midiInGetNumDevs();
-  if (devs < 1) {
-        error_text->Caption="No MIDI Input devices available";
-  }
-  else {
-    for (i=0; i<devs; i++)
-    {
-      status = midiInGetDevCaps(i, &incaps, sizeof(incaps));
-      if (status == MMSYSERR_NOERROR)
-      {
-        in_list->Items->Add(incaps.szPname);
-      }
-      else
-      {
-        in_list->Items->Add("MIDI In "+AnsiString(i+1)+" - ERROR");
-      }
-    }
-  }
-
-  in_list->ItemIndex=0;
 }
 
 //---------------------------------------------------------------------------
@@ -308,11 +244,11 @@ UInt8 Midi_IO_Open(AnsiString device_name)
   in = in_device->IndexOf(device_name);
   out = out_device->IndexOf(device_name);
 
-  if ((in >= 0) && (out >= 0))
+  FormDebug->Log(NULL, "Opening "+AnsiString(device_name));
+
+  if ((in < 0) && (out < 0))
   {
-  }
-  else
-  {
+    FormDebug->Log(NULL, "***ERROR: Open, no MIDI device available");
     rtnval = 1;
   }
 
@@ -321,6 +257,7 @@ UInt8 Midi_IO_Open(AnsiString device_name)
     status=midiOutOpen(&Midi_Out_Handle, out, 0, 0, CALLBACK_NULL);
     if (status != MMSYSERR_NOERROR)
     {
+      FormDebug->Log(NULL, "***ERROR: Can't open MIDI output device");
       midiOutClose(Midi_Out_Handle);
       rtnval = 1;
     }
@@ -331,35 +268,15 @@ UInt8 Midi_IO_Open(AnsiString device_name)
     status=midiInOpen(&Midi_In_Handle, in, 0, 0, CALLBACK_NULL);
     if (status != MMSYSERR_NOERROR)
     {
+      FormDebug->Log(NULL, "***ERROR: Can't open MIDI input device");
       midiOutClose(Midi_In_Handle);
       midiOutClose(Midi_Out_Handle);
       rtnval = 1;
     }
   }
 
+  FormDebug->Log(NULL, "OPEN: "+AnsiString(rtnval));
   return rtnval;
-}
-//---------------------------------------------------------------------------
-// Name        : 
-// Description : 
-// Parameters  : 
-// Returns     : NONE.
-//---------------------------------------------------------------------------
-UInt8 Midi_Out_Open(int device_index)
-{
-  MMRESULT status;
-  status=midiOutOpen(&Midi_Out_Handle, device_index, 0, 0, CALLBACK_NULL);
-
-  if (status == MMSYSERR_NOERROR)
-  {
-    return 0;
-  }
-  else
-  {
-    // TBD: report open error?
-    return 1;
-  }
-
 }
 //---------------------------------------------------------------------------
 // Name        : Midi_Out_Dump

@@ -10,8 +10,6 @@
 class TFormDevice : public TForm
 {
 __published:	// IDE-managed Components
-    TLabel *LabelOutDevName;
-    TComboBox *ComboBoxOutDevs;
     TLabel *LabelInDevName;
     TComboBox *ComboBoxInDevs;
     TLabel *LabelMidiDevError;
