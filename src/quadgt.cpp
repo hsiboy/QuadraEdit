@@ -153,6 +153,7 @@ void QuadGT_Init(void)
   ModTgtReverb_A->Add("Delay");
   ModTgtReverb_A->Add("Diffusion");
 
+  // Default the list of Midi Modulation targets
   MainForm->ModTarget->Items=ModTgtReverb_A;
 
 
@@ -315,8 +316,10 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
       MainForm->DelayNonTap->Visible=TRUE;
       MainForm->DelayRight->Visible=FALSE;
       MainForm->DelayRightVal->Visible=FALSE;
+      MainForm->DelayRightLabel->Visible=FALSE;
       MainForm->DelayRighFBack->Visible=FALSE;
       MainForm->DelayRightFBackVal->Visible=FALSE;
+      MainForm->DelayRightFBackLabel->Visible=FALSE;
 
       // Change left delay labels to suit mono
       MainForm->DelayLeftLabel->Caption="Delay";
@@ -330,12 +333,14 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
       MainForm->DelayNonTap->Visible=TRUE;
       MainForm->DelayRight->Visible=TRUE;
       MainForm->DelayRightVal->Visible=TRUE;
+      MainForm->DelayRightLabel->Visible=TRUE;
       MainForm->DelayRighFBack->Visible=TRUE;
       MainForm->DelayRightFBackVal->Visible=TRUE;
+      MainForm->DelayRightFBackLabel->Visible=TRUE;
 
       // Change left delay labels to suit stereo
       MainForm->DelayLeftLabel->Caption="L.Delay";
-      MainForm->DelayLeftFBackLabel->Caption="L.FBack";
+      MainForm->DelayLeftFBackLabel->Caption="L.FB";
     }
 
     // Multitap
@@ -345,12 +350,30 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
       MainForm->DelayNonTap->Visible=FALSE;
     }
   }
+
+  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) ||
+      (QuadGT_Progs[prog].config==CFG2_GEQ_DELAY) ||
+      (QuadGT_Progs[prog].config==CFG3_5BANDEQ_PITCH_DELAY))
+  {
+    MainForm->DelayInput->Visible = TRUE;
+  }
+  else if ((QuadGT_Progs[prog].config==CFG1_LESLIE_DELAY_REVERB) ||
+      (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB) ||
+      (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB))
+  {
+    MainForm->DelayInput->Visible = TRUE;
+  }
   
   if (MainForm->PanelQuadDelay->Visible == TRUE)
   {
     MainForm->DelayMode->ItemIndex=mode;
     MainForm->DelayInput->ItemIndex=QuadGT_Progs[prog].delay_input;
     RedrawVertBarTextS8(MainForm->DelayInMix, MainForm->DelayInMixVal, QuadGT_Progs[prog].delay_input_mix);
+
+    // TBD: is this fixed as reverb?
+    MainForm->DelayInMix1->Caption = "Reverb";
+    if (MainForm->DelayInput->ItemIndex == 0) MainForm->DelayInMix2->Caption = "Preamp";
+    else  MainForm->DelayInMix2->Caption = "Eq";
  
     if ((mode == DELAYMODE0_MONO) || (mode == DELAYMODE2_PINGPONG))
     {
@@ -393,15 +416,16 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
 
+    MainForm->PitchInput->Visible = TRUE;
+
     MainForm->PitchMode->ItemIndex = QuadGT_Progs[prog].pitch_mode;
     MainForm->PitchInput->ItemIndex = QuadGT_Progs[prog].pitch_input;
     MainForm->PitchWave->ItemIndex = QuadGT_Progs[prog].lfo_waveform;
-    MainForm->PitchSpeed->Position = QuadGT_Progs[prog].lfo_speed;
-    MainForm->PitchSpeedVal->Text = AnsiString(QuadGT_Progs[prog].lfo_speed);
-    MainForm->PitchDepth->Position = QuadGT_Progs[prog].lfo_depth;
-    MainForm->PitchDepthVal->Text = AnsiString(QuadGT_Progs[prog].lfo_depth);
-    MainForm->PitchFeedback->Position = QuadGT_Progs[prog].pitch_feedback;
-    MainForm->PitchFeedbackVal->Text = AnsiString(QuadGT_Progs[prog].pitch_feedback);
+
+    FormDebug->Log(NULL,"Redraw pitch");
+    RedrawVertBarTextU8(MainForm->PitchSpeed,    MainForm->PitchSpeedVal,    QuadGT_Progs[prog].lfo_speed, 0);
+    RedrawVertBarTextU8(MainForm->PitchDepth,    MainForm->PitchDepthVal,    QuadGT_Progs[prog].lfo_depth, 0);
+    RedrawVertBarTextU8(MainForm->PitchFeedback, MainForm->PitchFeedbackVal, QuadGT_Progs[prog].pitch_feedback, 0);
   }
   else if (QuadGT_Progs[prog].config==CFG1_LESLIE_DELAY_REVERB)
   {
@@ -410,7 +434,10 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
 
+    MainForm->PitchInput->Visible = FALSE;
+
     // TBD: Redraw Leslie parameters
+    FormDebug->Log(NULL,"Redraw leslie");
   }
   else if ((QuadGT_Progs[prog].config==CFG2_GEQ_DELAY) || 
            (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB) || 
@@ -420,6 +447,10 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadLeslie->Visible=FALSE;
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=FALSE;
+
+    MainForm->PitchInput->Visible = FALSE;
+
+    FormDebug->Log(NULL,"Redraw no-pitch");
   }
   else if (QuadGT_Progs[prog].config==CFG4_3BANDEQ_REVERB)
   {
@@ -428,9 +459,10 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadRingMod->Visible=FALSE;
     MainForm->QuadChorus->Visible=TRUE;
 
-    // Redraw Chorus parameters
+    // Redraw Reverb Chorus parameters
     RedrawVertBarTextU8(MainForm->ChorusSpeed, MainForm->ChorusSpeedVal, QuadGT_Progs[prog].lfo_speed, 1);
     RedrawVertBarTextU8(MainForm->ChorusDepth, MainForm->ChorusDepthVal, QuadGT_Progs[prog].lfo_depth, 1);
+    FormDebug->Log(NULL,"Redraw reverb chorus");
 
   }
   else if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
@@ -441,8 +473,63 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->QuadChorus->Visible=FALSE;
 
     // TBD: Redraw Ring Mod parameters
+    RedrawVertBarTextU16(MainForm->RingModSS,    MainForm->RingModSSVal,    QuadGT_Progs[prog].ring_mod_shift, 0);
+    RedrawVertBarTextS8(MainForm->RingModInMix, MainForm->RingModInMixVal, QuadGT_Progs[prog].ring_mod_in_mix);
+    RedrawVertBarTextS8(MainForm->RingModOutMix, MainForm->RingModOutMixVal, QuadGT_Progs[prog].ring_mod_out_mix);
   }
 
+  if (MainForm->QuadPitch->Visible==TRUE)
+  {
+    if ((MainForm->PitchMode->ItemIndex == PITCHMODE0_MONO_CHORUS) ||
+        (MainForm->PitchMode->ItemIndex == PITCHMODE1_STEREO_CHORUS))
+    {
+      MainForm->PitchWave->Visible = TRUE;
+    }
+    else
+    {
+      MainForm->PitchWave->Visible = FALSE;
+    }
+
+    if ((MainForm->PitchMode->ItemIndex == PITCHMODE0_MONO_CHORUS) ||
+        (MainForm->PitchMode->ItemIndex == PITCHMODE1_STEREO_CHORUS) ||
+        (MainForm->PitchMode->ItemIndex == PITCHMODE2_MONO_FLANGE) ||
+        (MainForm->PitchMode->ItemIndex == PITCHMODE3_STEREO_FLANGE))
+    {
+      MainForm->PitchChorusFlange->Visible = TRUE;
+    }
+    else
+    {
+      MainForm->PitchChorusFlange->Visible = FALSE;
+    }
+
+    if ((MainForm->PitchMode->ItemIndex == PITCHMODE2_MONO_FLANGE) ||
+        (MainForm->PitchMode->ItemIndex == PITCHMODE3_STEREO_FLANGE))
+    {
+      MainForm->PitchFlangeTriggerGroup->Visible = TRUE;
+    }
+    else
+    {
+      MainForm->PitchFlangeTriggerGroup->Visible = FALSE;
+    }
+
+    if (MainForm->PitchMode->ItemIndex == PITCHMODE4_DETUNE)
+    {
+      MainForm->PitchDetuneGroup->Visible = TRUE;
+    }
+    else
+    {
+      MainForm->PitchDetuneGroup->Visible = FALSE;
+    }
+
+    if (MainForm->PitchMode->ItemIndex == PITCHMODE5_PHASER)
+    {
+      MainForm->PhaserGroup->Visible = TRUE;
+    }
+    else
+    {
+      MainForm->PhaserGroup->Visible = FALSE;
+    }
+  }
 }
 
 //---------------------------------------------------------------------------
@@ -528,7 +615,7 @@ void QuadGT_Redraw_Eq(const UInt8 prog)
   {
     MainForm->QuadGraphEq->Visible=TRUE;
 
-    MainForm->GEQPreset->ItemIndex =QuadGT_Progs[prog].geq_preset;
+    MainForm->GEQPreset->ItemIndex =QuadGT_Progs[prog].eq_preset;
 
     // TBD: If using preset, disable sliders and display preset amplitudes
    
@@ -725,6 +812,14 @@ void QuadGT_Redraw_Mod(const UInt8 prog)
     RedrawHorizBarTextS8( MainForm->ModAmp,  MainForm->ModAmpVal,QuadGT_Progs[prog].mod_amp[mod]);
 
     // TBD: Replace numeric source field with a text list
+    if (MainForm->ModSource->ItemIndex==MainForm->ModSource->Items->Count-1)
+    {
+      MainForm->ModSourceCtrl->Enabled=true;
+    }
+    else
+    {
+      MainForm->ModSourceCtrl->Enabled=false;
+    }
     // TBD: Change list of possible targets based on current config
   }
 }
@@ -1049,6 +1144,9 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   }
 
   // Pitch parameters
+  else if (Sender == MainForm->PitchMode) { QuadGT_Progs[prog].pitch_mode=MainForm->PitchMode->ItemIndex; QuadGT_Redraw_Pitch(prog);}
+  else if (Sender == MainForm->PitchInput){ QuadGT_Progs[prog].pitch_input=MainForm->PitchInput->ItemIndex;  QuadGT_Redraw_Pitch(prog);}
+  else if (Sender == MainForm->PitchWave) { QuadGT_Progs[prog].lfo_waveform=MainForm->PitchWave->ItemIndex; QuadGT_Redraw_Pitch(prog);}
   else if (Sender == MainForm->PitchSpeed) VertBarChangeU8((TTrackBar *)Sender, MainForm->PitchSpeedVal, &QuadGT_Progs[prog].lfo_speed);
   else if (Sender == MainForm->PitchDepth) VertBarChangeU8((TTrackBar *)Sender, MainForm->PitchDepthVal, &QuadGT_Progs[prog].lfo_depth);
   else if (Sender == MainForm->PitchFeedback) VertBarChangeU8((TTrackBar *)Sender, MainForm->PitchFeedbackVal, &QuadGT_Progs[prog].pitch_feedback);
@@ -1058,6 +1156,7 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
 
   // Midi Modulation Parameters
   else if (Sender == MainForm->ModNumber) QuadGT_Redraw_Mod(prog);
+  else if (Sender == MainForm->ModSource) QuadGT_Redraw_Mod(prog);
   else if (Sender == MainForm->ModAmp)
   {
     UInt8 mod = StrToInt(MainForm->ModNumber->Text)-1;
@@ -1088,6 +1187,16 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->DelayLeftFBack) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayLeftFBackVal, &QuadGT_Progs[prog].delay_left_feedback);
   else if (Sender == MainForm->DelayRight)     VertBarChangeU16((TTrackBar *)Sender, MainForm->DelayRightVal,     &QuadGT_Progs[prog].delay_right);
   else if (Sender == MainForm->DelayRighFBack) VertBarChangeU8((TTrackBar *)Sender, MainForm->DelayRightFBackVal, &QuadGT_Progs[prog].delay_right_feedback);
+  else if (Sender == MainForm->DelayInput)
+  {
+    QuadGT_Progs[prog].delay_input=MainForm->DelayInput->ItemIndex;
+    QuadGT_Redraw_Delay(prog);
+  }
+
+  // Ring Modulation parameters
+  else if (Sender == MainForm->RingModSS)     VertBarChangeU16((TTrackBar *)Sender, MainForm->RingModSSVal,    &QuadGT_Progs[prog].ring_mod_shift);
+  else if (Sender == MainForm->RingModInMix)  VertBarChangeS8((TTrackBar *)Sender, MainForm->RingModInMixVal,  &QuadGT_Progs[prog].ring_mod_in_mix);
+  else if (Sender == MainForm->RingModOutMix) VertBarChangeS8((TTrackBar *)Sender, MainForm->RingModOutMixVal, &QuadGT_Progs[prog].ring_mod_out_mix);
 }
 
 void __fastcall TMainForm::DelayModeClick(TObject *Sender)
@@ -1319,7 +1428,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[RES4_AMP_IDX]    |= (QuadGT_Progs[prog].res_amp[3] << 1) & BITS1to7;
 
   data[LFO_WAVEFORM_IDX] = QuadGT_Progs[prog].lfo_waveform & BIT0;
-  data[EQ_PRESET_IDX]   |= (QuadGT_Progs[prog].geq_preset << 1) & BITS1to7;
+  data[EQ_PRESET_IDX]   |= (QuadGT_Progs[prog].eq_preset << 1) & BITS1to7;
 
   data[LFO_SPEED_IDX] = QuadGT_Progs[prog].lfo_speed;
 
@@ -1465,8 +1574,8 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {
-    data[RING_MOD_OUTPUT_MIX_IDX]  = QuadGT_Progs[prog].ring_mod_output_mix;
-    data[RING_MOD_DEL_REV_MIX_IDX] = QuadGT_Progs[prog].ring_mod_del_rev_mix;
+    data[RING_MOD_OUTPUT_MIX_IDX]  = QuadGT_Progs[prog].ring_mod_out_mix+99;
+    data[RING_MOD_DEL_REV_MIX_IDX] = QuadGT_Progs[prog].ring_mod_in_mix+99;
   }
   else
   {
@@ -1544,7 +1653,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Eq Parameters
   //-------------------------------------------------------------------------
-  QuadGT_Progs[prog].geq_preset = (data[EQ_PRESET_IDX]&BITS1to7)>>1;       // User or Preset 1-6
+  QuadGT_Progs[prog].eq_preset = (data[EQ_PRESET_IDX]&BITS1to7)>>1;       // User or Preset 1-6
 
   // Resonator parameters, alternative one
   if ((QuadGT_Progs[prog].config == CFG0_EQ_PITCH_DELAY_REVERB) &&
@@ -1850,8 +1959,8 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 
   if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {
-    QuadGT_Progs[prog].ring_mod_output_mix = data[RING_MOD_OUTPUT_MIX_IDX];
-    QuadGT_Progs[prog].ring_mod_del_rev_mix= data[RING_MOD_DEL_REV_MIX_IDX];
+    QuadGT_Progs[prog].ring_mod_out_mix = data[RING_MOD_OUTPUT_MIX_IDX]-99;
+    QuadGT_Progs[prog].ring_mod_in_mix= data[RING_MOD_DEL_REV_MIX_IDX]-99;
   }
   else
   {

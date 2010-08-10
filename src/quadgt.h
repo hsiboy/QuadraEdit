@@ -80,6 +80,18 @@ typedef enum
   DELAYMODE3_MULTITAP
 } tDelay_Mode;
 
+// Possible PITCH_MODE values
+typedef enum
+{
+  PITCHMODE0_MONO_CHORUS,
+  PITCHMODE1_STEREO_CHORUS,
+  PITCHMODE2_MONO_FLANGE,
+  PITCHMODE3_STEREO_FLANGE,
+  PITCHMODE4_DETUNE,
+  PITCHMODE5_PHASER
+} tPitch_Mode;
+
+
 #define LOW_EQ_FREQ_IDX                 (0x00) // LOW EQ FREQ, 16bits
 #define RES1_TUNE_IDX                   (0x00) // RES 1 TUNE
 #define RES1_DECAY_IDX                  (0x01) // RES 1 DECAY
@@ -284,14 +296,14 @@ typedef enum
 typedef struct
 {
   char  name[NAME_LENGTH+1];
-  UInt8 config;
+  UInt8 config;                    // 0-7
 
   // Preamp parameters
-  UInt8 comp;                      // Compression 0-?
-  UInt8 od;                        // Overdrive 0-?
-  UInt8 dist;                      // Distortion 0-?
+  UInt8 comp;                      // Compression 0-7
+  UInt8 od;                        // Overdrive 0-7
+  UInt8 dist;                      // Distortion 0-8
   UInt8 preamp_tone;               // Preamp tone 0-2 (Flat, Prescence, Bright)
-  UInt8 preamp_gate;               // Preamp noise gate level 0-15
+  UInt8 preamp_gate;               // Preamp noise gate level 0-17
   UInt8 preamp_out_level;          // Preamp output level 0-99
   UInt8 effect_loop;               // Effect loop on/off 0-1
   UInt8 bass_boost;                // Bass boost on/off 0-1
@@ -308,43 +320,43 @@ typedef struct
   UInt16 high_eq_amp;              // -14 to 14 db  (0-560)
   UInt16 low_mid_eq_freq;          // 20 to 500 Hz
   UInt16 low_mid_eq_amp;           // -14 to 14 db  (0-560)
-  UInt8  low_mid_eq_q;
-  UInt16 high_mid_eq_freq;
+  UInt8  low_mid_eq_q;             // 0.2 to 2.55 octaves (20-255)
+  UInt16 high_mid_eq_freq;         // 2000 to 18000 Hz
   UInt16 high_mid_eq_amp;          // -14 to 14 db  (0-560)
-  UInt8  high_mid_eq_q;
+  UInt8  high_mid_eq_q;            // 0.2 to 2.55 octaves (20-255)
+  UInt8 eq_preset;                 // 0=6 (User=0 or preset 1-6)
 
   // Graphic Eq parameters
-  UInt8 geq_preset;           // User or preset 1-6
-  SInt8 geq_16hz;                            // -14 to 14
-  SInt8 geq_32hz;                            // -14 to 14
-  SInt8 geq_62hz;                            // -14 to 14
-  SInt8 geq_126hz;                           // -14 to 14
-  SInt8 geq_250hz;                           // -14 to 14
-  SInt8 geq_500hz;                           // -14 to 14
-  SInt8 geq_1khz;                            // -14 to 14
-  SInt8 geq_2khz;                            // -14 to 14
-  SInt8 geq_4khz;                            // -14 to 14
-  SInt8 geq_8khz;                            // -14 to 14
-  SInt8 geq_16khz;                           // -14 to 14
+  SInt8 geq_16hz;                  // -14 to 14  (0-28)
+  SInt8 geq_32hz;                  // -14 to 14  (0-28)
+  SInt8 geq_62hz;                  // -14 to 14  (0-28)
+  SInt8 geq_126hz;                 // -14 to 14  (0-28)
+  SInt8 geq_250hz;                 // -14 to 14  (0-28)
+  SInt8 geq_500hz;                 // -14 to 14  (0-28)
+  SInt8 geq_1khz;                  // -14 to 14  (0-28)
+  SInt8 geq_2khz;                  // -14 to 14  (0-28)
+  SInt8 geq_4khz;                  // -14 to 14  (0-28)
+  SInt8 geq_8khz;                  // -14 to 14  (0-28)
+  SInt8 geq_16khz;                 // -14 to 14  (0-28)
 
   // Pitch parameters
-  UInt8 pitch_mode;
-  UInt8 pitch_input;
-  UInt8 lfo_waveform;
-  UInt8 lfo_speed;
-  UInt8 lfo_depth;
-  UInt8 pitch_feedback;
-  UInt8 trigger_flange;
-  UInt8 detune_amount;
+  UInt8 pitch_mode;                          // 0 - 5 (tPitch_Mode)
+  UInt8 pitch_input;                         // 0 - 1
+  UInt8 lfo_waveform;                        // 0 - 1
+  UInt8 lfo_speed;                           // 0 - 98
+  UInt8 lfo_depth;                           // 0 - 98
+  UInt8 pitch_feedback;                      // 0 - 99
+  UInt8 trigger_flange;                      // 0 - 1
+  UInt8 detune_amount;                       // -99 - 99
 
   // Delay parameters
-  UInt8  delay_mode;
-  UInt8  delay_input;
+  UInt8  delay_mode;                         // 0 - 3  (tDelay_Mode)
+  UInt8  delay_input;                        // 0 - 1
   SInt8  delay_input_mix;                    // -99 - 99
-  UInt16 delay_left;                         // Also used for mono
-  UInt8  delay_left_feedback;                // Also used for mono
-  UInt16 delay_right;
-  UInt8  delay_right_feedback;
+  UInt16 delay_left;                         // 1 - 375/775/800/1500/1470/705/400/320/720/750 Also used for mono
+  UInt8  delay_left_feedback;                // 0 - 99, Also used for mono
+  UInt16 delay_right;                        // 1 - 375/400/750/705/320 
+  UInt8  delay_right_feedback;               // 0 - 99
 
   // Multi tap delay parameters
   UInt8  tap_delay[8];
@@ -371,58 +383,58 @@ typedef struct
   UInt8 reverb_gated_level;                  // 0 - 99
 
   // Mix parameters
-  UInt8 prepost_eq;
-  UInt8 direct_level;
-  UInt8 master_effects_level;
-  UInt8 preamp_level;
-  UInt8 pitch_level;
-  UInt8 leslie_level;
-  UInt8 ring_mod_level;
-  UInt8 delay_level;
-  UInt8 reverb_level;
-  UInt8 mix_mod;
+  UInt8 prepost_eq;                  // 0 - 1 (0=Pre-eq, 1=Post-eq)
+  UInt8 direct_level;                // 0 - 99
+  UInt8 master_effects_level;        // 0 - 99
+  UInt8 preamp_level;                // 0 - 99
+  UInt8 pitch_level;                 // 0 - 99
+  UInt8 leslie_level;                // 0 - 99
+  UInt8 ring_mod_level;              // 0 - 99
+  UInt8 delay_level;                 // 0 - 99
+  UInt8 reverb_level;                // 0 - 99
+  UInt8 mix_mod;                     // 0 - 1
   UInt8 eq_level;
 
   UInt8 multitap_master_feedback;
   UInt8 multitap_number;
 
   // Midi modulation parameters
-  UInt8 mod_source[NUM_MOD];
-  UInt8 mod_target[NUM_MOD];
-  SInt8 mod_amp[NUM_MOD];
+  UInt8 mod_source[NUM_MOD];      // 0 - 126
+  UInt8 mod_target[NUM_MOD];    // 0 - ???
+  SInt8 mod_amp[NUM_MOD];       // -99 - 99
 
   // Resonator parameters
-  UInt8 res_tune[NUM_RES];
-  UInt8 res_amp[NUM_RES];
-  UInt8 res_decay[NUM_RES];
+  UInt8 res_tune[NUM_RES];      // 0 - 60
+  UInt8 res_amp[NUM_RES];       // 0 - 99
+  UInt8 res_decay[NUM_RES];     // 0 - 99
   UInt8 res_pitch[NUM_RES];
   UInt8 res_decay_all;
-  UInt8 res_midi_gate;
+  UInt8 res_midi_gate;          // 0 - 1
 
   // Sampling parameters
-  UInt8 sample_start;
-  UInt8 sample_length;
-  UInt8 sample_playback_mode;
+  UInt8 sample_start;            // 0 - 150
+  UInt8 sample_length;           // 5 - 155
+  UInt8 sample_playback_mode;    // 0 - 2
   UInt8 sample_pitch;
-  UInt8 sample_rec_audio_trigger;
-  UInt8 sample_midi_trigger;
-  UInt8 sample_midi_base_note;
-  UInt8 sample_low_midi_note;
-  UInt8 sample_high_midi_note;
+  UInt8 sample_rec_audio_trigger; // 0 - 1
+  UInt8 sample_midi_trigger;      // 0 - 2
+  UInt8 sample_midi_base_note;    // 0 - 127
+  UInt8 sample_low_midi_note;     // 0 - 127
+  UInt8 sample_high_midi_note;    // 0 - 127
 
   // Ring modulator parameters
-  UInt8 ring_mod_output_mix;
-  UInt8 ring_mod_del_rev_mix;
-  UInt16 ring_mod_shift;
+  SInt8 ring_mod_out_mix;  // -99-99
+  SInt8 ring_mod_in_mix;   // -99-99
+  UInt16 ring_mod_shift;   // 1-300
 
-  UInt8 pan_speed;
-  UInt8 pan_depth;
+  UInt8 pan_speed;         // 0 - 98 (Mod Speed?)
+  UInt8 pan_depth;         // 0 - 99 (Mod Depth?)
  
   // Leslie parameters (For Config = 1 - Leslie, Delay, Reverb)
   UInt8 leslie_speed;      // 0-1
   UInt8 leslie_motor;      // 0-1
   UInt8 leslie_seperation; // 0-99
-  UInt8 leslie_high_rotor_level;
+  UInt8 leslie_high_rotor_level;  // 0 - 26
 
 } tQuadGT_Prog;
 
