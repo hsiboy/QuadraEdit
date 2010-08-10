@@ -17,6 +17,8 @@ TFormDevice *FormDevice;
 __fastcall TFormDevice::TFormDevice(TComponent* Owner)
     : TForm(Owner)
 {
+  //TBD: Get rid of this field?
+  LabelMidiDevError->Caption = "";
 }
 //---------------------------------------------------------------------------
 void __fastcall TFormDevice::ButtonMidiDevOpenClick(TObject *Sender)
@@ -25,10 +27,10 @@ void __fastcall TFormDevice::ButtonMidiDevOpenClick(TObject *Sender)
 
    ModalResult=1;
 
-   status=Midi_IO_Open(FormDevice->ComboBoxInDevs->Items->Strings[FormDevice->ComboBoxInDevs->ItemIndex]);
+   status=Midi_IO_Open(ComboBoxInDevs->Items->Strings[ComboBoxInDevs->ItemIndex]);
    if (status != 0)
    {
-     FormError->ShowError(status,"opening Midi device");
+     FormError->ShowErrorCode(status,"opening Midi device");
      MainForm->DisableIO();
    }
    else

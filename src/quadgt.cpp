@@ -1980,7 +1980,8 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 //---------------------------------------------------------------------------
 // Name        : QuadPatchWriteClick
 // Description : Write the cyurrent patch to the QuadGT via MIDI
-// Param 1     : Pointer object that generated the event
+// Parameter 1 : Pointer object that generated the event
+// Returns     : NONE
 //---------------------------------------------------------------------------
 void __fastcall TMainForm::QuadPatchWriteClick(TObject *Sender)
 {
@@ -2022,7 +2023,7 @@ void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
 
   if (status != 0)
   {
-     FormError->ShowError(status, "sending SYSEX to Midi output device");
+     FormError->ShowErrorCode(status, "sending SYSEX to Midi output device");
   }
 
 }
@@ -2046,7 +2047,7 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
 
   if (bank_file == NULL)
   {
-    FormError->ShowError(ferror(bank_file),"opening bank file");
+    FormError->ShowErrorCode(ferror(bank_file),"opening bank file");
     return;
   }
 
@@ -2057,7 +2058,7 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
   {
     if (fwrite(&QuadGT_Progs[prog], sizeof(tQuadGT_Prog), 1, bank_file) != 1)
     {
-      FormError->ShowError(ferror(bank_file),"writing bank file ");
+      FormError->ShowErrorCode(ferror(bank_file),"writing bank file ");
       break;
     }
   }
@@ -2085,7 +2086,7 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
 
   if (bank_file == NULL)
   {
-    FormError->ShowError(ferror(bank_file),"opening bank file");
+    FormError->ShowErrorCode(ferror(bank_file),"opening bank file");
     return;
   }
 
@@ -2095,7 +2096,7 @@ void __fastcall TMainForm::QuadBankLoadClick(TObject *Sender)
   {
     if (fread(&quadgt_patch[prog], sizeof(tQuadGT_Prog), 1, bank_file) != 1)
     {
-      FormError->ShowError(ferror(bank_file),"reading bank file ");
+      FormError->ShowErrorCode(ferror(bank_file),"reading bank file ");
       break;
     }
   }
@@ -2129,7 +2130,7 @@ void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
   sysex_file = fopen(MainForm->SysexOpenDialog->Files->Strings[0].c_str(),"rb");
   if (sysex_file == NULL)
   {
-    FormError->ShowError(ferror(sysex_file),"opening SysEx file");
+    FormError->ShowErrorCode(ferror(sysex_file),"opening SysEx file");
     return;
   }
 
@@ -2141,13 +2142,13 @@ void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
   data.buffer=(UInt8 *)malloc(sizeof(UInt8) * size);
   if (data.buffer == NULL)
   {
-      FormError->ShowError(1,"allocating memory for SysEx file ");
+      FormError->ShowErrorCode(1,"allocating memory for SysEx file ");
   }
   else
   {
     if (fread(data.buffer, 1, size, sysex_file) != size)
     {
-      FormError->ShowError(ferror(sysex_file),"reading SysEx file ");
+      FormError->ShowErrorCode(ferror(sysex_file),"reading SysEx file ");
     }
     else
     {
@@ -2303,6 +2304,12 @@ void QuadGT_Sysex_Process(tBuffer sysex)
    }
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGtBankLoadClick
+// Description : Load a QuadGT bank file (as used by XXX program)
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
 {
   UInt8 prog;
@@ -2316,7 +2323,7 @@ void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
 
   if (quadgt_file == NULL)
   {
-    FormError->ShowError(ferror(quadgt_file),"opening QuadGT file");
+    FormError->ShowErrorCode(ferror(quadgt_file),"opening QuadGT file");
     return;
   }
 
@@ -2328,13 +2335,13 @@ void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
   data.buffer=(UInt8 *)malloc(sizeof(UInt8) * size);
   if (data.buffer == NULL)
   {
-      FormError->ShowError(1,"allocating memory for QuadGT file ");
+      FormError->ShowErrorCode(1,"allocating memory for QuadGT file ");
   }
   else
   {
     if (fread(data.buffer, 1, size, quadgt_file) != size)
     {
-      FormError->ShowError(ferror(quadgt_file),"reading QuadGT file ");
+      FormError->ShowErrorCode(ferror(quadgt_file),"reading QuadGT file ");
     }
     else
     {

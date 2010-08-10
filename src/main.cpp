@@ -118,10 +118,19 @@ void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
 
 void __fastcall TMainForm::DeviceOpenClick(TObject *Sender)
 {
-  // Get list of Midi devices
-  Midi_Get_IO_Dev_List(FormDevice->ComboBoxInDevs);
+  int device_count;
 
-  FormDevice->ShowModal();
+  // Get list of Midi devices
+  device_count = Midi_Get_IO_Dev_List(FormDevice->ComboBoxInDevs);
+
+  if (device_count > 0)
+  {
+    FormDevice->ShowModal();
+  }
+  else
+  {
+    FormError->ShowError("No MIDI IO devices available");
+  }
 }
 //---------------------------------------------------------------------------
 
@@ -137,26 +146,6 @@ void __fastcall TMainForm::MenuFileExitClick(TObject *Sender)
 
 
 //---------------------------------------------------------------------------
-void __fastcall TMainForm::RadioDelayClick(TObject *Sender)
-{
-  // TBD
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TMainForm::RadioPitchClick(TObject *Sender)
-{
-  // TBD
-}
-//---------------------------------------------------------------------------
-
-void __fastcall TMainForm::RadioReverbClick(TObject *Sender)
-{
-  //TBD
-}
-//---------------------------------------------------------------------------
-
-
-//---------------------------------------------------------------------------
 void __fastcall TMainForm::DeviceCloseClick(TObject *Sender)
 {
   unsigned int status;
@@ -164,7 +153,7 @@ void __fastcall TMainForm::DeviceCloseClick(TObject *Sender)
   status=Midi_IO_Close();
   if (status != 0)
   {
-    FormError->ShowError(status, "closing Midi device");
+    FormError->ShowErrorCode(status, "closing Midi device");
   }
 
   DisableIO();
@@ -212,7 +201,7 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
 
   if (status != 0)
   {
-     FormError->ShowError(status, "sending SYSEX data request to Midi output device");
+     FormError->ShowErrorCode(status, "sending SYSEX data request to Midi output device");
   }
 
     
@@ -230,7 +219,7 @@ void __fastcall TMainForm::QuadProgWriteClick(TObject *Sender)
 
   if (status != 0)
   {
-     FormError->ShowError(status, "sending SYSEX edit command to Midi output device");
+     FormError->ShowErrorCode(status, "sending SYSEX edit command to Midi output device");
   }
 }
 //---------------------------------------------------------------------------
@@ -243,7 +232,7 @@ void __fastcall TMainForm::QuadMidiWriteClick(TObject *Sender)
 
   if (status != 0)
   {
-     FormError->ShowError(status, "sending SYSEX edit command to Midi output device");
+     FormError->ShowErrorCode(status, "sending SYSEX edit command to Midi output device");
   }
 }
 
@@ -306,15 +295,3 @@ void __fastcall TMainForm::ResNumberExit(TObject *Sender)
   QuadGT_Redraw_Resonator((UInt8) StrToInt(QuadPatchNum->Text));
 }
 //---------------------------------------------------------------------------
-
-
-
-//---------------------------------------------------------------------------
-
-void __fastcall TMainForm::SysexBankReadClick(TObject *Sender)
-{
-  // TBD    
-}
-
-
-    

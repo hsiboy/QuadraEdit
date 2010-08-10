@@ -181,8 +181,8 @@ __published:	// IDE-managed Components
     TTrackBar *GEQ_126Hz;
     TTrackBar *GEQ_250Hz;
     TTrackBar *GEQ_500Hz;
-    TLabel *Label28;
-    TLabel *Label29;
+    TLabel *Geq16HzLabel;
+    TLabel *Geq32HzLabel;
     TLabel *Label30;
     TLabel *Label31;
     TLabel *Label32;
@@ -203,8 +203,8 @@ __published:	// IDE-managed Components
     TMenuItem *Open;
     TMenuItem *Close;
     TGroupBox *QuadChorus;
-    TLabel *Label39;
-    TLabel *Label40;
+    TLabel *ReverbChorusSpeedLabel;
+    TLabel *ReverbChorusDepthLabel;
     TTrackBar *ChorusSpeed;
     TTrackBar *ChorusDepth;
     TRadioGroup *ChorusOnOff;
@@ -338,9 +338,6 @@ __published:	// IDE-managed Components
     void __fastcall DeviceOpenClick(TObject *Sender);
     void __fastcall MenuFileExitClick(TObject *Sender);
     void __fastcall QuadParamChange(TObject *Sender);
-    void __fastcall RadioDelayClick(TObject *Sender);
-    void __fastcall RadioPitchClick(TObject *Sender);
-    void __fastcall RadioReverbClick(TObject *Sender);
     void __fastcall QuadPatchReadClick(TObject *Sender);
     void __fastcall DeviceCloseClick(TObject *Sender);
     void __fastcall FormClose(TObject *Sender, TCloseAction &Action);
@@ -369,7 +366,6 @@ __published:	// IDE-managed Components
     void __fastcall SysexBankLoadClick(TObject *Sender);
     
     void __fastcall QuadPatchWriteClick(TObject *Sender);
-    void __fastcall SysexBankReadClick(TObject *Sender);
     
     
 private:	// User declarations

@@ -17,7 +17,8 @@ __published:	// IDE-managed Components
 private:	// User declarations
 public:		// User declarations
     __fastcall TFormError(TComponent* Owner);
-    void __fastcall ShowError(UInt32 code, AnsiString string);
+    void __fastcall ShowError(AnsiString string);
+    void __fastcall ShowErrorCode(UInt32 code, AnsiString string);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TFormError *FormError;

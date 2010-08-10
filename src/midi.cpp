@@ -91,7 +91,7 @@ void Queue_Push(tBuffer buffer)
   entry = (tQueue_Entry *)malloc(sizeof(tQueue_Entry));
   if (entry == NULL)
   {
-    FormError->ShowError(1,"no memory left to create queue entry");
+    FormError->ShowErrorCode(1,"no memory left to create queue entry");
     return;
   }
 
@@ -99,7 +99,7 @@ void Queue_Push(tBuffer buffer)
   entry->payload.buffer = (UInt8 *) malloc(buffer.length);
   if (entry->payload.buffer == NULL)
   {
-    FormError->ShowError(2,"no memory left to queue data");
+    FormError->ShowErrorCode(2,"no memory left to queue data");
     free(entry);
     return;
   }
@@ -163,7 +163,7 @@ tBuffer Queue_Pop(void)
 // Name        : 
 // Description : 
 // Parameters  : 
-// Returns     : NONE.
+// Returns     : Number of Midi IO devices available.
 //---------------------------------------------------------------------------
 int Midi_Get_IO_Dev_List(TComboBox *list)
 {
