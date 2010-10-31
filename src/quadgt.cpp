@@ -11,22 +11,18 @@
 #include "error.h"
 #include "main.h"
 #include "debug.h"
+#include "display.h"
 
 #include "quadgt.h"
+
+#define GEQ_OFFSET (14)
 
 
 static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
 
-void RedrawHorizBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param);
-void RedrawHorizBarTextS8(TTrackBar *bar, TEdit *text, SInt8 param);
-
-void RedrawVertBarTextS8(TTrackBar *bar, TEdit *text, SInt8 param);
-void RedrawVertBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param, UInt8 offset);
-void RedrawVertBarTextU16(TTrackBar *bar, TEdit *text, UInt16 param, UInt16 offset);
-
 // 
 //---------------------------------------------------------------------------
-// Name        : 
+// Name        : save_patch
 // Description : DEBUG: Save a patch to a an ASCII hex disk file for analysis
 // Parameters  : 
 // Returns     : NONE.
@@ -44,12 +40,44 @@ void save_patch(UInt8 *data, UInt32 length, char *fname)
   fclose(handle);
 }
 
+//---------------------------------------------------------------------------
+//Decode two bytes of QuadreverbGT binary data to an internal format 16bit UInt
+UInt16 QuadGT_Decode_16Bit(UInt8 *data)
+{
+  //FormDebug->Log(NULL, "Decode "+AnsiString(*data)+", "+AnsiString(*(data+1)));
+  return( (UInt16) *(data + 1)  + ((UInt16) *(data)<<8));
+}
+
+UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb)
+{
+  //FormDebug->Log(NULL, "Decode "+AnsiString(*data)+", "+AnsiString(*(data+1)));
+  return( (UInt16) *msb  + ((UInt16) *(lsb)<<8));
+}
+
+// Encode an internal format 16 bit UInt to two bytes of QuadGT format data (8 bits each)
+void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data)
+{
+  *data= (UInt8)(word>>8); 
+  *(data+1)=(UInt8)(word & 0xff);
+  //FormDebug->Log(NULL, "Encoded "+AnsiString(*data)+", "+AnsiString(*(data+1)));
+}
+
+void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb)
+{
+  *lsb= (UInt8)(word>>8); 
+  *msb=(UInt8)(word & 0xff);
+  //FormDebug->Log(NULL, "Encoded "+AnsiString(*data)+", "+AnsiString(*(data+1)));
+}
+
 // 
 //---------------------------------------------------------------------------
-// Name        : 
+// Name        : QuadGT_Decode_From_Sysex
 // Description : Decode Midi SysEx data in 7bits to Quadraverb data in 8bits
-// Parameters  : 
-// Returns     : NONE.
+// Parameter 1 : Pointer to sysex data
+// Parameter 2 : Length of sysex data in bytes
+// Parameter 1 : Pointer to QuadtGt fromat data (returned)
+// Parameter 2 : Length of QuadGt format data in bytes
+// Returns     : Number of output bytes.  Zero on error.
 //---------------------------------------------------------------------------
 UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out_len)
 {
@@ -78,10 +106,13 @@ UInt32 QuadGT_Decode_From_Sysex(UInt8 *in, UInt32 length, UInt8* out, UInt32 out
 
 // 
 //---------------------------------------------------------------------------
-// Name        : 
+// Name        : QuadGT_Encode_To_Sysex
 // Description : Encode 8bit quadraverb data into low 7 bits for SysEx
-// Parameters  : 
-// Returns     : NONE.
+// Parameter 1 : Pointer to QuadGt format data
+// Parameter 2 : Length of QuadGt format data in bytes
+// Parameter 1 : Pointer to sysex fromat data (returned)
+// Parameter 2 : Length of sysex format data in bytes
+// Returns     : Number of output bytes.  Zero on error.
 //---------------------------------------------------------------------------
 UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_len)
 {
@@ -127,8 +158,8 @@ UInt32 QuadGT_Encode_To_Sysex(UInt8 *in, UInt32 length, UInt8 * out, UInt32 out_
 
 //---------------------------------------------------------------------------
 // Name        : QuadGT_Init
-// Description : 
-// Parameters  : 
+// Description : Initialise the QuadtGT specific data at program start.
+// Parameters  : NONE.
 // Returns     : NONE.
 //---------------------------------------------------------------------------
 void QuadGT_Init(void)
@@ -155,8 +186,6 @@ void QuadGT_Init(void)
 
   // Default the list of Midi Modulation targets
   MainForm->ModTarget->Items=ModTgtReverb_A;
-
-
 
 }
 
@@ -201,6 +230,7 @@ void QuadGT_Redraw_Reverb(const UInt8 prog)
 {
   UInt8 val;
 
+  // Select whether reverb is visible based on configuration
   if (QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB)
   {
     MainForm->QuadReverb->Visible=true;
@@ -281,6 +311,7 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
   {
     MainForm->PanelQuadDelay->Visible = TRUE;
 
+    // Position the delay panel based on configuration
     if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
     {
       MainForm->PanelQuadDelay->Left=660;
@@ -824,6 +855,12 @@ void QuadGT_Redraw_Mod(const UInt8 prog)
   }
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_Preamp
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_Preamp(const UInt8 prog)
 {
   UInt8 val;
@@ -874,133 +911,48 @@ void QuadGT_Redraw_Preamp(const UInt8 prog)
 
 }
 
-
-void RedrawHorizBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param)
-{
-  bar->Position=param;
-  bar->Hint=AnsiString(param);
-  text->Text=AnsiString(param);
-}
-void RedrawHorizBarTextS8(TTrackBar *bar, TEdit *text, SInt8 param)
-{
-  bar->Position=param;
-  bar->Hint=AnsiString(param);
-  text->Text=AnsiString(param);
-}
-void RedrawVertBarTextS8(TTrackBar *bar, TEdit *text, SInt8 param)
-{
-  bar->Position=param;
-  bar->Hint=AnsiString(param);
-  text->Text=AnsiString(param);
-}
-
-void RedrawVertBarTextU8(TTrackBar *bar, TEdit *text, UInt8 param, UInt8 offset)
-{
-  bar->Position=bar->Max-(param+offset);
-  bar->Hint=AnsiString(param+offset);
-  text->Text=AnsiString(param+offset);
-}
-
-void RedrawVertBarTextU16(TTrackBar *bar, TEdit *text, UInt16 param, UInt16 offset)
-{
-  bar->Position=bar->Max-(param+offset);
-  bar->Hint=AnsiString(param+offset);
-  text->Text=AnsiString(param+offset);
-}
-
 //---------------------------------------------------------------------------
-// Name        : EqBarChange
-// Description : Update the parameter, hint text and text field associated 
-//               with a vertical Eq frequency bar.
-// Parameter 1 : Pointer to bar object
-// Parameter 2 : Pointer to text object for numeric value
-// Parameter 3 : Pointer to parameter to update
+// Name        : QuadGT_Redraw_Resonator
+// Description : 
+// Parameters  : 
 // Returns     : NONE.
 //---------------------------------------------------------------------------
-void EqBarChange(TTrackBar *bar, TEdit *text, UInt16* param)
+void QuadGT_Redraw_Resonator(const UInt8 prog)
 {
-  *param= -1 * bar->Position + bar->Max;       // Convert to range: 0 to 560
-  bar->Hint=AnsiString(bar->Position/-20.0);   // Display in range: -14 to 14
-  text->Text=AnsiString(bar->Position/-20.0);  // Display value as text
-}
-
-void VertBarChange(TTrackBar *bar, UInt8* param)
-{
-  *param=(bar->Max - bar->Position);
-  bar->Hint=AnsiString(bar->Max - bar->Position);
-}
-
-void VertBarChangeS8(TTrackBar *bar, TEdit *text, SInt8* param)
-{
-  *param=-1*bar->Position;
-  bar->Hint=AnsiString(*param);
-  if (text != NULL)
+  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) && (QuadGT_Progs[prog].eq_mode == 1))
   {
-    text->Text=AnsiString(*param);
+    // 2 Resonators
+    MainForm->QuadResonator->Visible=TRUE;
   }
-}
-void VertBarChangeU8(TTrackBar *bar, TEdit *text, UInt8* param)
-{
-  *param=(bar->Max - bar->Position);
-  bar->Hint=AnsiString(*param);
-  if (text != NULL)
+  else if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Progs[prog].eq_mode == 1))
   {
-    text->Text=AnsiString(*param);
+    // 5 Resonators
+    MainForm->QuadResonator->Visible=TRUE;
+  }
+  else if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
+  {
+    // 5 Resonators
+    MainForm->QuadResonator->Visible=TRUE;
+  }
+  else
+  {
+    MainForm->QuadResonator->Visible=FALSE;
   }
 }
 
-void VertBarChangeU16(TTrackBar *bar, TEdit *text, UInt16* param)
-{
-  *param=(bar->Max - bar->Position);
-  bar->Hint=AnsiString(*param);
-  if (text != NULL)
-  {
-    text->Text=AnsiString(*param);
-  }
-}
-void VertBarChangeOffsetU8(TTrackBar *bar, TEdit *text, UInt8* param, UInt8 offset)
-{
-  *param=(bar->Max - bar->Position);
-  bar->Hint=AnsiString(*param+offset);
-  if (text != NULL)
-  {
-    text->Text=AnsiString(*param+offset);
-  }
-}
 
-void HorizBarChange(TTrackBar *bar, TEdit *text, UInt16* param)
-{
-  *param= bar->Position;
-  bar->Hint=AnsiString(*param);
-  if (text != NULL)
-  {
-    text->Text=AnsiString(*param);
-  }
-}
-
-void HorizBarChangeU8(TTrackBar *bar, TEdit *text, UInt8* param)
-{
-  *param= bar->Position;
-  bar->Hint=AnsiString(*param);
-  if (text != NULL)
-  {
-    text->Text=AnsiString(*param);
-  }
-}
-
-void HorizBarChangeS8(TTrackBar *bar, TEdit *text, SInt8* param)
-{
-  *param= bar->Position;
-  bar->Hint=AnsiString(*param);
-  if (text != NULL)
-  {
-    text->Text=AnsiString(*param);
-  }
-}
+#define PREPOSTEQ_PREAMP   (0)
+#define PREPOSTEQ_EQ       (1)
+//---------------------------------------------------------------------------
+// Name        : QuadGT_Redraw_PrePostEq
+// Description : 
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Redraw_PrePostEq(UInt8 prog)
 {
   // Preamp Level
-  if (MainForm->PrePostEq->ItemIndex==0)
+  if (MainForm->PrePostEq->ItemIndex==PREPOSTEQ_PREAMP)
   {
     MainForm->MixPreampEq->Position=99-QuadGT_Progs[prog].preamp_level;
     MainForm->MixPreampEq->Visible=TRUE;
@@ -1019,6 +971,13 @@ void QuadGT_Redraw_PrePostEq(UInt8 prog)
   }
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadParamChange
+// Description : Handles the user changing a parameter via the on screen
+//               controls.
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void __fastcall TMainForm::QuadParamChange(TObject *Sender)
 {
   UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
@@ -1208,29 +1167,6 @@ void __fastcall TMainForm::DelayModeClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void QuadGT_Redraw_Resonator(const UInt8 prog)
-{
-  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) && (QuadGT_Progs[prog].eq_mode == 1))
-  {
-    // 2 Resonators
-    MainForm->QuadResonator->Visible=TRUE;
-  }
-  else if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Progs[prog].eq_mode == 1))
-  {
-    // 5 Resonators
-    MainForm->QuadResonator->Visible=TRUE;
-  }
-  else if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
-  {
-    // 5 Resonators
-    MainForm->QuadResonator->Visible=TRUE;
-  }
-  else
-  {
-    MainForm->QuadResonator->Visible=FALSE;
-  }
-}
-
 //---------------------------------------------------------------------------
 // Name     : QuadGT_Convert_Data_From_Internal
 // Description : Convert internal data structure to raw Quadraverb GT data.
@@ -1254,12 +1190,12 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   // Graphic Eq
   else if (QuadGT_Progs[prog].config == CFG2_GEQ_DELAY)
   {
-    data[GEQ_16HZ_IDX] = QuadGT_Progs[prog].geq_16hz + 14;
-    data[GEQ_32HZ_IDX] = QuadGT_Progs[prog].geq_32hz + 14;
-    data[GEQ_62HZ_IDX] = QuadGT_Progs[prog].geq_62hz + 14;
+    data[GEQ_16HZ_IDX] = QuadGT_Progs[prog].geq_16hz + GEQ_OFFSET;
+    data[GEQ_32HZ_IDX] = QuadGT_Progs[prog].geq_32hz + GEQ_OFFSET;
+    data[GEQ_62HZ_IDX] = QuadGT_Progs[prog].geq_62hz + GEQ_OFFSET;
                          
-    data[GEQ_4KHZ_IDX] = QuadGT_Progs[prog].geq_4khz + 14;
-    data[GEQ_8KHZ_IDX] = QuadGT_Progs[prog].geq_8khz + 14;
+    data[GEQ_4KHZ_IDX] = QuadGT_Progs[prog].geq_4khz + GEQ_OFFSET;
+    data[GEQ_8KHZ_IDX] = QuadGT_Progs[prog].geq_8khz + GEQ_OFFSET;
   }
   // 3 and 5 Band Eq
   else
@@ -1272,13 +1208,13 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 
   if (QuadGT_Progs[prog].config==CFG2_GEQ_DELAY)
   {
-    data[GEQ_126HZ_IDX] = QuadGT_Progs[prog].geq_126hz + 14;
-    data[GEQ_250HZ_IDX] = QuadGT_Progs[prog].geq_250hz + 14;
-    data[GEQ_500HZ_IDX] = QuadGT_Progs[prog].geq_500hz + 14;
-    data[GEQ_1KHZ_IDX]  = QuadGT_Progs[prog].geq_1khz  + 14;
-    data[GEQ_2KHZ_IDX]  = QuadGT_Progs[prog].geq_2khz  + 14;
+    data[GEQ_126HZ_IDX] = QuadGT_Progs[prog].geq_126hz + GEQ_OFFSET;
+    data[GEQ_250HZ_IDX] = QuadGT_Progs[prog].geq_250hz + GEQ_OFFSET;
+    data[GEQ_500HZ_IDX] = QuadGT_Progs[prog].geq_500hz + GEQ_OFFSET;
+    data[GEQ_1KHZ_IDX]  = QuadGT_Progs[prog].geq_1khz  + GEQ_OFFSET;
+    data[GEQ_2KHZ_IDX]  = QuadGT_Progs[prog].geq_2khz  + GEQ_OFFSET;
                         
-    data[GEQ_16KHZ_IDX] = QuadGT_Progs[prog].geq_16khz + 14;
+    data[GEQ_16KHZ_IDX] = QuadGT_Progs[prog].geq_16khz + GEQ_OFFSET;
   }
   else
   {
@@ -1670,12 +1606,12 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   // Graphic Eq
   else if (QuadGT_Progs[prog].config == CFG2_GEQ_DELAY)
   {
-    QuadGT_Progs[prog].geq_16hz   = data[GEQ_16HZ_IDX]-14;
-    QuadGT_Progs[prog].geq_32hz   = data[GEQ_32HZ_IDX]-14;
-    QuadGT_Progs[prog].geq_62hz   = data[GEQ_62HZ_IDX]-14;
+    QuadGT_Progs[prog].geq_16hz   = data[GEQ_16HZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_32hz   = data[GEQ_32HZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_62hz   = data[GEQ_62HZ_IDX]-GEQ_OFFSET;
 
-    QuadGT_Progs[prog].geq_4khz   = data[GEQ_4KHZ_IDX]-14;
-    QuadGT_Progs[prog].geq_8khz   = data[GEQ_8KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_4khz   = data[GEQ_4KHZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_8khz   = data[GEQ_8KHZ_IDX]-GEQ_OFFSET;
   }
   // 3 and 5 Band Eq
   else
@@ -1687,13 +1623,13 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
 
   if (QuadGT_Progs[prog].config==CFG2_GEQ_DELAY)
   {
-    QuadGT_Progs[prog].geq_126hz  = data[GEQ_126HZ_IDX]-14;
-    QuadGT_Progs[prog].geq_250hz  = data[GEQ_250HZ_IDX]-14;
-    QuadGT_Progs[prog].geq_500hz  = data[GEQ_500HZ_IDX]-14;
-    QuadGT_Progs[prog].geq_1khz   = data[GEQ_1KHZ_IDX]-14;
-    QuadGT_Progs[prog].geq_2khz   = data[GEQ_2KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_126hz  = data[GEQ_126HZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_250hz  = data[GEQ_250HZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_500hz  = data[GEQ_500HZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_1khz   = data[GEQ_1KHZ_IDX]-GEQ_OFFSET;
+    QuadGT_Progs[prog].geq_2khz   = data[GEQ_2KHZ_IDX]-GEQ_OFFSET;
 
-    QuadGT_Progs[prog].geq_16khz  = data[GEQ_16KHZ_IDX]-14;
+    QuadGT_Progs[prog].geq_16khz  = data[GEQ_16KHZ_IDX]-GEQ_OFFSET;
   }
   else
   {
@@ -2187,40 +2123,6 @@ void __fastcall TMainForm::QuadPatchAuditionClick(TObject *Sender)
 
   // Send message
   Midi_Out_Dump(EDIT_BUFFER, sysex, sysex_size);
-}
-
-//---------------------------------------------------------------------------
-//Decode two bytes of QuadreverbGT binary data to an internal format 16bit UInt
-UInt16 QuadGT_Decode_16Bit(UInt8 *data)
-{
-  //FormDebug->Log(NULL, "Decode "+AnsiString(*data)+", "+AnsiString(*(data+1)));
-  return( (UInt16) *(data + 1)  + ((UInt16) *(data)<<8));
-}
-
-UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb)
-{
-  //FormDebug->Log(NULL, "Decode "+AnsiString(*data)+", "+AnsiString(*(data+1)));
-  return( (UInt16) *msb  + ((UInt16) *(lsb)<<8));
-}
-
-// Encode an internal format 16 bit UInt to two bytes of QuadGT format data (8 bits each)
-void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data)
-{
-  *data= (UInt8)(word>>8); 
-  *(data+1)=(UInt8)(word & 0xff);
-  //FormDebug->Log(NULL, "Encoded "+AnsiString(*data)+", "+AnsiString(*(data+1)));
-}
-
-void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb)
-{
-  *lsb= (UInt8)(word>>8); 
-  *msb=(UInt8)(word & 0xff);
-  //FormDebug->Log(NULL, "Encoded "+AnsiString(*data)+", "+AnsiString(*(data+1)));
-}
-
-void __fastcall TMainForm::VertBarCentChange(TObject *Sender)
-{
-  // TBD:???
 }
 
 //---------------------------------------------------------------------------

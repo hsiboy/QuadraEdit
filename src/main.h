@@ -358,7 +358,6 @@ __published:	// IDE-managed Components
     void __fastcall DelayModeClick(TObject *Sender);
 
     void __fastcall QuadPatchAuditionClick(TObject *Sender);
-    void __fastcall VertBarCentChange(TObject *Sender);
     
     void __fastcall ResNumberKeyDown(TObject *Sender, WORD &Key,
           TShiftState Shift);

@@ -24,7 +24,7 @@ VERSION = BCB.03
 # ---------------------------------------------------------------------------
 PROJECT = quadedit.exe
 OBJFILES = obj\quadedit.obj obj\main.obj obj\about.obj obj\error.obj obj\midi.obj \
-  obj\debug.obj obj\device.obj obj\quadgt.obj
+  obj\debug.obj obj\device.obj obj\quadgt.obj obj\display.obj
 RESFILES = quadedit.res
 DEFFILE =
 RESDEPEN = $(RESFILES) main.dfm about.dfm error.dfm debug.dfm device.dfm
