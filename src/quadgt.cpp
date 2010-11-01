@@ -2414,4 +2414,19 @@ void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
 
   QuadGT_Redraw_Patch(0);
 }
+
+void QuadGT_Swap(const int patch1, const int patch2)
+{
+  UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+  tQuadGT_Prog swap;
+
+  memcpy(&swap,                 &QuadGT_Progs[patch1], sizeof(tQuadGT_Prog));
+  memcpy(&QuadGT_Progs[patch1], &QuadGT_Progs[patch2], sizeof(tQuadGT_Prog));
+  memcpy(&QuadGT_Progs[patch2], &swap,                 sizeof(tQuadGT_Prog));
+
+  if ( (prog == patch1) || (prog == patch2) )
+  {
+    QuadGT_Redraw_Patch(prog);
+  }
+}
 //---------------------------------------------------------------------------

@@ -21,6 +21,7 @@
 #include "debug.h"
 #include "device.h"
 #include "quadgt.h"
+#include "swap.h"
 #include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
@@ -284,6 +285,17 @@ void __fastcall TMainForm::UpDownQuadPatchClick(TObject *Sender,
       TUDBtnType Button)
 {
  QuadPatchNumExit(Sender);
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMainForm::QuadPatchSwapClick(TObject *Sender)
+{
+  if (FormSwap->ShowModal() == 1)
+  {
+    FormDebug->Log(Sender,"Swap " + FormSwap->PatchNum1->Text + " " + FormSwap->PatchNum2->Text);
+    QuadGT_Swap(StrToInt(FormSwap->PatchNum1->Text), StrToInt(FormSwap->PatchNum2->Text));
+  }
 }
 //---------------------------------------------------------------------------
 

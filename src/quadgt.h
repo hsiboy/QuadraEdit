@@ -477,3 +477,4 @@ UInt16 QuadGT_Decode_16Bit(UInt8 *data);
 UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb);
 void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data);
 void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb);
+void QuadGT_Swap(const int patch1, const int patch2);

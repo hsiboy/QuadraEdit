@@ -1,8 +1,8 @@
 object MainForm: TMainForm
-  Left = 276
-  Top = 0
-  Width = 1004
-  Height = 661
+  Left = 235
+  Top = 80
+  Width = 1008
+  Height = 650
   Caption = 'QuadEdit'
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -3433,6 +3433,18 @@ object MainForm: TMainForm
         '1'
         '2')
       TabOrder = 26
+    end
+    object QuadPatchSwap: TButton
+      Left = 811
+      Top = 541
+      Width = 79
+      Height = 25
+      Hint = 'Swap two patches'
+      Caption = 'Swap Patches'
+      ParentShowHint = False
+      ShowHint = True
+      TabOrder = 27
+      OnClick = QuadPatchSwapClick
     end
   end
   object QuadBankRead: TButton

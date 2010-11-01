@@ -16,6 +16,7 @@ USEFORM("debug.cpp", FormDebug);
 USEFORM("device.cpp", FormDevice);
 USEUNIT("quadgt.cpp");
 USEUNIT("display.cpp");
+USEFORM("swap.cpp", FormSwap);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -29,6 +30,7 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         Application->CreateForm(__classid(TFormAbout), &FormAbout);
         Application->CreateForm(__classid(TFormError), &FormError);
         Application->CreateForm(__classid(TFormDevice), &FormDevice);
+        Application->CreateForm(__classid(TFormSwap), &FormSwap);
         FormDebug->Show();
         MainForm->Init();
 
