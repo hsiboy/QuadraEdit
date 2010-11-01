@@ -329,6 +329,7 @@ __published:	// IDE-managed Components
     TTrackBar *PitchDetune;
     TLabel *PitchDetuneLabel;
     TEdit *PitchDetuneVal;
+    TLabel *QuadBankLabel;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownQuadPatchClick(TObject *Sender,
           TUDBtnType Button);

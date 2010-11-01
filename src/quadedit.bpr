@@ -12,6 +12,15 @@ SHELL = cmd /c
 ECHO = ${SHELL} echo
 DEL = ${SHELL} del
 
+# Define path to standard Borland convert utility
+CONVERT = $(BCB)\BIN\convert.exe
+
+# Define path to Borland C Builder IDE
+IDE = $(BCB)\BIN\bcb.exe
+
+
+DFM = about.dfm debug.dfm device.dfm error.dfm main.dfm
+
 # ---------------------------------------------------------------------------
 # IDE SECTION
 # ---------------------------------------------------------------------------
@@ -24,7 +33,7 @@ VERSION = BCB.03
 # ---------------------------------------------------------------------------
 PROJECT = quadedit.exe
 OBJFILES = obj\quadedit.obj obj\main.obj obj\about.obj obj\error.obj obj\midi.obj \
-  obj\debug.obj obj\device.obj obj\quadgt.obj obj\display.obj
+  obj\debug.obj obj\device.obj obj\quadgt.obj
 RESFILES = quadedit.res
 DEFFILE =
 RESDEPEN = $(RESFILES) main.dfm about.dfm error.dfm debug.dfm device.dfm
@@ -221,6 +230,12 @@ $(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
     @${ECHO} Compiling resource file $<
     $(BCB)\BIN\$(BRCC32) $(RFLAGS) -fo$@ $<
 
+.txt.dfm:
+        @${ECHO} ${LINE}
+        @${ECHO} Making binary form file $@...
+        @${CONVERT} $<
+        @${ECHO} ${LINE}
+
 # ---------------------------------------------------------------------------
 # EXTENDED SECTION
 # ---------------------------------------------------------------------------
@@ -235,8 +250,26 @@ clean:
        @${DEL} obj\*.obj
        @${ECHO} ${LINE}
 
+# Convert text form file from binary file
+txtform:        
+        @${ECHO} ${LINE}
+        @${ECHO} Making text form file...
+        @${CONVERT} about.dfm
+        @${CONVERT} debug.dfm
+        @${CONVERT} device.dfm
+        @${CONVERT} error.dfm
+        @${CONVERT} main.dfm
+        @${ECHO} ${LINE}
+
 # Open the project in the Borland IDE
-ide: main.dfm About.dfm error.dfm debug.dfm device.dfm version.h runide txtform
+ide: ${DFM} runide txtform
 
 run:
       quadedit.exe
+
+# Open the project in the Borland IDE
+.ignore
+runide:
+        ${IDE} quadedit.bpr
+
+executable: ${DFM}        

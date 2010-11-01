@@ -1,0 +1,55 @@
+object FormDevice: TFormDevice
+  Left = 305
+  Top = 295
+  Width = 265
+  Height = 165
+  Caption = 'FormDevice'
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  PixelsPerInch = 96
+  TextHeight = 13
+  object LabelInDevName: TLabel
+    Left = 16
+    Top = 19
+    Width = 87
+    Height = 13
+    Caption = 'MIDI Input Device'
+  end
+  object LabelMidiDevError: TLabel
+    Left = 8
+    Top = 48
+    Width = 237
+    Height = 34
+    Caption = 'LabelMidiDevError'
+  end
+  object ComboBoxInDevs: TComboBox
+    Left = 112
+    Top = 15
+    Width = 137
+    Height = 21
+    ItemHeight = 13
+    TabOrder = 0
+    Text = 'ComboBoxInDevs'
+  end
+  object ButtonMidiDevOpen: TButton
+    Left = 8
+    Top = 96
+    Width = 75
+    Height = 25
+    Caption = 'Open'
+    TabOrder = 1
+    OnClick = ButtonMidiDevOpenClick
+  end
+  object ButtonMidiDevCancel: TButton
+    Left = 168
+    Top = 96
+    Width = 75
+    Height = 25
+    Caption = 'Cancel'
+    TabOrder = 2
+    OnClick = ButtonMidiDevCancelClick
+  end
+end

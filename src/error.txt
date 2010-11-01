@@ -1,0 +1,31 @@
+object FormError: TFormError
+  Left = 226
+  Top = 283
+  Width = 363
+  Height = 198
+  Caption = 'QuadEdit Error'
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'MS Sans Serif'
+  Font.Style = []
+  OnHide = FormHide
+  PixelsPerInch = 96
+  TextHeight = 13
+  object LabelError: TLabel
+    Left = 48
+    Top = 24
+    Width = 48
+    Height = 13
+    Caption = 'LabelError'
+  end
+  object ButtonOk: TButton
+    Left = 144
+    Top = 104
+    Width = 75
+    Height = 25
+    Caption = 'Ok'
+    TabOrder = 0
+    OnClick = ButtonOkClick
+  end
+end
