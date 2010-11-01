@@ -15,6 +15,7 @@ USEUNIT("midi.cpp");
 USEFORM("debug.cpp", FormDebug);
 USEFORM("device.cpp", FormDevice);
 USEUNIT("quadgt.cpp");
+USEUNIT("display.cpp");
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {

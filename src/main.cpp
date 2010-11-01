@@ -92,15 +92,12 @@ void __fastcall TMainForm::MenuHelpAboutClick(TObject *Sender)
 
 
 
-void __fastcall TMainForm::UpDownQuadPatchClick(TObject *Sender,
+void __fastcall TMainForm::UpDownResNumClick(TObject *Sender,
       TUDBtnType Button)
 {
- QuadPatchNumExit(Sender);
+ ResNumberExit(Sender);
 }
 //---------------------------------------------------------------------------
-
-
-
 
 
 void __fastcall TMainForm::TimerMidiCountsTimer(TObject *Sender)
@@ -267,19 +264,6 @@ void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
-
-
-
-//---------------------------------------------------------------------------
-
-
-
-
-
-//---------------------------------------------------------------------------
-
-
 void __fastcall TMainForm::ResNumberKeyDown(TObject *Sender, WORD &Key,
       TShiftState Shift)
 {
@@ -295,3 +279,11 @@ void __fastcall TMainForm::ResNumberExit(TObject *Sender)
   QuadGT_Redraw_Resonator((UInt8) StrToInt(QuadPatchNum->Text));
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TMainForm::UpDownQuadPatchClick(TObject *Sender,
+      TUDBtnType Button)
+{
+ QuadPatchNumExit(Sender);
+}
+//---------------------------------------------------------------------------
+

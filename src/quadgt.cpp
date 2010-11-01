@@ -16,6 +16,7 @@
 #include "quadgt.h"
 
 #define GEQ_OFFSET (14)
+#define RES_TUNE_OFFSET (24)
 
 
 static tQuadGT_Prog QuadGT_Progs[QUAD_NUM_PATCH];
@@ -237,23 +238,33 @@ void QuadGT_Redraw_Reverb(const UInt8 prog)
     MainForm->ReverbInput1->Visible=true;
     MainForm->ReverbInMix->Visible=true;
     MainForm->ReverbInMixVal->Visible=true;
+
+    MainForm->ReverbInput1->Items->Strings[0]="Preamp";
+    MainForm->ReverbInput1->Items->Strings[1]="Eq";
+    MainForm->ReverbInput1->Items->Strings[2]="Pitch";
+    if (MainForm->ReverbInput1->Items->Count == 3) MainForm->ReverbInput1->Items->Add("Delay");
+
+    MainForm->ReverbInput2->Items->Strings[0]="Pitch";
+    MainForm->ReverbInput2->Items->Strings[1]="Delay";
   }
-  else if ((QuadGT_Progs[prog].config==CFG1_LESLIE_DELAY_REVERB) || 
-           (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB) || 
-           (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB))
+  else if (QuadGT_Progs[prog].config==CFG1_LESLIE_DELAY_REVERB)
   {
     MainForm->QuadReverb->Visible=true;
     MainForm->ReverbInput1->Visible=true;
     MainForm->ReverbInMix->Visible=true;
     MainForm->ReverbInMixVal->Visible=true;
-    // TBD: Disable input 1, selection 3
+
+    MainForm->ReverbInput1->Items->Strings[0]="Preamp";
+    MainForm->ReverbInput1->Items->Strings[1]="Leslie";
+    MainForm->ReverbInput1->Items->Strings[2]="Delay";
+    if (MainForm->ReverbInput1->Items->Count == 4) MainForm->ReverbInput1->Items->Delete(3);
+
+    MainForm->ReverbInput2->Items->Strings[0]="Leslie";
+    MainForm->ReverbInput2->Items->Strings[1]="Delay";
   }
   else if ((QuadGT_Progs[prog].config==CFG2_GEQ_DELAY) || 
+           (QuadGT_Progs[prog].config==CFG3_5BANDEQ_PITCH_DELAY) ||
            (QuadGT_Progs[prog].config==CFG7_SAMPLING))
-  {
-    MainForm->QuadReverb->Visible=false;
-  }
-  else if (QuadGT_Progs[prog].config==CFG3_5BANDEQ_PITCH_DELAY)
   {
     MainForm->QuadReverb->Visible=false;
   }
@@ -264,6 +275,36 @@ void QuadGT_Redraw_Reverb(const UInt8 prog)
     MainForm->ReverbInMix->Visible=FALSE;
     MainForm->ReverbInMixVal->Visible=false;
   }
+  else if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
+  {
+    MainForm->QuadReverb->Visible=true;
+    MainForm->ReverbInput1->Visible=true;
+    MainForm->ReverbInMix->Visible=true;
+    MainForm->ReverbInMixVal->Visible=true;
+
+    MainForm->ReverbInput1->Items->Strings[0]="Preamp";
+    MainForm->ReverbInput1->Items->Strings[1]="Ring";
+    MainForm->ReverbInput1->Items->Strings[2]="Delay";
+    if (MainForm->ReverbInput1->Items->Count == 4) MainForm->ReverbInput1->Items->Delete(3);
+
+    MainForm->ReverbInput2->Items->Strings[0]="Ring";
+    MainForm->ReverbInput2->Items->Strings[1]="Delay";
+  }
+  else if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
+  {
+    MainForm->QuadReverb->Visible=true;
+    MainForm->ReverbInput1->Visible=true;
+    MainForm->ReverbInMix->Visible=true;
+    MainForm->ReverbInMixVal->Visible=true;
+
+    MainForm->ReverbInput1->Items->Strings[0]="Preamp";
+    MainForm->ReverbInput1->Items->Strings[1]="Resonator";
+    MainForm->ReverbInput1->Items->Strings[2]="Delay";
+    if (MainForm->ReverbInput1->Items->Count == 4) MainForm->ReverbInput1->Items->Delete(3);
+
+    MainForm->ReverbInput2->Items->Strings[0]="Resonator";
+    MainForm->ReverbInput2->Items->Strings[1]="Delay";
+  }
 
   if (MainForm->QuadReverb->Visible == true)
   {
@@ -271,6 +312,8 @@ void QuadGT_Redraw_Reverb(const UInt8 prog)
 
     MainForm->ReverbInput1->ItemIndex = QuadGT_Progs[prog].reverb_input_1;
     MainForm->ReverbInput2->ItemIndex = QuadGT_Progs[prog].reverb_input_2;
+    FormDebug->Log(NULL, "Reverb In 1 "+AnsiString(QuadGT_Progs[prog].reverb_input_1));
+    FormDebug->Log(NULL, "Reverb In 2 "+AnsiString(QuadGT_Progs[prog].reverb_input_2));
 
     RedrawVertBarTextU8(MainForm->ReverbPreDelay, MainForm->ReverbPreDelayVal, QuadGT_Progs[prog].reverb_predelay, 1);
     
@@ -326,14 +369,12 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
       // Add "Multitap" to list of possibilities
       int i=MainForm->DelayMode->Items->IndexOf("Multitap");
       if (i < 0) MainForm->DelayMode->Items->Add("Multitap");
-      FormDebug->Log(NULL,"Add multitap: "+AnsiString(i));
     }
     else
     {
       // Remove "Multitap" from list of possibilities
       int i=MainForm->DelayMode->Items->IndexOf("Multitap");
       if (i >= 0) MainForm->DelayMode->Items->Delete(i);
-      FormDebug->Log(NULL,"Hide multitap: "+AnsiString(i));
       if (mode == DELAYMODE3_MULTITAP)
       {
         mode=QuadGT_Progs[prog].delay_mode=DELAYMODE0_MONO;
@@ -453,7 +494,6 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->PitchInput->ItemIndex = QuadGT_Progs[prog].pitch_input;
     MainForm->PitchWave->ItemIndex = QuadGT_Progs[prog].lfo_waveform;
 
-    FormDebug->Log(NULL,"Redraw pitch");
     RedrawVertBarTextU8(MainForm->PitchSpeed,    MainForm->PitchSpeedVal,    QuadGT_Progs[prog].lfo_speed, 0);
     RedrawVertBarTextU8(MainForm->PitchDepth,    MainForm->PitchDepthVal,    QuadGT_Progs[prog].lfo_depth, 0);
     RedrawVertBarTextU8(MainForm->PitchFeedback, MainForm->PitchFeedbackVal, QuadGT_Progs[prog].pitch_feedback, 0);
@@ -468,7 +508,6 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     MainForm->PitchInput->Visible = FALSE;
 
     // TBD: Redraw Leslie parameters
-    FormDebug->Log(NULL,"Redraw leslie");
   }
   else if ((QuadGT_Progs[prog].config==CFG2_GEQ_DELAY) || 
            (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB) || 
@@ -481,7 +520,6 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
 
     MainForm->PitchInput->Visible = FALSE;
 
-    FormDebug->Log(NULL,"Redraw no-pitch");
   }
   else if (QuadGT_Progs[prog].config==CFG4_3BANDEQ_REVERB)
   {
@@ -493,7 +531,6 @@ void QuadGT_Redraw_Pitch(const UInt8 prog)
     // Redraw Reverb Chorus parameters
     RedrawVertBarTextU8(MainForm->ChorusSpeed, MainForm->ChorusSpeedVal, QuadGT_Progs[prog].lfo_speed, 1);
     RedrawVertBarTextU8(MainForm->ChorusDepth, MainForm->ChorusDepthVal, QuadGT_Progs[prog].lfo_depth, 1);
-    FormDebug->Log(NULL,"Redraw reverb chorus");
 
   }
   else if (QuadGT_Progs[prog].config==CFG5_RINGMOD_DELAY_REVERB)
@@ -575,6 +612,7 @@ void QuadGT_Redraw_Eq(const UInt8 prog)
   if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) || (QuadGT_Progs[prog].config==CFG4_3BANDEQ_REVERB))
   {
     MainForm->PanelQuadEq3->Visible=TRUE;
+    MainForm->Eq3Mode->ItemIndex =QuadGT_Progs[prog].eq_mode;
 
     MainForm->EqFreq1->Position = QuadGT_Progs[prog].low_eq_freq;
     MainForm->EqFreq1Val->Text = AnsiString(QuadGT_Progs[prog].low_eq_freq);
@@ -604,6 +642,8 @@ void QuadGT_Redraw_Eq(const UInt8 prog)
   if (QuadGT_Progs[prog].config==CFG3_5BANDEQ_PITCH_DELAY) 
   {
     MainForm->QuadEq5->Visible=TRUE;
+
+    MainForm->Eq5Mode->ItemIndex =QuadGT_Progs[prog].eq_mode;
 
     MainForm->Eq5Freq1->Position = QuadGT_Progs[prog].low_eq_freq;
     MainForm->Eq5Freq1Val->Text = AnsiString(QuadGT_Progs[prog].low_eq_freq);
@@ -668,7 +708,6 @@ void QuadGT_Redraw_Eq(const UInt8 prog)
     MainForm->QuadGraphEq->Visible=FALSE;
   }
 
-  // Resonator
 }
 
 //---------------------------------------------------------------------------
@@ -919,24 +958,55 @@ void QuadGT_Redraw_Preamp(const UInt8 prog)
 //---------------------------------------------------------------------------
 void QuadGT_Redraw_Resonator(const UInt8 prog)
 {
-  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) && (QuadGT_Progs[prog].eq_mode == 1))
+  UInt8 resnum;
+
+  if ((QuadGT_Progs[prog].config==CFG0_EQ_PITCH_DELAY_REVERB) && (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
     // 2 Resonators
     MainForm->QuadResonator->Visible=TRUE;
+
+    MainForm->ResUpDown->Max = 2;
+    MainForm->ResDecayLabel->Visible = TRUE;
+    MainForm->ResDecay->Visible = TRUE;
+    MainForm->ResDecayVal->Visible = TRUE;
+    MainForm->ResAmpLabel->Visible = TRUE;
+    MainForm->ResAmp->Visible = TRUE;
+    MainForm->ResAmpVal->Visible = TRUE;
   }
-  else if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Progs[prog].eq_mode == 1))
+  else if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
     // 5 Resonators
     MainForm->QuadResonator->Visible=TRUE;
+    MainForm->ResUpDown->Max = 5;
   }
   else if (QuadGT_Progs[prog].config==CFG6_RESONATOR_DELAY_REVERB)
   {
     // 5 Resonators
     MainForm->QuadResonator->Visible=TRUE;
+
+    MainForm->ResUpDown->Max = 5;
+    MainForm->ResDecayLabel->Visible = FALSE;
+    MainForm->ResDecay->Visible = FALSE;
+    MainForm->ResDecayVal->Visible = FALSE;
+    MainForm->ResAmpLabel->Visible = FALSE;
+    MainForm->ResAmp->Visible = FALSE;
+    MainForm->ResAmpVal->Visible = FALSE;
+
+    RedrawHorizBarTextS8(MainForm->ResGlobalDecay, MainForm->ResGlobalDecayVal, QuadGT_Progs[prog].res_decay_all);
+    MainForm->ResMidiGate->ItemIndex= QuadGT_Progs[prog].res_midi_gate;
   }
   else
   {
     MainForm->QuadResonator->Visible=FALSE;
+  }
+
+  if (MainForm->QuadResonator->Visible==TRUE)
+  {
+    resnum = (UInt8)StrToInt(MainForm->ResNumber->Text);
+    RedrawHorizBarTextS8(MainForm->ResTune, MainForm->ResTuneVal, QuadGT_Progs[prog].res_tune[resnum -1]);
+    RedrawHorizBarTextS8(MainForm->ResDecay, MainForm->ResDecayVal, QuadGT_Progs[prog].res_decay[resnum -1]);
+    RedrawHorizBarTextS8(MainForm->ResAmp, MainForm->ResAmpVal, QuadGT_Progs[prog].res_amp[resnum -1]);
+
   }
 }
 
@@ -982,7 +1052,6 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
 {
   UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
   UInt8 tap = StrToInt(MainForm->TapNumber->Text)-1;
-  //FormDebug->Log(NULL,"Change: "+AnsiString(prog));
 
   // Patch number and name
   if (Sender == MainForm->QuadConfig)
@@ -1179,11 +1248,11 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   if ((QuadGT_Progs[prog].config == CFG0_EQ_PITCH_DELAY_REVERB) &&
       (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
-    data[RES1_TUNE_IDX]  = QuadGT_Progs[prog].res_tune[0];
+    data[RES1_TUNE_IDX]  = QuadGT_Progs[prog].res_tune[0] + RES_TUNE_OFFSET;
     data[RES1_DECAY_IDX] = QuadGT_Progs[prog].res_decay[0];
     data[RES1_AMP_IDX]   = QuadGT_Progs[prog].res_amp[0];
 
-    data[RES2_TUNE_IDX]  = QuadGT_Progs[prog].res_tune[1];
+    data[RES2_TUNE_IDX]  = QuadGT_Progs[prog].res_tune[1] + RES_TUNE_OFFSET;
     data[RES2_DECAY_IDX] = QuadGT_Progs[prog].res_decay[1];
     data[RES2_AMP_IDX]   = QuadGT_Progs[prog].res_amp[1];
   }
@@ -1227,7 +1296,8 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 
 
   // Type = 3 Eq and 5 Resonators
-  if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && (QuadGT_Progs[prog].eq_mode == 1))
+  if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && 
+      (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
     data[RES1_TUNE_IDX_B]  = QuadGT_Progs[prog].res_tune[0];
     data[RES1_DECAY_IDX_B] = QuadGT_Progs[prog].res_decay[0];
@@ -1595,13 +1665,17 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   if ((QuadGT_Progs[prog].config == CFG0_EQ_PITCH_DELAY_REVERB) &&
       (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
-    QuadGT_Progs[prog].res_tune[0] = data[RES1_TUNE_IDX]  ; 
+    FormDebug->Log(NULL, "Loading resontors 1 and 2");
+    QuadGT_Progs[prog].res_tune[0] = data[RES1_TUNE_IDX] - RES_TUNE_OFFSET; 
     QuadGT_Progs[prog].res_decay[0] =data[RES1_DECAY_IDX] ; 
     QuadGT_Progs[prog].res_amp[0] =  data[RES1_AMP_IDX]   ; 
                                      
-    QuadGT_Progs[prog].res_tune[1] = data[RES2_TUNE_IDX]  ; 
+    QuadGT_Progs[prog].res_tune[1] = data[RES2_TUNE_IDX]  - RES_TUNE_OFFSET; 
     QuadGT_Progs[prog].res_decay[1] =data[RES2_DECAY_IDX] ; 
     QuadGT_Progs[prog].res_amp[1] =  data[RES2_AMP_IDX]   ; 
+
+    FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadGT_Progs[prog].res_tune[0]));
+    FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadGT_Progs[prog].res_tune[1]));
   }
   // Graphic Eq
   else if (QuadGT_Progs[prog].config == CFG2_GEQ_DELAY)
@@ -1640,9 +1714,11 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
 
   // Type = 3 Eq and 5 Resonators
-  if ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && 
-      (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR))
+  if ( ((QuadGT_Progs[prog].config == CFG3_5BANDEQ_PITCH_DELAY) && 
+        (QuadGT_Progs[prog].eq_mode == EQMODE1_EQ_PLUS_RESONATOR)) ||
+       (QuadGT_Progs[prog].config == CFG6_RESONATOR_DELAY_REVERB))
   {
+    FormDebug->Log(NULL, "Loading resontors tune and decay");
     QuadGT_Progs[prog].res_tune[0]  = data[RES1_TUNE_IDX_B];
     QuadGT_Progs[prog].res_decay[0] =data[RES1_DECAY_IDX_B];
                                      
@@ -1657,6 +1733,12 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
                                      
     QuadGT_Progs[prog].res_tune[4]  = data[RES5_TUNE_IDX];
     QuadGT_Progs[prog].res_decay[4] =data[RES5_DECAY_IDX];
+
+    FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadGT_Progs[prog].res_tune[0]));
+    FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadGT_Progs[prog].res_tune[1]));
+    FormDebug->Log(NULL, "Res Tune 3 "+AnsiString(QuadGT_Progs[prog].res_tune[2]));
+    FormDebug->Log(NULL, "Res Tune 4 "+AnsiString(QuadGT_Progs[prog].res_tune[3]));
+    FormDebug->Log(NULL, "Res Tune 5 "+AnsiString(QuadGT_Progs[prog].res_tune[4]));
   }
   // Otherwise, assume 5 band Eq
   else
@@ -1780,6 +1862,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   {
     QuadGT_Progs[prog].res_decay_all = data[RES_DECAY_IDX];
     QuadGT_Progs[prog].res_midi_gate = data[RES_MIDI_GATE_IDX];
+    FormDebug->Log(NULL, "Midi Gate "+AnsiString(QuadGT_Progs[prog].res_midi_gate));
 
     QuadGT_Progs[prog].res_pitch[0]  = data[RES1_PITCH_IDX];
     QuadGT_Progs[prog].res_pitch[1]  = data[RES2_PITCH_IDX];
@@ -1963,6 +2046,40 @@ void __fastcall TMainForm::QuadPatchReadClick(TObject *Sender)
   }
 
 }
+//---------------------------------------------------------------------------
+// Name        : QuadPatchSaveClick
+// Description : Save a program to a .bnk file (internal
+//               data format as raw binary) on disk.
+// Parameter 1 : Pointer to object that generated the event (In, unused)
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::QuadPatchSaveClick(TObject *Sender)
+{
+  UInt8 prog;
+  FILE *patch_file;
+
+  if (!MainForm->QuadGtPatchOpenDialog->Execute()) return;
+
+  patch_file = fopen(MainForm->QuadGtPatchOpenDialog->Files->Strings[0].c_str(),"wb");
+
+  if (patch_file == NULL)
+  {
+    FormError->ShowErrorCode(ferror(patch_file),"opening patch file");
+    return;
+  }
+
+  prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+
+  // TBD: Write a header
+
+  if (fwrite(&QuadGT_Progs[prog], sizeof(tQuadGT_Prog), 1, patch_file) != 1)
+  {
+    FormError->ShowErrorCode(ferror(patch_file),"writing patch file ");
+  }
+
+  fclose(patch_file);
+
+}
 
 //---------------------------------------------------------------------------
 // Name        : QuadSaveBankClick
@@ -2002,6 +2119,48 @@ void __fastcall TMainForm::QuadBankSaveClick(TObject *Sender)
   fclose(bank_file);
 
 }
+//---------------------------------------------------------------------------
+// Name        : QuadPatchLoadClick
+// Description : Load a single patch (program) from a .bnk file (internal
+//               data format as raw binary) on disk.
+// Parameter 1 : Pointer to object that generated the event (In, unused)
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+void __fastcall TMainForm::QuadPatchLoadClick(TObject *Sender)
+{
+  UInt8 prog;
+  FILE *patch_file;
+  tQuadGT_Prog quadgt_patch;
+
+  FormDebug->Log(NULL, "Load Patch");
+
+  if (!MainForm->QuadGtPatchOpenDialog->Execute()) return;
+
+  patch_file = fopen(MainForm->QuadGtPatchOpenDialog->Files->Strings[0].c_str(),"rb");
+
+  if (patch_file == NULL)
+  {
+    FormError->ShowErrorCode(ferror(patch_file),"opening patch file");
+    return;
+  }
+
+  prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+
+  // TBD: Read the header and check for validity
+  if (fread(&quadgt_patch, sizeof(tQuadGT_Prog), 1, patch_file) != 1)
+  {
+    FormError->ShowErrorCode(ferror(patch_file),"reading patch file ");
+    fclose(patch_file);
+  }
+  else
+  {
+    memcpy(&QuadGT_Progs[prog], &quadgt_patch, sizeof(quadgt_patch));
+    fclose(patch_file);
+    QuadGT_Redraw_Patch(prog);
+  }
+
+}
+
 
 //---------------------------------------------------------------------------
 // Name        : QuadBankLoadClick
@@ -2089,7 +2248,6 @@ void __fastcall TMainForm::SysexBankLoadClick(TObject *Sender)
     else
     {
       data.length = size;
-      FormDebug->Log(NULL, "Loaded SYSEX");
       QuadGT_Sysex_Process(data);
     }
   }
@@ -2144,7 +2302,6 @@ void QuadGT_Sysex_Process(tBuffer sysex)
 
    if (sysex.buffer != NULL)
    {
-     FormDebug->Log(NULL, "Sysex Process");
      if (memcmp(Sysex_Start, sysex.buffer+offset, sizeof(Sysex_Start))==0)
      {
        offset+=sizeof(Sysex_Start);
@@ -2165,14 +2322,11 @@ void QuadGT_Sysex_Process(tBuffer sysex)
 	   prog = *(sysex.buffer+offset);
 	   offset+=1;
 
-	   FormDebug->Log(NULL, "Sysex Code: "+AnsiString(code)+"   Prog: "+AnsiString(prog));
-
            if (code == *Sysex_Data_Dump)
            {
              // SysEx contains a single patch
              if (prog < QUAD_NUM_PATCH)
              {
-	       FormDebug->Log(NULL, "RX: Sysex quad patch, bytes: "+AnsiString(sysex.length-offset));
                QuadGT_Decode_From_Sysex(sysex.buffer+offset,sysex.length-offset-1, quadgt, QUAD_PATCH_SIZE);
                QuadGT_Convert_QuadGT_To_Internal(prog, quadgt);
                QuadGT_Redraw_Patch(prog);
@@ -2181,7 +2335,6 @@ void QuadGT_Sysex_Process(tBuffer sysex)
              // Sysex contains a bank of patches
              else if (prog > QUAD_NUM_PATCH)
              {
-	       FormDebug->Log(NULL, "RX: Sysex bank, bytes: "+AnsiString(sysex.length-offset));
                for (prog = 0; prog < QUAD_NUM_PATCH; prog++)
                {
                  QuadGT_Decode_From_Sysex(sysex.buffer+offset, SYSEX_PATCH_SIZE, quadgt, QUAD_PATCH_SIZE);
@@ -2248,7 +2401,6 @@ void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
     else
     {
       data.length = size;
-      FormDebug->Log(NULL, "Loaded QuadGT");
 
       for (prog = 0; prog < QUAD_NUM_PATCH; prog++)
       {

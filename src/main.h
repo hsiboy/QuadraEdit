@@ -224,14 +224,15 @@ __published:	// IDE-managed Components
     TUpDown *ResUpDown;
     TTrackBar *ResTune;
     TTrackBar *ResDecay;
-    TLabel *Label41;
-    TLabel *Label42;
-    TLabel *Label43;
+    TLabel *F;
+    TLabel *ResDecayLabel;
+    TLabel *ResAmpLabel;
     TTrackBar *ResAmp;
     TRadioGroup *Eq5Mode;
     TOpenDialog *SysexOpenDialog;
     TButton *SysexBankLoad;
     TOpenDialog *QuadGtOpenDialog;
+    TOpenDialog *QuadGtPatchOpenDialog;
     TOpenDialog *InternalOpenDialog;
     TEdit *Eq5Q2Val;
     TEdit *Eq5Q3Val;
@@ -329,9 +330,13 @@ __published:	// IDE-managed Components
     TTrackBar *PitchDetune;
     TLabel *PitchDetuneLabel;
     TEdit *PitchDetuneVal;
-    TLabel *QuadBankLabel;
+    TLabel *ResGlobalDecayLabel;
+    TRadioGroup *ResMidiGate;
+    TTrackBar *ResGlobalDecay;
+    TEdit *ResGlobalDecayVal;
+    TRadioGroup *QuadBank;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
-    void __fastcall UpDownQuadPatchClick(TObject *Sender,
+    void __fastcall UpDownResNumClick(TObject *Sender,
           TUDBtnType Button);
     
     void __fastcall TimerMidiCountsTimer(TObject *Sender);
@@ -353,7 +358,9 @@ __published:	// IDE-managed Components
           TShiftState Shift);
 
     void __fastcall QuadPatchNumExit(TObject *Sender);
+    void __fastcall QuadPatchSaveClick(TObject *Sender);
     void __fastcall QuadBankSaveClick(TObject *Sender);
+    void __fastcall QuadPatchLoadClick(TObject *Sender);
     void __fastcall QuadBankLoadClick(TObject *Sender);
     void __fastcall QuadGtBankLoadClick(TObject *Sender);
     void __fastcall DelayModeClick(TObject *Sender);
@@ -368,6 +375,9 @@ __published:	// IDE-managed Components
     void __fastcall QuadPatchWriteClick(TObject *Sender);
     
     
+    
+    void __fastcall UpDownQuadPatchClick(TObject *Sender,
+          TUDBtnType Button);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);
