@@ -241,13 +241,14 @@ $(PROJECT): $(OBJFILES) $(RESDEPEN) $(DEFFILE)
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 # This section of the project file is for hand done extensions to the makefile
-all: executable
+all: ${DFM} $(PROJECT)
 
 # clean - removes all generated files
-clean:
+clean: txtform
        @${ECHO} ${LINE}
        @${ECHO} Cleaning up generated files...
        @${DEL} obj\*.obj
+       @${DEL} ${DFM}
        @${ECHO} ${LINE}
 
 # Convert text form file from binary file
