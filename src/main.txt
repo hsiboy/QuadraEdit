@@ -3427,12 +3427,12 @@ object MainForm: TMainForm
       Height = 31
       Caption = 'Bank'
       Columns = 2
-      Enabled = False
       ItemIndex = 0
       Items.Strings = (
         '1'
         '2')
       TabOrder = 26
+      OnClick = QuadBankClick
     end
     object QuadPatchSwap: TButton
       Left = 811

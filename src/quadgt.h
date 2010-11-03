@@ -462,7 +462,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data);
 void QuadGT_Sysex_Process(tBuffer sysex);
 
 void QuadGT_Init(void);
-void QuadGT_Redraw_Patch(UInt8 program);
+void QuadGT_Redraw_Patch(const UInt8 bank, UInt8 program);
 void QuadGT_Redraw_Reverb(const UInt8 program);
 void QuadGT_Redraw_Delay(const UInt8 program);
 void QuadGT_Redraw_Pitch(const UInt8 program);
@@ -477,4 +477,4 @@ UInt16 QuadGT_Decode_16Bit(UInt8 *data);
 UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb);
 void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data);
 void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb);
-void QuadGT_Swap(const int patch1, const int patch2);
+void QuadGT_Swap(const int bank1, const int patch1, const int bank2, const int patch2);

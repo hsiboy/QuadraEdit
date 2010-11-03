@@ -381,6 +381,7 @@ __published:	// IDE-managed Components
           TUDBtnType Button);
     
     void __fastcall QuadPatchSwapClick(TObject *Sender);
+    void __fastcall QuadBankClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

@@ -59,7 +59,7 @@ void __fastcall TMainForm::Init(void)
   Midi_Init();
   QuadGT_Init();
 
-  QuadGT_Redraw_Patch((UInt8) StrToInt(QuadPatchNum->Text));
+  QuadGT_Redraw_Patch(0, (UInt8) StrToInt(QuadPatchNum->Text));
 
   DeviceOpenClick(NULL);
 
@@ -261,7 +261,7 @@ void __fastcall TMainForm::QuadPatchNumKeyDown(TObject *Sender, WORD &Key,
 void __fastcall TMainForm::QuadPatchNumExit(TObject *Sender)
 {
   FormDebug->Log(Sender,"Quad Patch [" + QuadPatchNum->Text + "] selected");
-  QuadGT_Redraw_Patch((UInt8) StrToInt(QuadPatchNum->Text));
+  QuadGT_Redraw_Patch(QuadBank->ItemIndex, (UInt8) StrToInt(QuadPatchNum->Text));
 }
 //---------------------------------------------------------------------------
 
@@ -294,8 +294,12 @@ void __fastcall TMainForm::QuadPatchSwapClick(TObject *Sender)
   if (FormSwap->ShowModal() == 1)
   {
     FormDebug->Log(Sender,"Swap " + FormSwap->PatchNum1->Text + " " + FormSwap->PatchNum2->Text);
-    QuadGT_Swap(StrToInt(FormSwap->PatchNum1->Text), StrToInt(FormSwap->PatchNum2->Text));
+    QuadGT_Swap(FormSwap->Bank1->ItemIndex, StrToInt(FormSwap->PatchNum1->Text),
+                FormSwap->Bank2->ItemIndex, StrToInt(FormSwap->PatchNum2->Text));
   }
 }
+//---------------------------------------------------------------------------
+
+
 //---------------------------------------------------------------------------
 

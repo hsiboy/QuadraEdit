@@ -14,11 +14,11 @@ class TFormSwap : public TForm
 {
 __published:	// IDE-managed Components
     TPanel *Panel1;
-    TRadioGroup *QuadBank;
+    TRadioGroup *Bank1;
     TLabel *LabelQuadPatch;
     TMaskEdit *PatchNum1;
     TUpDown *UpDownPatchNum1;
-    TRadioGroup *RadioGroup1;
+    TRadioGroup *Bank2;
     TLabel *Label1;
     TMaskEdit *PatchNum2;
     TUpDown *UpDownPatchNum2;
