@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 235
-  Top = 80
+  Left = 272
+  Top = 24
   Width = 1008
   Height = 650
   Caption = 'QuadEdit'
@@ -3436,7 +3436,7 @@ object MainForm: TMainForm
     end
     object QuadPatchSwap: TButton
       Left = 811
-      Top = 541
+      Top = 517
       Width = 79
       Height = 25
       Hint = 'Swap two patches'
@@ -3445,6 +3445,15 @@ object MainForm: TMainForm
       ShowHint = True
       TabOrder = 27
       OnClick = QuadPatchSwapClick
+    end
+    object QuadPatchCopy: TButton
+      Left = 808
+      Top = 552
+      Width = 113
+      Height = 25
+      Caption = 'Copy Patch Settings'
+      TabOrder = 28
+      OnClick = QuadPatchCopyClick
     end
   end
   object QuadBankRead: TButton

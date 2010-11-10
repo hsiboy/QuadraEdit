@@ -310,7 +310,7 @@ typedef struct
   UInt8 cab_sim;                   // Cabinet simulator 0-2 (Off, Cab 1, Cab 2)
 
   // Eq parameters
-  UInt8 eq_mode;                   // 0=Eq,  1=Eq+Resonator
+  UInt8  eq_mode;                  // 0=Eq,  1=Eq+Resonator
   UInt16 low_eq_freq;              // 20 to 999 Hz
   UInt16 low_eq_amp;               // -14 to 14 db  (0-560)
   UInt16 mid_eq_freq;              // 200 to 9999 Hz
@@ -478,3 +478,4 @@ UInt16 QuadGT_Decode_16Bit_Split(UInt8 *msb, UInt8 *lsb);
 void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data);
 void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb);
 void QuadGT_Swap(const int bank1, const int patch1, const int bank2, const int patch2);
+void QuadGT_Copy(const int param, const int bankfrom, const int patchfrom, const int bankto, const int patchto);

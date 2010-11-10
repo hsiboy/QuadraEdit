@@ -3,7 +3,7 @@ object FormSwap: TFormSwap
   Top = 14
   Width = 274
   Height = 173
-  Caption = 'FormSwap'
+  Caption = 'Swap Patches'
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -11

@@ -336,6 +336,7 @@ __published:	// IDE-managed Components
     TEdit *ResGlobalDecayVal;
     TRadioGroup *QuadBank;
     TButton *QuadPatchSwap;
+    TButton *QuadPatchCopy;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownResNumClick(TObject *Sender,
           TUDBtnType Button);
@@ -382,6 +383,7 @@ __published:	// IDE-managed Components
     
     void __fastcall QuadPatchSwapClick(TObject *Sender);
     void __fastcall QuadBankClick(TObject *Sender);
+    void __fastcall QuadPatchCopyClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

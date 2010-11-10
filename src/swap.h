@@ -14,16 +14,16 @@ class TFormSwap : public TForm
 {
 __published:	// IDE-managed Components
     TPanel *Panel1;
-    TRadioGroup *Bank1;
     TLabel *LabelQuadPatch;
     TMaskEdit *PatchNum1;
     TUpDown *UpDownPatchNum1;
-    TRadioGroup *Bank2;
     TLabel *Label1;
     TMaskEdit *PatchNum2;
     TUpDown *UpDownPatchNum2;
     TButton *Swap;
     TButton *Cancel;
+    TRadioGroup *Bank2;
+    TRadioGroup *Bank1;
     void __fastcall CancelClick(TObject *Sender);
     void __fastcall SwapClick(TObject *Sender);
     

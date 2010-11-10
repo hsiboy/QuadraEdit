@@ -2428,6 +2428,12 @@ void __fastcall TMainForm::QuadGtBankLoadClick(TObject *Sender)
   QuadGT_Redraw_Patch(bank, 0);
 }
 
+//---------------------------------------------------------------------------
+// Name        : QuadGt_Swap
+// Description : Swap two programs
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
 void QuadGT_Swap(const int bank1, const int patch1, const int bank2, const int patch2)
 {
   UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
@@ -2438,6 +2444,89 @@ void QuadGT_Swap(const int bank1, const int patch1, const int bank2, const int p
   memcpy(&QuadtGT_Bank[bank2][patch2], &swap,                        sizeof(tQuadGT_Prog));
 
   if ( ((bank == bank1) && (prog == patch1)) || ((bank == bank2) && (prog == patch2)) )
+  {
+    QuadGT_Redraw_Patch(bank, prog);
+  }
+}
+
+typedef enum
+{
+  Param_Preamp,
+  Param_Mix,
+  Param_Mod,
+  Param_Reverb,
+  Param_Pitch,
+  Param_Eq,
+  Param_Resonator
+} tParam;
+
+//---------------------------------------------------------------------------
+// Name        : QuadGt_Copy
+// Description : Copy a set of parameters from one patch to another
+// Parameter 1 : Parameter settings to copy
+// Parameter 2 : Bank to copy from
+// Parameter 3 : Patch to copy from
+// Parameter 4 : Bank to copy to
+// Parameter 5 : Patch to copy to
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+void QuadGT_Copy(const int param, const int bankfrom, const int patchfrom, const int bankto, const int patchto)
+{
+  UInt8 prog=(UInt8)StrToInt(MainForm->QuadPatchNum->Text);
+
+  FormDebug->Log(NULL,"Copy From Bank" + AnsiString(bankfrom) + " Patch " + AnsiString(patchfrom));
+  FormDebug->Log(NULL,"Copy To   Bank" + AnsiString(bankto) + " Patch " + AnsiString(patchto));
+
+  switch (param)
+  {
+    case Param_Preamp:
+      QuadtGT_Bank[bankto][patchto].comp             = QuadtGT_Bank[bankfrom][patchfrom].comp;
+      QuadtGT_Bank[bankto][patchto].od               = QuadtGT_Bank[bankfrom][patchfrom].od;
+      QuadtGT_Bank[bankto][patchto].dist             = QuadtGT_Bank[bankfrom][patchfrom].dist;
+      QuadtGT_Bank[bankto][patchto].preamp_tone      = QuadtGT_Bank[bankfrom][patchfrom].preamp_tone;
+      QuadtGT_Bank[bankto][patchto].preamp_gate      = QuadtGT_Bank[bankfrom][patchfrom].preamp_gate;
+      QuadtGT_Bank[bankto][patchto].preamp_out_level = QuadtGT_Bank[bankfrom][patchfrom].preamp_out_level;
+      QuadtGT_Bank[bankto][patchto].effect_loop      = QuadtGT_Bank[bankfrom][patchfrom].effect_loop;
+      QuadtGT_Bank[bankto][patchto].bass_boost       = QuadtGT_Bank[bankfrom][patchfrom].bass_boost;
+      QuadtGT_Bank[bankto][patchto].cab_sim          = QuadtGT_Bank[bankfrom][patchfrom].cab_sim;
+      break;
+
+    case Param_Mix:
+      QuadtGT_Bank[bankto][patchto].prepost_eq           = QuadtGT_Bank[bankfrom][patchfrom].prepost_eq;
+      QuadtGT_Bank[bankto][patchto].direct_level         = QuadtGT_Bank[bankfrom][patchfrom].direct_level;
+      QuadtGT_Bank[bankto][patchto].master_effects_level = QuadtGT_Bank[bankfrom][patchfrom].master_effects_level;
+      QuadtGT_Bank[bankto][patchto].preamp_level         = QuadtGT_Bank[bankfrom][patchfrom].preamp_level;
+      QuadtGT_Bank[bankto][patchto].pitch_level          = QuadtGT_Bank[bankfrom][patchfrom].pitch_level;
+      QuadtGT_Bank[bankto][patchto].leslie_level         = QuadtGT_Bank[bankfrom][patchfrom].leslie_level;
+      QuadtGT_Bank[bankto][patchto].ring_mod_level       = QuadtGT_Bank[bankfrom][patchfrom].ring_mod_level;
+      QuadtGT_Bank[bankto][patchto].delay_level          = QuadtGT_Bank[bankfrom][patchfrom].delay_level;
+      QuadtGT_Bank[bankto][patchto].reverb_level         = QuadtGT_Bank[bankfrom][patchfrom].reverb_level;
+      QuadtGT_Bank[bankto][patchto].mix_mod              = QuadtGT_Bank[bankfrom][patchfrom].mix_mod;
+      QuadtGT_Bank[bankto][patchto].eq_level             = QuadtGT_Bank[bankfrom][patchfrom].eq_level;
+      break;
+
+    case Param_Mod:
+      // TBD
+      break;
+
+    case Param_Reverb:
+      // TBD
+      break;
+
+    case Param_Pitch:
+      // TBD
+      break;
+
+    case Param_Eq:
+      // TBD
+      break;
+
+    case Param_Resonator:
+      // TBD
+      break;
+  }
+
+  if ( (bank == bankto) && (prog == patchto) )
   {
     QuadGT_Redraw_Patch(bank, prog);
   }

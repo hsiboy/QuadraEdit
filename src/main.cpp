@@ -22,6 +22,7 @@
 #include "device.h"
 #include "quadgt.h"
 #include "swap.h"
+#include "copy.h"
 #include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
@@ -298,8 +299,18 @@ void __fastcall TMainForm::QuadPatchSwapClick(TObject *Sender)
                 FormSwap->Bank2->ItemIndex, StrToInt(FormSwap->PatchNum2->Text));
   }
 }
+
+
 //---------------------------------------------------------------------------
 
-
+void __fastcall TMainForm::QuadPatchCopyClick(TObject *Sender)
+{
+  if (FormCopy->ShowModal() == 1)
+  {
+    QuadGT_Copy(FormCopy->Parameters->ItemIndex,
+                FormCopy->Bank1->ItemIndex, StrToInt(FormCopy->PatchNum1->Text),
+                FormCopy->Bank2->ItemIndex, StrToInt(FormCopy->PatchNum2->Text));
+  }
+}
 //---------------------------------------------------------------------------
 
