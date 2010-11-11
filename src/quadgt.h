@@ -420,15 +420,17 @@ typedef struct
   UInt8 res_midi_gate;          // 0 - 1
 
   // Sampling parameters
-  UInt8 sample_start;            // 0 - 150
-  UInt8 sample_length;           // 5 - 155
-  UInt8 sample_playback_mode;    // 0 - 2
-  UInt8 sample_pitch;
-  UInt8 sample_rec_audio_trigger; // 0 - 1
-  UInt8 sample_midi_trigger;      // 0 - 2
-  UInt8 sample_midi_base_note;    // 0 - 127
-  UInt8 sample_low_midi_note;     // 0 - 127
-  UInt8 sample_high_midi_note;    // 0 - 127
+  struct {
+  UInt8 start;            // 0 - 150
+  UInt8 length;           // 5 - 155
+  UInt8 playback_mode;    // 0 - 2
+  UInt8 pitch;
+  UInt8 rec_audio_trigger; // 0 - 1
+  UInt8 midi_trigger;      // 0 - 2
+  UInt8 midi_base_note;    // 0 - 127
+  UInt8 low_midi_note;     // 0 - 127
+  UInt8 high_midi_note;    // 0 - 127
+  } sample;
 
   // Ring modulator parameters
   SInt8 ring_mod_out_mix;  // -99-99

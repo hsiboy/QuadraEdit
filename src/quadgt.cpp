@@ -1341,15 +1341,15 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   // Select Sampling or Tap 1
   if (QuadtGT_Bank[bank][prog].config == CFG7_SAMPLING) 
   {
-    data[SAMPLE_START_IDX]           = QuadtGT_Bank[bank][prog].sample_start;
-    data[SAMPLE_LENGTH_IDX]          = QuadtGT_Bank[bank][prog].sample_length;
-    data[SAMPLE_PLAYBACK_MODE_IDX]   = QuadtGT_Bank[bank][prog].sample_playback_mode;
-    data[SAMPLE_PITCH_IDX]           = QuadtGT_Bank[bank][prog].sample_pitch;
-    data[SAMPLE_REC_AUDIO_TRIG_IDX]  = QuadtGT_Bank[bank][prog].sample_rec_audio_trigger;
-    data[SAMPLE_MIDI_TRIG_IDX]       = QuadtGT_Bank[bank][prog].sample_midi_trigger;
-    data[SAMPLE_MIDI_BASE_NOTE_IDX]  = QuadtGT_Bank[bank][prog].sample_midi_base_note;
-    data[SAMPLE_LOW_MIDI_NOTE_IDX]   = QuadtGT_Bank[bank][prog].sample_low_midi_note;
-    data[SAMPLE_HIGH_MIDI_NOTE_IDX]  = QuadtGT_Bank[bank][prog].sample_high_midi_note;
+    data[SAMPLE_START_IDX]           = QuadtGT_Bank[bank][prog].sample.start;
+    data[SAMPLE_LENGTH_IDX]          = QuadtGT_Bank[bank][prog].sample.length;
+    data[SAMPLE_PLAYBACK_MODE_IDX]   = QuadtGT_Bank[bank][prog].sample.playback_mode;
+    data[SAMPLE_PITCH_IDX]           = QuadtGT_Bank[bank][prog].sample.pitch;
+    data[SAMPLE_REC_AUDIO_TRIG_IDX]  = QuadtGT_Bank[bank][prog].sample.rec_audio_trigger;
+    data[SAMPLE_MIDI_TRIG_IDX]       = QuadtGT_Bank[bank][prog].sample.midi_trigger;
+    data[SAMPLE_MIDI_BASE_NOTE_IDX]  = QuadtGT_Bank[bank][prog].sample.midi_base_note;
+    data[SAMPLE_LOW_MIDI_NOTE_IDX]   = QuadtGT_Bank[bank][prog].sample.low_midi_note;
+    data[SAMPLE_HIGH_MIDI_NOTE_IDX]  = QuadtGT_Bank[bank][prog].sample.high_midi_note;
   }
   else 
   {
@@ -1768,15 +1768,15 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   // Sampling or Tap/Leslie parameters
   if (QuadtGT_Bank[bank][prog].config == CFG7_SAMPLING) 
   {
-    QuadtGT_Bank[bank][prog].sample_start            = data[SAMPLE_START_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_length           = data[SAMPLE_LENGTH_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_playback_mode    = data[SAMPLE_PLAYBACK_MODE_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_pitch            = data[SAMPLE_PITCH_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_rec_audio_trigger= data[SAMPLE_REC_AUDIO_TRIG_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_midi_trigger     = data[SAMPLE_MIDI_TRIG_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_midi_base_note   = data[SAMPLE_MIDI_BASE_NOTE_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_low_midi_note    = data[SAMPLE_LOW_MIDI_NOTE_IDX]; 
-    QuadtGT_Bank[bank][prog].sample_high_midi_note   = data[SAMPLE_HIGH_MIDI_NOTE_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.start            = data[SAMPLE_START_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.length           = data[SAMPLE_LENGTH_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.playback_mode    = data[SAMPLE_PLAYBACK_MODE_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.pitch            = data[SAMPLE_PITCH_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.rec_audio_trigger= data[SAMPLE_REC_AUDIO_TRIG_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.midi_trigger     = data[SAMPLE_MIDI_TRIG_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.midi_base_note   = data[SAMPLE_MIDI_BASE_NOTE_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.low_midi_note    = data[SAMPLE_LOW_MIDI_NOTE_IDX]; 
+    QuadtGT_Bank[bank][prog].sample.high_midi_note   = data[SAMPLE_HIGH_MIDI_NOTE_IDX]; 
   }
   else
   {
