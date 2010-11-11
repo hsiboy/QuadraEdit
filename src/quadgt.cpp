@@ -321,30 +321,30 @@ void QuadGT_Redraw_Reverb(const UInt8 prog)
 
   if (MainForm->QuadReverb->Visible == true)
   {
-    MainForm->ReverbType->ItemIndex = QuadtGT_Bank[bank][prog].reverb_mode;
+    MainForm->ReverbType->ItemIndex = QuadtGT_Bank[bank][prog].reverb.mode;
 
-    MainForm->ReverbInput1->ItemIndex = QuadtGT_Bank[bank][prog].reverb_input_1;
-    MainForm->ReverbInput2->ItemIndex = QuadtGT_Bank[bank][prog].reverb_input_2;
-    FormDebug->Log(NULL, "Reverb In 1 "+AnsiString(QuadtGT_Bank[bank][prog].reverb_input_1));
-    FormDebug->Log(NULL, "Reverb In 2 "+AnsiString(QuadtGT_Bank[bank][prog].reverb_input_2));
+    MainForm->ReverbInput1->ItemIndex = QuadtGT_Bank[bank][prog].reverb.input_1;
+    MainForm->ReverbInput2->ItemIndex = QuadtGT_Bank[bank][prog].reverb.input_2;
+    FormDebug->Log(NULL, "Reverb In 1 "+AnsiString(QuadtGT_Bank[bank][prog].reverb.input_1));
+    FormDebug->Log(NULL, "Reverb In 2 "+AnsiString(QuadtGT_Bank[bank][prog].reverb.input_2));
 
-    RedrawVertBarTextU8(MainForm->ReverbPreDelay, MainForm->ReverbPreDelayVal, QuadtGT_Bank[bank][prog].reverb_predelay, 1);
+    RedrawVertBarTextU8(MainForm->ReverbPreDelay, MainForm->ReverbPreDelayVal, QuadtGT_Bank[bank][prog].reverb.predelay, 1);
     
-    RedrawHorizBarTextS8(MainForm->ReverbInMix, MainForm->ReverbInMixVal, QuadtGT_Bank[bank][prog].reverb_input_mix);
-    RedrawHorizBarTextS8(MainForm->ReverbPreMix, MainForm->ReverbPreMixVal, QuadtGT_Bank[bank][prog].reverb_predelay_mix);
+    RedrawHorizBarTextS8(MainForm->ReverbInMix, MainForm->ReverbInMixVal, QuadtGT_Bank[bank][prog].reverb.input_mix);
+    RedrawHorizBarTextS8(MainForm->ReverbPreMix, MainForm->ReverbPreMixVal, QuadtGT_Bank[bank][prog].reverb.predelay_mix);
 
-    RedrawVertBarTextU8(MainForm->ReverbLowDecay,  MainForm->ReverbLowDecayVal,  QuadtGT_Bank[bank][prog].reverb_low_decay, 0);
-    RedrawVertBarTextU8(MainForm->ReverbHighDecay, MainForm->ReverbHighDecayVal, QuadtGT_Bank[bank][prog].reverb_high_decay, 0);
-    RedrawVertBarTextU8(MainForm->ReverbDecay,     MainForm->ReverbDecayVal,     QuadtGT_Bank[bank][prog].reverb_decay, 0);
+    RedrawVertBarTextU8(MainForm->ReverbLowDecay,  MainForm->ReverbLowDecayVal,  QuadtGT_Bank[bank][prog].reverb.low_decay, 0);
+    RedrawVertBarTextU8(MainForm->ReverbHighDecay, MainForm->ReverbHighDecayVal, QuadtGT_Bank[bank][prog].reverb.high_decay, 0);
+    RedrawVertBarTextU8(MainForm->ReverbDecay,     MainForm->ReverbDecayVal,     QuadtGT_Bank[bank][prog].reverb.decay, 0);
 
-    RedrawVertBarTextU8(MainForm->ReverbDiffusion,  MainForm->ReverbDiffusionVal, QuadtGT_Bank[bank][prog].reverb_diffusion,0);
+    RedrawVertBarTextU8(MainForm->ReverbDiffusion,  MainForm->ReverbDiffusionVal, QuadtGT_Bank[bank][prog].reverb.diffusion,0);
 
-    RedrawVertBarTextU8(MainForm->ReverbDensity,  MainForm->ReverbDensityVal, QuadtGT_Bank[bank][prog].reverb_density,0);
+    RedrawVertBarTextU8(MainForm->ReverbDensity,  MainForm->ReverbDensityVal, QuadtGT_Bank[bank][prog].reverb.density,0);
 
-    MainForm->ReverbGateOn->Checked = (QuadtGT_Bank[bank][prog].reverb_gate==1) ? TRUE : FALSE;
-    RedrawVertBarTextU8(MainForm->ReverbGateHold,  MainForm->ReverbGateHoldVal, QuadtGT_Bank[bank][prog].reverb_gate_hold,0);
-    RedrawVertBarTextU8(MainForm->ReverbGateRelease,  MainForm->ReverbGateReleaseVal, QuadtGT_Bank[bank][prog].reverb_gate_release,0);
-    RedrawVertBarTextU8(MainForm->ReverbGateLevel,  MainForm->ReverbGateLevelVal, QuadtGT_Bank[bank][prog].reverb_gated_level,0);
+    MainForm->ReverbGateOn->Checked = (QuadtGT_Bank[bank][prog].reverb.gate==1) ? TRUE : FALSE;
+    RedrawVertBarTextU8(MainForm->ReverbGateHold,  MainForm->ReverbGateHoldVal, QuadtGT_Bank[bank][prog].reverb.gate_hold,0);
+    RedrawVertBarTextU8(MainForm->ReverbGateRelease,  MainForm->ReverbGateReleaseVal, QuadtGT_Bank[bank][prog].reverb.gate_release,0);
+    RedrawVertBarTextU8(MainForm->ReverbGateLevel,  MainForm->ReverbGateLevelVal, QuadtGT_Bank[bank][prog].reverb.gated_level,0);
   }
 }
 
@@ -703,17 +703,17 @@ void QuadGT_Redraw_Eq(const UInt8 prog)
 
     // TBD: If using preset, disable sliders and display preset amplitudes
    
-    MainForm->GEQ_16Hz->Position =-1*QuadtGT_Bank[bank][prog].geq_16hz  ;
-    MainForm->GEQ_32Hz->Position =-1*QuadtGT_Bank[bank][prog].geq_32hz  ;
-    MainForm->GEQ_62Hz->Position =-1*QuadtGT_Bank[bank][prog].geq_62hz  ;
-    MainForm->GEQ_126Hz->Position=-1*QuadtGT_Bank[bank][prog].geq_126hz ;
-    MainForm->GEQ_250Hz->Position=-1*QuadtGT_Bank[bank][prog].geq_250hz ;
-    MainForm->GEQ_500Hz->Position=-1*QuadtGT_Bank[bank][prog].geq_500hz ;
-    MainForm->GEQ_1KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_1khz  ;
-    MainForm->GEQ_2KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_2khz  ;
-    MainForm->GEQ_4KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_4khz  ;
-    MainForm->GEQ_8KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_8khz  ;
-    MainForm->GEQ_16KHz->Position=-1*QuadtGT_Bank[bank][prog].geq_16khz ;
+    MainForm->GEQ_16Hz->Position =-1*QuadtGT_Bank[bank][prog].geq_16hz;
+    MainForm->GEQ_32Hz->Position =-1*QuadtGT_Bank[bank][prog].geq_32hz;
+    MainForm->GEQ_62Hz->Position =-1*QuadtGT_Bank[bank][prog].geq_62hz;
+    MainForm->GEQ_126Hz->Position=-1*QuadtGT_Bank[bank][prog].geq_126hz;
+    MainForm->GEQ_250Hz->Position=-1*QuadtGT_Bank[bank][prog].geq_250hz;
+    MainForm->GEQ_500Hz->Position=-1*QuadtGT_Bank[bank][prog].geq_500hz;
+    MainForm->GEQ_1KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_1khz;
+    MainForm->GEQ_2KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_2khz;
+    MainForm->GEQ_4KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_4khz;
+    MainForm->GEQ_8KHz->Position =-1*QuadtGT_Bank[bank][prog].geq_8khz;
+    MainForm->GEQ_16KHz->Position=-1*QuadtGT_Bank[bank][prog].geq_16khz;
 
   }
   else
@@ -1205,17 +1205,17 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   }
 
   // Reverb parameters
-  else if (Sender == MainForm->ReverbPreDelay)  VertBarChangeOffsetU8((TTrackBar *)Sender,  MainForm->ReverbPreDelayVal,       &QuadtGT_Bank[bank][prog].reverb_predelay, 1);
-  else if (Sender == MainForm->ReverbDecay)     VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbDecayVal,          &QuadtGT_Bank[bank][prog].reverb_decay);
-  else if (Sender == MainForm->ReverbLowDecay)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbLowDecayVal,       &QuadtGT_Bank[bank][prog].reverb_low_decay);
-  else if (Sender == MainForm->ReverbHighDecay) VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbHighDecayVal,      &QuadtGT_Bank[bank][prog].reverb_high_decay);
-  else if (Sender == MainForm->ReverbDensity)   VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbDensityVal,        &QuadtGT_Bank[bank][prog].reverb_density);
-  else if (Sender == MainForm->ReverbDiffusion) VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbDiffusionVal,      &QuadtGT_Bank[bank][prog].reverb_diffusion);
-  else if (Sender == MainForm->ReverbGateHold)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbGateHoldVal,       &QuadtGT_Bank[bank][prog].reverb_gate_hold);
-  else if (Sender == MainForm->ReverbGateRelease)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbGateReleaseVal, &QuadtGT_Bank[bank][prog].reverb_gate_release);
-  else if (Sender == MainForm->ReverbGateLevel)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbGateLevelVal,     &QuadtGT_Bank[bank][prog].reverb_gated_level);
-  else if (Sender == MainForm->ReverbInMix)     HorizBarChangeS8((TTrackBar *)Sender, MainForm->ReverbInMixVal,          &QuadtGT_Bank[bank][prog].reverb_input_mix);
-  else if (Sender == MainForm->ReverbPreMix)    HorizBarChangeS8((TTrackBar *)Sender, MainForm->ReverbPreMixVal,         &QuadtGT_Bank[bank][prog].reverb_predelay_mix);
+  else if (Sender == MainForm->ReverbPreDelay)  VertBarChangeOffsetU8((TTrackBar *)Sender,  MainForm->ReverbPreDelayVal,       &QuadtGT_Bank[bank][prog].reverb.predelay, 1);
+  else if (Sender == MainForm->ReverbDecay)     VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbDecayVal,          &QuadtGT_Bank[bank][prog].reverb.decay);
+  else if (Sender == MainForm->ReverbLowDecay)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbLowDecayVal,       &QuadtGT_Bank[bank][prog].reverb.low_decay);
+  else if (Sender == MainForm->ReverbHighDecay) VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbHighDecayVal,      &QuadtGT_Bank[bank][prog].reverb.high_decay);
+  else if (Sender == MainForm->ReverbDensity)   VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbDensityVal,        &QuadtGT_Bank[bank][prog].reverb.density);
+  else if (Sender == MainForm->ReverbDiffusion) VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbDiffusionVal,      &QuadtGT_Bank[bank][prog].reverb.diffusion);
+  else if (Sender == MainForm->ReverbGateHold)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbGateHoldVal,       &QuadtGT_Bank[bank][prog].reverb.gate_hold);
+  else if (Sender == MainForm->ReverbGateRelease)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbGateReleaseVal, &QuadtGT_Bank[bank][prog].reverb.gate_release);
+  else if (Sender == MainForm->ReverbGateLevel)  VertBarChangeU8((TTrackBar *)Sender,  MainForm->ReverbGateLevelVal,     &QuadtGT_Bank[bank][prog].reverb.gated_level);
+  else if (Sender == MainForm->ReverbInMix)     HorizBarChangeS8((TTrackBar *)Sender, MainForm->ReverbInMixVal,          &QuadtGT_Bank[bank][prog].reverb.input_mix);
+  else if (Sender == MainForm->ReverbPreMix)    HorizBarChangeS8((TTrackBar *)Sender, MainForm->ReverbPreMixVal,         &QuadtGT_Bank[bank][prog].reverb.predelay_mix);
 
   // Delay Parameters
   else if (Sender == MainForm->TapDelay) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapDelayVal, &QuadtGT_Bank[bank][prog].tap.tap_delay[tap]);
@@ -1380,7 +1380,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
     }
     else
     {
-      data[REVERB_MODE_IDX]   = QuadtGT_Bank[bank][prog].reverb_mode;
+      data[REVERB_MODE_IDX]   = QuadtGT_Bank[bank][prog].reverb.mode;
     }
   }
 
@@ -1416,20 +1416,20 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    data[REVERB_INPUT_1_IDX]=     QuadtGT_Bank[bank][prog].reverb_input_1	;
-    data[REVERB_INPUT_2_IDX]=     QuadtGT_Bank[bank][prog].reverb_input_2	;
-    data[REVERB_INPUT_MIX_IDX]=   QuadtGT_Bank[bank][prog].reverb_input_mix+99;
-    data[REVERB_PREDELAY_IDX]=    QuadtGT_Bank[bank][prog].reverb_predelay	;
-    data[REVERB_PREDELAY_MIX_IDX]=QuadtGT_Bank[bank][prog].reverb_predelay_mix+99;
-    data[REVERB_DECAY_IDX]=       QuadtGT_Bank[bank][prog].reverb_decay	;
-    data[REVERB_DIFFUSION_IDX]=   QuadtGT_Bank[bank][prog].reverb_diffusion	;
-    data[REVERB_LOW_DECAY_IDX]=   QuadtGT_Bank[bank][prog].reverb_low_decay	;
-    data[REVERB_HIGH_DECAY_IDX]=  QuadtGT_Bank[bank][prog].reverb_high_decay	;
-    data[REVERB_DENSITY_IDX]=     QuadtGT_Bank[bank][prog].reverb_density	;
-    data[REVERB_GATE_IDX]=        QuadtGT_Bank[bank][prog].reverb_gate	;
-    data[REVERB_GATE_HOLD_IDX]=   QuadtGT_Bank[bank][prog].reverb_gate_hold	;
-    data[REVERB_GATE_RELEASE_IDX]=QuadtGT_Bank[bank][prog].reverb_gate_release;
-    data[REVERB_GATED_LEVEL_IDX]= QuadtGT_Bank[bank][prog].reverb_gated_level	;
+    data[REVERB_INPUT_1_IDX]=     QuadtGT_Bank[bank][prog].reverb.input_1	;
+    data[REVERB_INPUT_2_IDX]=     QuadtGT_Bank[bank][prog].reverb.input_2	;
+    data[REVERB_INPUT_MIX_IDX]=   QuadtGT_Bank[bank][prog].reverb.input_mix+99;
+    data[REVERB_PREDELAY_IDX]=    QuadtGT_Bank[bank][prog].reverb.predelay	;
+    data[REVERB_PREDELAY_MIX_IDX]=QuadtGT_Bank[bank][prog].reverb.predelay_mix+99;
+    data[REVERB_DECAY_IDX]=       QuadtGT_Bank[bank][prog].reverb.decay	;
+    data[REVERB_DIFFUSION_IDX]=   QuadtGT_Bank[bank][prog].reverb.diffusion	;
+    data[REVERB_LOW_DECAY_IDX]=   QuadtGT_Bank[bank][prog].reverb.low_decay	;
+    data[REVERB_HIGH_DECAY_IDX]=  QuadtGT_Bank[bank][prog].reverb.high_decay	;
+    data[REVERB_DENSITY_IDX]=     QuadtGT_Bank[bank][prog].reverb.density	;
+    data[REVERB_GATE_IDX]=        QuadtGT_Bank[bank][prog].reverb.gate	;
+    data[REVERB_GATE_HOLD_IDX]=   QuadtGT_Bank[bank][prog].reverb.gate_hold	;
+    data[REVERB_GATE_RELEASE_IDX]=QuadtGT_Bank[bank][prog].reverb.gate_release;
+    data[REVERB_GATED_LEVEL_IDX]= QuadtGT_Bank[bank][prog].reverb.gated_level	;
 
     QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].ring_mod_shift, &data[RING_MOD_SHIFT_IDX]);
   }
@@ -1653,7 +1653,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   QuadtGT_Bank[bank][prog].delay_mode    = data[DELAY_MODE_IDX];
   if (QuadtGT_Bank[bank][prog].config != CFG3_5BANDEQ_PITCH_DELAY)
   {
-    QuadtGT_Bank[bank][prog].reverb_mode   = data[REVERB_MODE_IDX];
+    QuadtGT_Bank[bank][prog].reverb.mode   = data[REVERB_MODE_IDX];
   }
 
   //-------------------------------------------------------------------------
@@ -1680,12 +1680,12 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   {
     FormDebug->Log(NULL, "Loading resontors 1 and 2");
     QuadtGT_Bank[bank][prog].res_tune[0] = data[RES1_TUNE_IDX] - RES_TUNE_OFFSET; 
-    QuadtGT_Bank[bank][prog].res_decay[0] =data[RES1_DECAY_IDX] ; 
-    QuadtGT_Bank[bank][prog].res_amp[0] =  data[RES1_AMP_IDX]   ; 
+    QuadtGT_Bank[bank][prog].res_decay[0] =data[RES1_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res_amp[0] =  data[RES1_AMP_IDX];
                                      
     QuadtGT_Bank[bank][prog].res_tune[1] = data[RES2_TUNE_IDX]  - RES_TUNE_OFFSET; 
-    QuadtGT_Bank[bank][prog].res_decay[1] =data[RES2_DECAY_IDX] ; 
-    QuadtGT_Bank[bank][prog].res_amp[1] =  data[RES2_AMP_IDX]   ; 
+    QuadtGT_Bank[bank][prog].res_decay[1] =data[RES2_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res_amp[1] =  data[RES2_AMP_IDX];
 
     FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[0]));
     FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[1]));
@@ -1842,20 +1842,20 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
     //-------------------------------------------------------------------------
     // Reverb Parameters
     //-------------------------------------------------------------------------
-    QuadtGT_Bank[bank][prog].reverb_input_1	        = data[REVERB_INPUT_1_IDX];
-    QuadtGT_Bank[bank][prog].reverb_input_2	        = data[REVERB_INPUT_2_IDX];
-    QuadtGT_Bank[bank][prog].reverb_input_mix	        = data[REVERB_INPUT_MIX_IDX]-99;
-    QuadtGT_Bank[bank][prog].reverb_predelay	        = data[REVERB_PREDELAY_IDX];
-    QuadtGT_Bank[bank][prog].reverb_predelay_mix	= data[REVERB_PREDELAY_MIX_IDX]-99;
-    QuadtGT_Bank[bank][prog].reverb_decay	        = data[REVERB_DECAY_IDX];
-    QuadtGT_Bank[bank][prog].reverb_diffusion	        = data[REVERB_DIFFUSION_IDX];
-    QuadtGT_Bank[bank][prog].reverb_low_decay	        = data[REVERB_LOW_DECAY_IDX];
-    QuadtGT_Bank[bank][prog].reverb_high_decay	= data[REVERB_HIGH_DECAY_IDX];
-    QuadtGT_Bank[bank][prog].reverb_density	        = data[REVERB_DENSITY_IDX];
-    QuadtGT_Bank[bank][prog].reverb_gate	        = data[REVERB_GATE_IDX];
-    QuadtGT_Bank[bank][prog].reverb_gate_hold	        = data[REVERB_GATE_HOLD_IDX];
-    QuadtGT_Bank[bank][prog].reverb_gate_release	= data[REVERB_GATE_RELEASE_IDX];
-    QuadtGT_Bank[bank][prog].reverb_gated_level	= data[REVERB_GATED_LEVEL_IDX];
+    QuadtGT_Bank[bank][prog].reverb.input_1	        = data[REVERB_INPUT_1_IDX];
+    QuadtGT_Bank[bank][prog].reverb.input_2	        = data[REVERB_INPUT_2_IDX];
+    QuadtGT_Bank[bank][prog].reverb.input_mix	        = data[REVERB_INPUT_MIX_IDX]-99;
+    QuadtGT_Bank[bank][prog].reverb.predelay	        = data[REVERB_PREDELAY_IDX];
+    QuadtGT_Bank[bank][prog].reverb.predelay_mix	= data[REVERB_PREDELAY_MIX_IDX]-99;
+    QuadtGT_Bank[bank][prog].reverb.decay	        = data[REVERB_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].reverb.diffusion	        = data[REVERB_DIFFUSION_IDX];
+    QuadtGT_Bank[bank][prog].reverb.low_decay	        = data[REVERB_LOW_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].reverb.high_decay	= data[REVERB_HIGH_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].reverb.density	        = data[REVERB_DENSITY_IDX];
+    QuadtGT_Bank[bank][prog].reverb.gate	        = data[REVERB_GATE_IDX];
+    QuadtGT_Bank[bank][prog].reverb.gate_hold	        = data[REVERB_GATE_HOLD_IDX];
+    QuadtGT_Bank[bank][prog].reverb.gate_release	= data[REVERB_GATE_RELEASE_IDX];
+    QuadtGT_Bank[bank][prog].reverb.gated_level	= data[REVERB_GATED_LEVEL_IDX];
 
     QuadtGT_Bank[bank][prog].ring_mod_shift = QuadGT_Decode_16Bit(&data[RING_MOD_SHIFT_IDX]);
   }

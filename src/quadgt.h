@@ -370,25 +370,27 @@ typedef struct
   UInt8  tap_volume[8];
   UInt8  tap_pan[8];
   UInt8  tap_feedback[8];
-  UInt8  master_feedback;
+  UInt8  master_feedback;           // NOT USED, SEE MULTITAP_MASTER_FEEDBACK
   } tap;
 
   // Reverb parameters
-  UInt8 reverb_mode;
-  UInt8 reverb_input_1;                      // 0 - 3
-  UInt8 reverb_input_2;                      // 0 - 1
-  SInt8 reverb_input_mix;                    // -99 - 99
-  UInt8 reverb_predelay;                     // 1 - 140
-  SInt8 reverb_predelay_mix;                 // -99 - 99
-  UInt8 reverb_decay;                        // 0 - 99
-  UInt8 reverb_diffusion;                    // 0 - 8
-  UInt8 reverb_low_decay;                    // 0 - 60
-  UInt8 reverb_high_decay;                   // 0 - 60
-  UInt8 reverb_density;                      // 0 - 8
-  UInt8 reverb_gate;                         // 0 - 1
-  UInt8 reverb_gate_hold;                    // 0 - 99
-  UInt8 reverb_gate_release;                 // 0 - 99
-  UInt8 reverb_gated_level;                  // 0 - 99
+  struct {
+    UInt8 mode;
+    UInt8 input_1;                      // 0 - 3
+    UInt8 input_2;                      // 0 - 1
+    SInt8 input_mix;                    // -99 - 99
+    UInt8 predelay;                     // 1 - 140
+    SInt8 predelay_mix;                 // -99 - 99
+    UInt8 decay;                        // 0 - 99
+    UInt8 diffusion;                    // 0 - 8
+    UInt8 low_decay;                    // 0 - 60
+    UInt8 high_decay;                   // 0 - 60
+    UInt8 density;                      // 0 - 8
+    UInt8 gate;                         // 0 - 1
+    UInt8 gate_hold;                    // 0 - 99
+    UInt8 gate_release;                 // 0 - 99
+    UInt8 gated_level;                  // 0 - 99
+  } reverb;
 
   // Mix parameters
   UInt8 prepost_eq;                  // 0 - 1 (0=Pre-eq, 1=Post-eq)
