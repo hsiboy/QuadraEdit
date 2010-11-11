@@ -299,32 +299,36 @@ typedef struct
   UInt8 config;                    // 0-7
 
   // Preamp parameters
-  UInt8 comp;                      // Compression 0-7
-  UInt8 od;                        // Overdrive 0-7
-  UInt8 dist;                      // Distortion 0-8
-  UInt8 preamp_tone;               // Preamp tone 0-2 (Flat, Prescence, Bright)
-  UInt8 preamp_gate;               // Preamp noise gate level 0-17
-  UInt8 preamp_out_level;          // Preamp output level 0-99
-  UInt8 effect_loop;               // Effect loop on/off 0-1
-  UInt8 bass_boost;                // Bass boost on/off 0-1
-  UInt8 cab_sim;                   // Cabinet simulator 0-2 (Off, Cab 1, Cab 2)
+  struct 
+  {
+    UInt8 comp;                      // Compression 0-7
+    UInt8 od;                        // Overdrive 0-7
+    UInt8 dist;                      // Distortion 0-8
+    UInt8 preamp_tone;               // Preamp tone 0-2 (Flat, Prescence, Bright)
+    UInt8 preamp_gate;               // Preamp noise gate level 0-17
+    UInt8 preamp_out_level;          // Preamp output level 0-99
+    UInt8 effect_loop;               // Effect loop on/off 0-1
+    UInt8 bass_boost;                // Bass boost on/off 0-1
+    UInt8 cab_sim;                   // Cabinet simulator 0-2 (Off, Cab 1, Cab 2)
+  } preamp;
 
   // Eq parameters
-  UInt8  eq_mode;                  // 0=Eq,  1=Eq+Resonator
-  UInt16 low_eq_freq;              // 20 to 999 Hz
-  UInt16 low_eq_amp;               // -14 to 14 db  (0-560)
-  UInt16 mid_eq_freq;              // 200 to 9999 Hz
-  UInt16 mid_eq_amp;               // -14 to 14 db  (0-560)
-  UInt8  mid_eq_q;                 // 0.2 to 2.55 octaves (20-255)
-  UInt16 high_eq_freq;             // 2000 to 18000 Hz
-  UInt16 high_eq_amp;              // -14 to 14 db  (0-560)
-  UInt16 low_mid_eq_freq;          // 20 to 500 Hz
-  UInt16 low_mid_eq_amp;           // -14 to 14 db  (0-560)
-  UInt8  low_mid_eq_q;             // 0.2 to 2.55 octaves (20-255)
-  UInt16 high_mid_eq_freq;         // 2000 to 18000 Hz
-  UInt16 high_mid_eq_amp;          // -14 to 14 db  (0-560)
-  UInt8  high_mid_eq_q;            // 0.2 to 2.55 octaves (20-255)
-  UInt8 eq_preset;                 // 0=6 (User=0 or preset 1-6)
+  UInt8  mode;                  // 0=Eq,  1=Eq+Resonator
+  UInt16 low_freq;              // 20 to 999 Hz
+  UInt16 low_amp;               // -14 to 14 db  (0-560)
+  UInt16 mid_freq;              // 200 to 9999 Hz
+  UInt16 mid_amp;               // -14 to 14 db  (0-560)
+  UInt8  mid_q;                 // 0.2 to 2.55 octaves (20-255)
+  UInt16 high_freq;             // 2000 to 18000 Hz
+  UInt16 high_amp;              // -14 to 14 db  (0-560)
+  UInt16 low_mid_freq;          // 20 to 500 Hz
+  UInt16 low_mid_amp;           // -14 to 14 db  (0-560)
+  UInt8  low_mid_q;             // 0.2 to 2.55 octaves (20-255)
+  UInt16 high_mid_freq;         // 2000 to 18000 Hz
+  UInt16 high_mid_amp;          // -14 to 14 db  (0-560)
+  UInt8  high_mid_q;            // 0.2 to 2.55 octaves (20-255)
+  UInt8  preset;                // 0=6 (User=0 or preset 1-6)
+  
 
   // Graphic Eq parameters
   SInt8 geq_16hz;                  // -14 to 14  (0-28)
