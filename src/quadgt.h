@@ -365,11 +365,13 @@ typedef struct
   UInt8  delay_right_feedback;               // 0 - 99
 
   // Multi tap delay parameters
+  struct {
   UInt8  tap_delay[8];
   UInt8  tap_volume[8];
   UInt8  tap_pan[8];
   UInt8  tap_feedback[8];
   UInt8  master_feedback;
+  } tap;
 
   // Reverb parameters
   UInt8 reverb_mode;

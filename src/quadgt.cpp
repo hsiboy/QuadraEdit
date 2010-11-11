@@ -477,10 +477,10 @@ void QuadGT_Redraw_Delay(const UInt8 prog)
     {
       UInt8 tap = StrToInt(MainForm->TapNumber->Text)-1;
 
-      RedrawVertBarTextU8(MainForm->TapDelay,    MainForm->TapDelayVal, QuadtGT_Bank[bank][prog].tap_delay[tap], 0);
-      RedrawVertBarTextU8(MainForm->TapPan,      MainForm->TapPanVal, QuadtGT_Bank[bank][prog].tap_pan[tap], 0);
-      RedrawVertBarTextU8(MainForm->TapVol,      MainForm->TapVolVal, QuadtGT_Bank[bank][prog].tap_volume[tap], 0);
-      RedrawVertBarTextU8(MainForm->TapFeedback, MainForm->TapFeedbackVal, QuadtGT_Bank[bank][prog].tap_feedback[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapDelay,    MainForm->TapDelayVal, QuadtGT_Bank[bank][prog].tap.tap_delay[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapPan,      MainForm->TapPanVal, QuadtGT_Bank[bank][prog].tap.tap_pan[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapVol,      MainForm->TapVolVal, QuadtGT_Bank[bank][prog].tap.tap_volume[tap], 0);
+      RedrawVertBarTextU8(MainForm->TapFeedback, MainForm->TapFeedbackVal, QuadtGT_Bank[bank][prog].tap.tap_feedback[tap], 0);
     }
   }
 }
@@ -1218,10 +1218,10 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->ReverbPreMix)    HorizBarChangeS8((TTrackBar *)Sender, MainForm->ReverbPreMixVal,         &QuadtGT_Bank[bank][prog].reverb_predelay_mix);
 
   // Delay Parameters
-  else if (Sender == MainForm->TapDelay) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapDelayVal, &QuadtGT_Bank[bank][prog].tap_delay[tap]);
-  else if (Sender == MainForm->TapPan) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapPanVal, &QuadtGT_Bank[bank][prog].tap_pan[tap]);
-  else if (Sender == MainForm->TapVol) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapVolVal, &QuadtGT_Bank[bank][prog].tap_volume[tap]);
-  else if (Sender == MainForm->TapFeedback) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapFeedbackVal, &QuadtGT_Bank[bank][prog].tap_feedback[tap]);
+  else if (Sender == MainForm->TapDelay) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapDelayVal, &QuadtGT_Bank[bank][prog].tap.tap_delay[tap]);
+  else if (Sender == MainForm->TapPan) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapPanVal, &QuadtGT_Bank[bank][prog].tap.tap_pan[tap]);
+  else if (Sender == MainForm->TapVol) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapVolVal, &QuadtGT_Bank[bank][prog].tap.tap_volume[tap]);
+  else if (Sender == MainForm->TapFeedback) VertBarChangeU8((TTrackBar *)Sender, MainForm->TapFeedbackVal, &QuadtGT_Bank[bank][prog].tap.tap_feedback[tap]);
 
   else if (Sender == MainForm->DelayInMix)     VertBarChangeS8((TTrackBar *)Sender, MainForm->DelayInMixVal,     &QuadtGT_Bank[bank][prog].delay_input_mix);
   else if (Sender == MainForm->DelayLeft)      VertBarChangeU16((TTrackBar *)Sender, MainForm->DelayLeftVal,      &QuadtGT_Bank[bank][prog].delay_left);
@@ -1361,22 +1361,22 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
     }
     else
     {
-      QuadGT_Encode_16Bit_Split(QuadtGT_Bank[bank][prog].tap_delay[0], &data[TAP1_DELAY_MSB_IDX],
+      QuadGT_Encode_16Bit_Split(QuadtGT_Bank[bank][prog].tap.tap_delay[0], &data[TAP1_DELAY_MSB_IDX],
                                                                &data[TAP1_DELAY_LSB_IDX]);
-      QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[1], &data[TAP2_DELAY_IDX]);
+      QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[1], &data[TAP2_DELAY_IDX]);
     }
 
-    data[TAP1_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap_volume[0];
-    data[TAP1_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap_pan[0];
+    data[TAP1_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap.tap_volume[0];
+    data[TAP1_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap.tap_pan[0];
 
     data[DETUNE_AMOUNT_IDX] = QuadtGT_Bank[bank][prog].pitch.detune_amount;
 
-    data[TAP2_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap_volume[1];
-    data[TAP3_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap_feedback[2];
+    data[TAP2_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap.tap_volume[1];
+    data[TAP3_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap.tap_feedback[2];
 
     if (QuadtGT_Bank[bank][prog].config == CFG3_5BANDEQ_PITCH_DELAY)
     {
-      QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[3], &data[TAP4_DELAY_IDX]);
+      QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[3], &data[TAP4_DELAY_IDX]);
     }
     else
     {
@@ -1390,29 +1390,29 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    data[TAP1_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap_feedback[0];
+    data[TAP1_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap.tap_feedback[0];
   }
 
-  data[TAP4_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap_volume[3];
+  data[TAP4_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap.tap_volume[3];
 
   if (QuadtGT_Bank[bank][prog].config == CFG3_5BANDEQ_PITCH_DELAY)
   {
-    data[TAP4_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap_pan[3];
-    data[TAP4_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap_feedback[3];
+    data[TAP4_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap.tap_pan[3];
+    data[TAP4_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap.tap_feedback[3];
 
-    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[4], &data[TAP5_DELAY_IDX]);
-    data[TAP5_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap_volume[4];
-    data[TAP5_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap_pan[4];
-    data[TAP5_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap_feedback[4];
+    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[4], &data[TAP5_DELAY_IDX]);
+    data[TAP5_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap.tap_volume[4];
+    data[TAP5_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap.tap_pan[4];
+    data[TAP5_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap.tap_feedback[4];
 
-    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[5], &data[TAP6_DELAY_IDX]);
-    data[TAP6_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap_volume[5];
-    data[TAP6_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap_pan[5];
-    data[TAP6_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap_feedback[5];
+    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[5], &data[TAP6_DELAY_IDX]);
+    data[TAP6_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap.tap_volume[5];
+    data[TAP6_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap.tap_pan[5];
+    data[TAP6_FEEDBACK_IDX] = QuadtGT_Bank[bank][prog].tap.tap_feedback[5];
 
-    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[6], &data[TAP7_DELAY_IDX]);
-    data[TAP7_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap_volume[6];
-    data[TAP7_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap_pan[6];
+    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[6], &data[TAP7_DELAY_IDX]);
+    data[TAP7_VOLUME_IDX]   = QuadtGT_Bank[bank][prog].tap.tap_volume[6];
+    data[TAP7_PAN_IDX]      = QuadtGT_Bank[bank][prog].tap.tap_pan[6];
   }
   else
   {
@@ -1467,10 +1467,10 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
     data[LFO_DEPTH_IDX] = QuadtGT_Bank[bank][prog].pitch.lfo_depth;
     data[TRIGGER_FLANGE_IDX] = QuadtGT_Bank[bank][prog].pitch.trigger_flange;
 
-    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[7], &data[TAP8_DELAY_IDX]);
-    data[TAP8_VOLUME_IDX]  = QuadtGT_Bank[bank][prog].tap_volume[7];
-    data[TAP8_PAN_IDX]     = QuadtGT_Bank[bank][prog].tap_pan[7];
-    data[TAP8_FEEDBACK_IDX]= QuadtGT_Bank[bank][prog].tap_feedback[7];
+    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[7], &data[TAP8_DELAY_IDX]);
+    data[TAP8_VOLUME_IDX]  = QuadtGT_Bank[bank][prog].tap.tap_volume[7];
+    data[TAP8_PAN_IDX]     = QuadtGT_Bank[bank][prog].tap.tap_pan[7];
+    data[TAP8_FEEDBACK_IDX]= QuadtGT_Bank[bank][prog].tap.tap_feedback[7];
   }
 
   //-------------------------------------------------------------------------
@@ -1495,11 +1495,11 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   }
   else if (QuadtGT_Bank[bank][prog].delay_mode == 3)
   {
-    data[TAP2_PAN_IDX]     = QuadtGT_Bank[bank][prog].tap_pan[1];
-    data[TAP2_FEEDBACK_IDX]= QuadtGT_Bank[bank][prog].tap_feedback[1];
-    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap_delay[2], &data[TAP3_DELAY_IDX]);
-    data[TAP3_VOLUME_IDX]  = QuadtGT_Bank[bank][prog].tap_volume[2];
-    data[TAP3_PAN_IDX]     = QuadtGT_Bank[bank][prog].tap_pan[2];
+    data[TAP2_PAN_IDX]     = QuadtGT_Bank[bank][prog].tap.tap_pan[1];
+    data[TAP2_FEEDBACK_IDX]= QuadtGT_Bank[bank][prog].tap.tap_feedback[1];
+    QuadGT_Encode_16Bit(QuadtGT_Bank[bank][prog].tap.tap_delay[2], &data[TAP3_DELAY_IDX]);
+    data[TAP3_VOLUME_IDX]  = QuadtGT_Bank[bank][prog].tap.tap_volume[2];
+    data[TAP3_PAN_IDX]     = QuadtGT_Bank[bank][prog].tap.tap_pan[2];
   }
 
   //-------------------------------------------------------------------------
@@ -1788,22 +1788,22 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
     }
     else
     {
-      QuadtGT_Bank[bank][prog].tap_delay[0] = QuadGT_Decode_16Bit_Split(&data[TAP1_DELAY_MSB_IDX],
+      QuadtGT_Bank[bank][prog].tap.tap_delay[0] = QuadGT_Decode_16Bit_Split(&data[TAP1_DELAY_MSB_IDX],
                                                                 &data[TAP1_DELAY_LSB_IDX]);
-      QuadtGT_Bank[bank][prog].tap_delay[1] = QuadGT_Decode_16Bit(&data[TAP2_DELAY_IDX]);
+      QuadtGT_Bank[bank][prog].tap.tap_delay[1] = QuadGT_Decode_16Bit(&data[TAP2_DELAY_IDX]);
     }
 
-    QuadtGT_Bank[bank][prog].tap_volume[0] = data[TAP1_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_pan[0]    = data[TAP1_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_volume[0] = data[TAP1_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[0]    = data[TAP1_PAN_IDX];
 
     QuadtGT_Bank[bank][prog].pitch.detune_amount = data[DETUNE_AMOUNT_IDX];
 
-    QuadtGT_Bank[bank][prog].tap_volume[1] = data[TAP2_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_feedback[2] = data[TAP3_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_volume[1] = data[TAP2_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[2] = data[TAP3_FEEDBACK_IDX];
 
     if (QuadtGT_Bank[bank][prog].config == CFG3_5BANDEQ_PITCH_DELAY)
     {
-      QuadtGT_Bank[bank][prog].tap_delay[3] = QuadGT_Decode_16Bit(&data[TAP4_DELAY_IDX]);
+      QuadtGT_Bank[bank][prog].tap.tap_delay[3] = QuadGT_Decode_16Bit(&data[TAP4_DELAY_IDX]);
     }
   }
 
@@ -1813,29 +1813,29 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    QuadtGT_Bank[bank][prog].tap_feedback[0] = data[TAP1_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[0] = data[TAP1_FEEDBACK_IDX];
   }
 
-  QuadtGT_Bank[bank][prog].tap_volume[3] = data[TAP4_VOLUME_IDX];
+  QuadtGT_Bank[bank][prog].tap.tap_volume[3] = data[TAP4_VOLUME_IDX];
 
   if (QuadtGT_Bank[bank][prog].config == CFG3_5BANDEQ_PITCH_DELAY)
   {
-    QuadtGT_Bank[bank][prog].tap_pan[3]      = data[TAP4_PAN_IDX];
-    QuadtGT_Bank[bank][prog].tap_feedback[3] = data[TAP4_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[3]      = data[TAP4_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[3] = data[TAP4_FEEDBACK_IDX];
 
-    QuadtGT_Bank[bank][prog].tap_delay[4] = QuadGT_Decode_16Bit(&data[TAP5_DELAY_IDX]);
-    QuadtGT_Bank[bank][prog].tap_volume[4] = data[TAP5_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_pan[4]      = data[TAP5_PAN_IDX];
-    QuadtGT_Bank[bank][prog].tap_feedback[4] = data[TAP5_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_delay[4] = QuadGT_Decode_16Bit(&data[TAP5_DELAY_IDX]);
+    QuadtGT_Bank[bank][prog].tap.tap_volume[4] = data[TAP5_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[4]      = data[TAP5_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[4] = data[TAP5_FEEDBACK_IDX];
 
-    QuadtGT_Bank[bank][prog].tap_delay[5] = QuadGT_Decode_16Bit(&data[TAP6_DELAY_IDX]);
-    QuadtGT_Bank[bank][prog].tap_volume[5] = data[TAP6_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_pan[5]      = data[TAP6_PAN_IDX];
-    QuadtGT_Bank[bank][prog].tap_feedback[5] = data[TAP6_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_delay[5] = QuadGT_Decode_16Bit(&data[TAP6_DELAY_IDX]);
+    QuadtGT_Bank[bank][prog].tap.tap_volume[5] = data[TAP6_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[5]      = data[TAP6_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[5] = data[TAP6_FEEDBACK_IDX];
 
-    QuadtGT_Bank[bank][prog].tap_delay[6] = QuadGT_Decode_16Bit(&data[TAP7_DELAY_IDX]);
-    QuadtGT_Bank[bank][prog].tap_volume[6] = data[TAP7_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_pan[6]      = data[TAP7_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_delay[6] = QuadGT_Decode_16Bit(&data[TAP7_DELAY_IDX]);
+    QuadtGT_Bank[bank][prog].tap.tap_volume[6] = data[TAP7_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[6]      = data[TAP7_PAN_IDX];
   }
   else
   {
@@ -1888,10 +1888,10 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
     QuadtGT_Bank[bank][prog].pitch.lfo_depth      = data[LFO_DEPTH_IDX];
     QuadtGT_Bank[bank][prog].pitch.trigger_flange = data[TRIGGER_FLANGE_IDX];
 
-    QuadtGT_Bank[bank][prog].tap_delay[7] = QuadGT_Decode_16Bit(&data[TAP8_DELAY_IDX]);
-    QuadtGT_Bank[bank][prog].tap_volume[7] = data[TAP8_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_pan[7]    = data[TAP8_PAN_IDX];
-    QuadtGT_Bank[bank][prog].tap_feedback[7]= data[TAP8_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_delay[7] = QuadGT_Decode_16Bit(&data[TAP8_DELAY_IDX]);
+    QuadtGT_Bank[bank][prog].tap.tap_volume[7] = data[TAP8_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[7]    = data[TAP8_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[7]= data[TAP8_FEEDBACK_IDX];
   }
   QuadtGT_Bank[bank][prog].pitch.pitch_feedback= data[PITCH_FEEDBACK_IDX];
 
@@ -1912,11 +1912,11 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
   else if (QuadtGT_Bank[bank][prog].delay_mode == 3)
   {
-    QuadtGT_Bank[bank][prog].tap_pan[1]      = data[TAP2_PAN_IDX];
-    QuadtGT_Bank[bank][prog].tap_feedback[1] = data[TAP2_FEEDBACK_IDX];
-    QuadtGT_Bank[bank][prog].tap_delay[2]    = QuadGT_Decode_16Bit(&data[TAP3_DELAY_IDX]);
-    QuadtGT_Bank[bank][prog].tap_volume[2]   = data[TAP3_VOLUME_IDX];
-    QuadtGT_Bank[bank][prog].tap_pan[2]      = data[TAP3_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[1]      = data[TAP2_PAN_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_feedback[1] = data[TAP2_FEEDBACK_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_delay[2]    = QuadGT_Decode_16Bit(&data[TAP3_DELAY_IDX]);
+    QuadtGT_Bank[bank][prog].tap.tap_volume[2]   = data[TAP3_VOLUME_IDX];
+    QuadtGT_Bank[bank][prog].tap.tap_pan[2]      = data[TAP3_PAN_IDX];
   }
 
   //-------------------------------------------------------------------------
