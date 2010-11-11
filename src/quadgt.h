@@ -344,6 +344,7 @@ typedef struct
   SInt8 geq_16khz;                 // -14 to 14  (0-28)
 
   // Pitch parameters
+  struct {
   UInt8 pitch_mode;                          // 0 - 5 (tPitch_Mode)
   UInt8 pitch_input;                         // 0 - 1
   UInt8 lfo_waveform;                        // 0 - 1
@@ -352,6 +353,7 @@ typedef struct
   UInt8 pitch_feedback;                      // 0 - 99
   UInt8 trigger_flange;                      // 0 - 1
   UInt8 detune_amount;                       // -99 - 99
+  } pitch;
 
   // Delay parameters
   UInt8  delay_mode;                         // 0 - 3  (tDelay_Mode)
