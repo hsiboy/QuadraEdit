@@ -890,9 +890,9 @@ void QuadGT_Redraw_Mod(const UInt8 prog)
   if (QuadtGT_Bank[bank][prog].config != CFG7_SAMPLING)
   {
     mod = StrToInt(MainForm->ModNumber->Text)-1;
-    MainForm->ModSource->Text=AnsiString(QuadtGT_Bank[bank][prog].mod_source[mod]);
-    MainForm->ModTarget->ItemIndex=QuadtGT_Bank[bank][prog].mod_target[mod];
-    RedrawHorizBarTextS8( MainForm->ModAmp,  MainForm->ModAmpVal,QuadtGT_Bank[bank][prog].mod_amp[mod]);
+    MainForm->ModSource->Text=AnsiString(QuadtGT_Bank[bank][prog].mod.source[mod]);
+    MainForm->ModTarget->ItemIndex=QuadtGT_Bank[bank][prog].mod.target[mod];
+    RedrawHorizBarTextS8( MainForm->ModAmp,  MainForm->ModAmpVal,QuadtGT_Bank[bank][prog].mod.amp[mod]);
 
     // TBD: Replace numeric source field with a text list
     if (MainForm->ModSource->ItemIndex==MainForm->ModSource->Items->Count-1)
@@ -1201,7 +1201,7 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->ModAmp)
   {
     UInt8 mod = StrToInt(MainForm->ModNumber->Text)-1;
-    HorizBarChangeS8((TTrackBar *)Sender, MainForm->ModAmpVal, &QuadtGT_Bank[bank][prog].mod_amp[mod]);
+    HorizBarChangeS8((TTrackBar *)Sender, MainForm->ModAmpVal, &QuadtGT_Bank[bank][prog].mod.amp[mod]);
   }
 
   // Reverb parameters
@@ -1547,37 +1547,37 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Modulation Parameters (0x50 - 0x67)
   //-------------------------------------------------------------------------
-  data[MOD1_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[0];
-  data[MOD1_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[0];
-  data[MOD1_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[0]+99;
+  data[MOD1_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[0];
+  data[MOD1_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[0];
+  data[MOD1_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[0]+99;
                          
-  data[MOD2_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[1];
-  data[MOD2_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[1];
-  data[MOD2_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[1]+99;
+  data[MOD2_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[1];
+  data[MOD2_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[1];
+  data[MOD2_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[1]+99;
                          
-  data[MOD3_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[2];
-  data[MOD3_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[2];
-  data[MOD3_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[2]+99;
+  data[MOD3_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[2];
+  data[MOD3_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[2];
+  data[MOD3_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[2]+99;
                          
-  data[MOD4_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[3];
-  data[MOD4_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[3];
-  data[MOD4_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[3]+99;
+  data[MOD4_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[3];
+  data[MOD4_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[3];
+  data[MOD4_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[3]+99;
                          
-  data[MOD5_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[4];
-  data[MOD5_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[4];
-  data[MOD4_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[4]+99;
+  data[MOD5_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[4];
+  data[MOD5_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[4];
+  data[MOD4_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[4]+99;
                          
-  data[MOD6_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[5];
-  data[MOD6_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[5];
-  data[MOD5_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[5]+99;
+  data[MOD6_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[5];
+  data[MOD6_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[5];
+  data[MOD5_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[5]+99;
                          
-  data[MOD7_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[6];
-  data[MOD7_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[6];
-  data[MOD7_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[6]+99;
+  data[MOD7_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[6];
+  data[MOD7_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[6];
+  data[MOD7_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[6]+99;
                          
-  data[MOD8_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod_source[7];
-  data[MOD8_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod_target[7];
-  data[MOD8_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod_amp[7]+99;
+  data[MOD8_SOURCE_IDX]=QuadtGT_Bank[bank][prog].mod.source[7];
+  data[MOD8_TARGET_IDX]=QuadtGT_Bank[bank][prog].mod.target[7];
+  data[MOD8_AMP_IDX]=   QuadtGT_Bank[bank][prog].mod.amp[7]+99;
   
   //-------------------------------------------------------------------------
   // Multi-tap Parameters (0x68 - 0x69)
@@ -1957,37 +1957,37 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Modulation Parameters
   //-------------------------------------------------------------------------
-  QuadtGT_Bank[bank][prog].mod_source[0]=data[MOD1_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[0]=data[MOD1_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[0]   =data[MOD1_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[0]=data[MOD1_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[0]=data[MOD1_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[0]   =data[MOD1_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[1]=data[MOD2_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[1]=data[MOD2_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[1]   =data[MOD2_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[1]=data[MOD2_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[1]=data[MOD2_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[1]   =data[MOD2_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[2]=data[MOD3_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[2]=data[MOD3_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[2]   =data[MOD3_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[2]=data[MOD3_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[2]=data[MOD3_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[2]   =data[MOD3_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[3]=data[MOD4_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[3]=data[MOD4_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[3]   =data[MOD4_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[3]=data[MOD4_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[3]=data[MOD4_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[3]   =data[MOD4_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[4]=data[MOD5_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[4]=data[MOD5_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[4]   =data[MOD4_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[4]=data[MOD5_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[4]=data[MOD5_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[4]   =data[MOD4_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[5]=data[MOD6_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[5]=data[MOD6_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[5]   =data[MOD5_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[5]=data[MOD6_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[5]=data[MOD6_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[5]   =data[MOD5_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[6]=data[MOD7_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[6]=data[MOD7_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[6]   =data[MOD7_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[6]=data[MOD7_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[6]=data[MOD7_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[6]   =data[MOD7_AMP_IDX]-99;
 
-  QuadtGT_Bank[bank][prog].mod_source[7]=data[MOD8_SOURCE_IDX];
-  QuadtGT_Bank[bank][prog].mod_target[7]=data[MOD8_TARGET_IDX];
-  QuadtGT_Bank[bank][prog].mod_amp[7]   =data[MOD8_AMP_IDX]-99;
+  QuadtGT_Bank[bank][prog].mod.source[7]=data[MOD8_SOURCE_IDX];
+  QuadtGT_Bank[bank][prog].mod.target[7]=data[MOD8_TARGET_IDX];
+  QuadtGT_Bank[bank][prog].mod.amp[7]   =data[MOD8_AMP_IDX]-99;
 
   if (QuadtGT_Bank[bank][prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {

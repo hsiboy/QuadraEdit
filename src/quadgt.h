@@ -345,14 +345,14 @@ typedef struct
 
   // Pitch parameters
   struct {
-  UInt8 pitch_mode;                          // 0 - 5 (tPitch_Mode)
-  UInt8 pitch_input;                         // 0 - 1
-  UInt8 lfo_waveform;                        // 0 - 1
-  UInt8 lfo_speed;                           // 0 - 98
-  UInt8 lfo_depth;                           // 0 - 98
-  UInt8 pitch_feedback;                      // 0 - 99
-  UInt8 trigger_flange;                      // 0 - 1
-  UInt8 detune_amount;                       // -99 - 99
+    UInt8 pitch_mode;                          // 0 - 5 (tPitch_Mode)
+    UInt8 pitch_input;                         // 0 - 1
+    UInt8 lfo_waveform;                        // 0 - 1
+    UInt8 lfo_speed;                           // 0 - 98
+    UInt8 lfo_depth;                           // 0 - 98
+    UInt8 pitch_feedback;                      // 0 - 99
+    UInt8 trigger_flange;                      // 0 - 1
+    UInt8 detune_amount;                       // -99 - 99
   } pitch;
 
   // Delay parameters
@@ -366,11 +366,11 @@ typedef struct
 
   // Multi tap delay parameters
   struct {
-  UInt8  tap_delay[8];
-  UInt8  tap_volume[8];
-  UInt8  tap_pan[8];
-  UInt8  tap_feedback[8];
-  UInt8  master_feedback;           // NOT USED, SEE MULTITAP_MASTER_FEEDBACK
+    UInt8  tap_delay[8];
+    UInt8  tap_volume[8];
+    UInt8  tap_pan[8];
+    UInt8  tap_feedback[8];
+    UInt8  master_feedback;           // NOT USED, SEE MULTITAP_MASTER_FEEDBACK
   } tap;
 
   // Reverb parameters
@@ -409,9 +409,11 @@ typedef struct
   UInt8 multitap_number;
 
   // Midi modulation parameters
-  UInt8 mod_source[NUM_MOD];      // 0 - 126
-  UInt8 mod_target[NUM_MOD];    // 0 - ???
-  SInt8 mod_amp[NUM_MOD];       // -99 - 99
+  struct {
+    UInt8 source[NUM_MOD];    // 0 - 126
+    UInt8 target[NUM_MOD];    // 0 - ???
+    SInt8 amp[NUM_MOD];       // -99 - 99
+  } mod;
 
   // Resonator parameters
   struct {
