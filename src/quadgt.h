@@ -393,17 +393,19 @@ typedef struct
   } reverb;
 
   // Mix parameters
-  UInt8 prepost_eq;                  // 0 - 1 (0=Pre-eq, 1=Post-eq)
-  UInt8 direct_level;                // 0 - 99
-  UInt8 master_effects_level;        // 0 - 99
-  UInt8 preamp_level;                // 0 - 99
-  UInt8 pitch_level;                 // 0 - 99
-  UInt8 leslie_level;                // 0 - 99
-  UInt8 ring_mod_level;              // 0 - 99
-  UInt8 delay_level;                 // 0 - 99
-  UInt8 reverb_level;                // 0 - 99
-  UInt8 mix_mod;                     // 0 - 1
-  UInt8 eq_level;
+  struct {
+    UInt8 prepost_eq;                  // 0 - 1 (0=Pre-eq, 1=Post-eq)
+    UInt8 direct_level;                // 0 - 99
+    UInt8 master_effects_level;        // 0 - 99
+    UInt8 preamp_level;                // 0 - 99
+    UInt8 pitch_level;                 // 0 - 99
+    UInt8 leslie_level;                // 0 - 99
+    UInt8 ring_mod_level;              // 0 - 99
+    UInt8 delay_level;                 // 0 - 99
+    UInt8 reverb_level;                // 0 - 99
+    UInt8 mix_mod;                     // 0 - 1
+    UInt8 eq_level;
+  } mix;
 
   UInt8 multitap_master_feedback;
   UInt8 multitap_number;

@@ -734,15 +734,15 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   UInt8 val;
 
   // Direct level
-  MainForm->MixDirect->Position=MainForm->MixDirect->Max - QuadtGT_Bank[bank][prog].direct_level;
-  MainForm->MixDirectVal->Text=AnsiString(QuadtGT_Bank[bank][prog].direct_level);
+  MainForm->MixDirect->Position=MainForm->MixDirect->Max - QuadtGT_Bank[bank][prog].mix.direct_level;
+  MainForm->MixDirectVal->Text=AnsiString(QuadtGT_Bank[bank][prog].mix.direct_level);
 
   // Master Fx Level
   if (QuadtGT_Bank[bank][prog].config != 7)
   {
-    val=QuadtGT_Bank[bank][prog].master_effects_level;
+    val=QuadtGT_Bank[bank][prog].mix.master_effects_level;
     MainForm->MixMaster->Position=99-val;
-    MainForm->MixMasterVal->Text=AnsiString(QuadtGT_Bank[bank][prog].master_effects_level);
+    MainForm->MixMasterVal->Text=AnsiString(QuadtGT_Bank[bank][prog].mix.master_effects_level);
     MainForm->Master->Visible=TRUE;
     MainForm->MixMaster->Visible=TRUE;
     MainForm->MixMasterVal->Visible=TRUE;
@@ -755,7 +755,7 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   }
 
   // Pre or Post Eq
-  MainForm->PrePostEq->ItemIndex=QuadtGT_Bank[bank][prog].prepost_eq;
+  MainForm->PrePostEq->ItemIndex=QuadtGT_Bank[bank][prog].mix.prepost_eq;
  
   QuadGT_Redraw_PrePostEq(prog);
 
@@ -763,7 +763,7 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   if ( (QuadtGT_Bank[bank][prog].config == CFG0_EQ_PITCH_DELAY_REVERB) ||
        (QuadtGT_Bank[bank][prog].config == CFG3_5BANDEQ_PITCH_DELAY))
   {
-    val=QuadtGT_Bank[bank][prog].pitch_level;
+    val=QuadtGT_Bank[bank][prog].mix.pitch_level;
     MainForm->MixPitch->Position=99-val;
     MainForm->MixPitchVal->Text=AnsiString(val);
 
@@ -779,16 +779,16 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   }
 
   // Delay Level
-  val=QuadtGT_Bank[bank][prog].delay_level;
+  val=QuadtGT_Bank[bank][prog].mix.delay_level;
   MainForm->MixDelay->Position=99-val;
   MainForm->MixDelayVal->Text=AnsiString(val);
 
   // Reverb Level
-  val=QuadtGT_Bank[bank][prog].reverb_level;
+  val=QuadtGT_Bank[bank][prog].mix.reverb_level;
   MainForm->MixReverb->Position=99-val;
   MainForm->MixReverbVal->Text=AnsiString(val);
 
-  val=QuadtGT_Bank[bank][prog].mix_mod;
+  val=QuadtGT_Bank[bank][prog].mix.mix_mod;
   if (val == 0)
   {
     MainForm->MixModNone->Checked=TRUE;
@@ -836,7 +836,7 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   // Leslie Level
   if (QuadtGT_Bank[bank][prog].config == CFG1_LESLIE_DELAY_REVERB)
   {
-    val=QuadtGT_Bank[bank][prog].leslie_level;
+    val=QuadtGT_Bank[bank][prog].mix.leslie_level;
     MainForm->MixLeslieRingModReson->Position=99-val;
     MainForm->MixLeslieRingModResonVal->Text=AnsiString(val);
     MainForm->MixLeslieRingModReson->Visible=TRUE;
@@ -848,7 +848,7 @@ void QuadGT_Redraw_Mix(const UInt8 prog)
   // Ring Level
   else if (QuadtGT_Bank[bank][prog].config == CFG5_RINGMOD_DELAY_REVERB)
   {
-    val=QuadtGT_Bank[bank][prog].ring_mod_level;
+    val=QuadtGT_Bank[bank][prog].mix.ring_mod_level;
     MainForm->MixLeslieRingModReson->Position=99-val;
     MainForm->MixLeslieRingModResonVal->Text=AnsiString(val);
     MainForm->MixLeslieRingModReson->Visible=TRUE;
@@ -1037,18 +1037,18 @@ void QuadGT_Redraw_PrePostEq(UInt8 prog)
   // Preamp Level
   if (MainForm->PrePostEq->ItemIndex==PREPOSTEQ_PREAMP)
   {
-    MainForm->MixPreampEq->Position=99-QuadtGT_Bank[bank][prog].preamp_level;
+    MainForm->MixPreampEq->Position=99-QuadtGT_Bank[bank][prog].mix.preamp_level;
     MainForm->MixPreampEq->Visible=TRUE;
-    MainForm->MixPreampEqVal->Text=AnsiString(QuadtGT_Bank[bank][prog].preamp_level);
+    MainForm->MixPreampEqVal->Text=AnsiString(QuadtGT_Bank[bank][prog].mix.preamp_level);
     MainForm->PreAmpEq->Visible=TRUE;
     MainForm->PreAmpEq->Caption="Preamp";
   }
   // Eq Level
   else
   {
-    MainForm->MixPreampEq->Position=99-QuadtGT_Bank[bank][prog].eq_level;
+    MainForm->MixPreampEq->Position=99-QuadtGT_Bank[bank][prog].mix.eq_level;
     MainForm->MixPreampEq->Visible=TRUE;
-    MainForm->MixPreampEqVal->Text=AnsiString(QuadtGT_Bank[bank][prog].eq_level);
+    MainForm->MixPreampEqVal->Text=AnsiString(QuadtGT_Bank[bank][prog].mix.eq_level);
     MainForm->PreAmpEq->Visible=TRUE;
     MainForm->PreAmpEq->Caption="Eq";
   }
@@ -1126,24 +1126,24 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->Eq5Q4) HorizBarChangeU8(MainForm->Eq5Q4, MainForm->Eq5Q4Val, &QuadtGT_Bank[bank][prog].high_mid_q);
 
   // Mix parameters
-  else if (Sender == MainForm->MixDirect) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixDirectVal, &QuadtGT_Bank[bank][prog].direct_level);
-  else if (Sender == MainForm->MixMaster) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixMasterVal, &QuadtGT_Bank[bank][prog].master_effects_level);
-  else if (Sender == MainForm->MixPitch)  VertBarChangeU8((TTrackBar *)Sender, MainForm->MixPitchVal,  &QuadtGT_Bank[bank][prog].pitch_level);
+  else if (Sender == MainForm->MixDirect) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixDirectVal, &QuadtGT_Bank[bank][prog].mix.direct_level);
+  else if (Sender == MainForm->MixMaster) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixMasterVal, &QuadtGT_Bank[bank][prog].mix.master_effects_level);
+  else if (Sender == MainForm->MixPitch)  VertBarChangeU8((TTrackBar *)Sender, MainForm->MixPitchVal,  &QuadtGT_Bank[bank][prog].mix.pitch_level);
   else if (Sender == MainForm->PrePostEq) 
   {
-    QuadtGT_Bank[bank][prog].prepost_eq=MainForm->PrePostEq->ItemIndex;
+    QuadtGT_Bank[bank][prog].mix.prepost_eq=MainForm->PrePostEq->ItemIndex;
     QuadGT_Redraw_PrePostEq(prog);
   }
   else if (Sender == MainForm->MixPreampEq) 
   {
-    if (QuadtGT_Bank[bank][prog].prepost_eq==0) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixPreampEqVal, &QuadtGT_Bank[bank][prog].preamp_level);
-    else                                  VertBarChangeU8((TTrackBar *)Sender, MainForm->MixPreampEqVal, &QuadtGT_Bank[bank][prog].eq_level);
+    if (QuadtGT_Bank[bank][prog].mix.prepost_eq==0) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixPreampEqVal, &QuadtGT_Bank[bank][prog].mix.preamp_level);
+    else                                  VertBarChangeU8((TTrackBar *)Sender, MainForm->MixPreampEqVal, &QuadtGT_Bank[bank][prog].mix.eq_level);
   }
-  else if (Sender == MainForm->MixDelay) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixDelayVal, &QuadtGT_Bank[bank][prog].delay_level);
-  else if (Sender == MainForm->MixReverb) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixReverbVal, &QuadtGT_Bank[bank][prog].reverb_level);
+  else if (Sender == MainForm->MixDelay) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixDelayVal, &QuadtGT_Bank[bank][prog].mix.delay_level);
+  else if (Sender == MainForm->MixReverb) VertBarChangeU8((TTrackBar *)Sender, MainForm->MixReverbVal, &QuadtGT_Bank[bank][prog].mix.reverb_level);
   else if (Sender == MainForm->MixModNone) 
   {
-    QuadtGT_Bank[bank][prog].mix_mod=0;
+    QuadtGT_Bank[bank][prog].mix.mix_mod=0;
     MainForm->ModDepth->Enabled=FALSE;
     MainForm->ModDepthVal->Enabled=FALSE;
     MainForm->Depth->Enabled=FALSE;
@@ -1153,7 +1153,7 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   }
   else if (Sender == MainForm->MixModTrem) 
   {
-    QuadtGT_Bank[bank][prog].mix_mod=1;
+    QuadtGT_Bank[bank][prog].mix.mix_mod=1;
     MainForm->ModDepth->Enabled=TRUE;
     MainForm->ModDepthVal->Enabled=TRUE;
     MainForm->Depth->Enabled=TRUE;
@@ -1163,7 +1163,7 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   }
   else if (Sender == MainForm->MixModPan) 
   {
-    QuadtGT_Bank[bank][prog].mix_mod=2;
+    QuadtGT_Bank[bank][prog].mix.mix_mod=2;
     MainForm->ModDepth->Enabled=TRUE;
     MainForm->ModDepthVal->Enabled=TRUE;
     MainForm->Depth->Enabled=TRUE;
@@ -1176,9 +1176,9 @@ void __fastcall TMainForm::QuadParamChange(TObject *Sender)
   else if (Sender == MainForm->MixLeslieRingModReson)
   {
     if (QuadtGT_Bank[bank][prog].config == CFG1_LESLIE_DELAY_REVERB)
-      VertBarChangeU8((TTrackBar *)Sender, MainForm->MixLeslieRingModResonVal, &QuadtGT_Bank[bank][prog].leslie_level);
+      VertBarChangeU8((TTrackBar *)Sender, MainForm->MixLeslieRingModResonVal, &QuadtGT_Bank[bank][prog].mix.leslie_level);
     else if (QuadtGT_Bank[bank][prog].config == CFG5_RINGMOD_DELAY_REVERB)
-      VertBarChangeU8((TTrackBar *)Sender, MainForm->MixLeslieRingModResonVal, &QuadtGT_Bank[bank][prog].ring_mod_level);
+      VertBarChangeU8((TTrackBar *)Sender, MainForm->MixLeslieRingModResonVal, &QuadtGT_Bank[bank][prog].mix.ring_mod_level);
     //else if (QuadtGT_Bank[bank][prog].config == CFG6_RESONATOR_DELAY_REVERB)
     //  VertBarChangeU8((TTrackBar *)Sender, MainForm->MixLeslieRingModResonVal, &QuadtGT_Bank[bank][prog].TBD);
 
@@ -1514,30 +1514,30 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Mix Parameters (0x45 - 
   //-------------------------------------------------------------------------
-  data[PREPOST_EQ_IDX]    = QuadtGT_Bank[bank][prog].prepost_eq & BIT0;
-  data[DIRECT_LEVEL_IDX] |= (QuadtGT_Bank[bank][prog].direct_level << 1) & BITS1to7;
-  data[MASTER_EFFECTS_LEVEL_IDX] = QuadtGT_Bank[bank][prog].master_effects_level;
+  data[PREPOST_EQ_IDX]    = QuadtGT_Bank[bank][prog].mix.prepost_eq & BIT0;
+  data[DIRECT_LEVEL_IDX] |= (QuadtGT_Bank[bank][prog].mix.direct_level << 1) & BITS1to7;
+  data[MASTER_EFFECTS_LEVEL_IDX] = QuadtGT_Bank[bank][prog].mix.master_effects_level;
 
-  if (QuadtGT_Bank[bank][prog].prepost_eq == 0) data[PREAMP_LEVEL_IDX]=QuadtGT_Bank[bank][prog].preamp_level;
-  else                                    data[EQ_LEVEL_IDX]=QuadtGT_Bank[bank][prog].eq_level;
+  if (QuadtGT_Bank[bank][prog].mix.prepost_eq == 0) data[PREAMP_LEVEL_IDX]=QuadtGT_Bank[bank][prog].mix.preamp_level;
+  else                                    data[EQ_LEVEL_IDX]=QuadtGT_Bank[bank][prog].mix.eq_level;
 
   if (QuadtGT_Bank[bank][prog].config==CFG1_LESLIE_DELAY_REVERB)
   {
-    data[LESLIE_LEVEL_IDX] = QuadtGT_Bank[bank][prog].leslie_level;
+    data[LESLIE_LEVEL_IDX] = QuadtGT_Bank[bank][prog].mix.leslie_level;
   }
   else if (QuadtGT_Bank[bank][prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {
-    data[RING_MOD_LEVEL_IDX] = QuadtGT_Bank[bank][prog].ring_mod_level;
+    data[RING_MOD_LEVEL_IDX] = QuadtGT_Bank[bank][prog].mix.ring_mod_level;
   }
   else
   {
-    data[PITCH_LEVEL_IDX] = QuadtGT_Bank[bank][prog].pitch_level;
+    data[PITCH_LEVEL_IDX] = QuadtGT_Bank[bank][prog].mix.pitch_level;
   }
 
-  data[DELAY_LEVEL_IDX ] = QuadtGT_Bank[bank][prog].delay_level;
+  data[DELAY_LEVEL_IDX ] = QuadtGT_Bank[bank][prog].mix.delay_level;
   if (QuadtGT_Bank[bank][prog].config!=CFG5_RINGMOD_DELAY_REVERB)
   {
-    data[REVERB_LEVEL_IDX ] = QuadtGT_Bank[bank][prog].reverb_level;
+    data[REVERB_LEVEL_IDX ] = QuadtGT_Bank[bank][prog].mix.reverb_level;
   }
   else
   {
@@ -1612,7 +1612,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[PREAMP_COMP_IDX] |= (QuadtGT_Bank[bank][prog].preamp.comp << 4) & BITS4to6;
   data[EQ_MODE_IDX]     |= (QuadtGT_Bank[bank][prog].mode<<7) & BIT7;
 
-  data[MIX_MOD_IDX]      = (QuadtGT_Bank[bank][prog].mix_mod      << 6) & BITS6to7;
+  data[MIX_MOD_IDX]      = (QuadtGT_Bank[bank][prog].mix.mix_mod      << 6) & BITS6to7;
   data[EFFECT_LOOP_IDX] |= (QuadtGT_Bank[bank][prog].preamp.effect_loop  << 5) & BIT5;
   data[BASS_BOOST_IDX]  |= (QuadtGT_Bank[bank][prog].preamp.bass_boost   << 4) & BIT4;
   data[PREAMP_TONE_IDX] |= (QuadtGT_Bank[bank][prog].preamp.preamp_tone  << 2) & BITS2to3;
@@ -1922,37 +1922,37 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   //-------------------------------------------------------------------------
   // Mix Parameters
   //-------------------------------------------------------------------------
-  QuadtGT_Bank[bank][prog].prepost_eq=data[PREPOST_EQ_IDX] & BIT0;
-  QuadtGT_Bank[bank][prog].direct_level=(data[DIRECT_LEVEL_IDX ] & BITS1to7) >> 1;
-  QuadtGT_Bank[bank][prog].master_effects_level=data[MASTER_EFFECTS_LEVEL_IDX ];
+  QuadtGT_Bank[bank][prog].mix.prepost_eq=data[PREPOST_EQ_IDX] & BIT0;
+  QuadtGT_Bank[bank][prog].mix.direct_level=(data[DIRECT_LEVEL_IDX ] & BITS1to7) >> 1;
+  QuadtGT_Bank[bank][prog].mix.master_effects_level=data[MASTER_EFFECTS_LEVEL_IDX ];
 
-  if (QuadtGT_Bank[bank][prog].prepost_eq == 0) QuadtGT_Bank[bank][prog].preamp_level=data[PREAMP_LEVEL_IDX];
-  else                                    QuadtGT_Bank[bank][prog].eq_level=data[EQ_LEVEL_IDX];
+  if (QuadtGT_Bank[bank][prog].mix.prepost_eq == 0) QuadtGT_Bank[bank][prog].mix.preamp_level=data[PREAMP_LEVEL_IDX];
+  else                                    QuadtGT_Bank[bank][prog].mix.eq_level=data[EQ_LEVEL_IDX];
 
   if (QuadtGT_Bank[bank][prog].config==CFG1_LESLIE_DELAY_REVERB)
   {
-    QuadtGT_Bank[bank][prog].leslie_level=data[LESLIE_LEVEL_IDX];
+    QuadtGT_Bank[bank][prog].mix.leslie_level=data[LESLIE_LEVEL_IDX];
   }
   else if (QuadtGT_Bank[bank][prog].config==CFG5_RINGMOD_DELAY_REVERB)
   {
-    QuadtGT_Bank[bank][prog].ring_mod_level=data[RING_MOD_LEVEL_IDX];
+    QuadtGT_Bank[bank][prog].mix.ring_mod_level=data[RING_MOD_LEVEL_IDX];
   }
   else
   {
-    QuadtGT_Bank[bank][prog].pitch_level=data[PITCH_LEVEL_IDX];
+    QuadtGT_Bank[bank][prog].mix.pitch_level=data[PITCH_LEVEL_IDX];
   }
 
-  QuadtGT_Bank[bank][prog].delay_level=data[DELAY_LEVEL_IDX ];
+  QuadtGT_Bank[bank][prog].mix.delay_level=data[DELAY_LEVEL_IDX ];
   if (QuadtGT_Bank[bank][prog].config!=CFG5_RINGMOD_DELAY_REVERB)
   {
-    QuadtGT_Bank[bank][prog].reverb_level=data[REVERB_LEVEL_IDX ];
+    QuadtGT_Bank[bank][prog].mix.reverb_level=data[REVERB_LEVEL_IDX ];
   }
   else
   {
     QuadtGT_Bank[bank][prog].res.amp[0] =  data[RES1_AMP_IDX_B]; 
   }
 
-  QuadtGT_Bank[bank][prog].mix_mod=(data[MIX_MOD_IDX] & BITS6to7) >> 6;
+  QuadtGT_Bank[bank][prog].mix.mix_mod=(data[MIX_MOD_IDX] & BITS6to7) >> 6;
 
   //-------------------------------------------------------------------------
   // Modulation Parameters
@@ -2492,17 +2492,17 @@ void QuadGT_Copy(const int param, const int bankfrom, const int patchfrom, const
       break;
 
     case Param_Mix:
-      QuadtGT_Bank[bankto][patchto].prepost_eq           = QuadtGT_Bank[bankfrom][patchfrom].prepost_eq;
-      QuadtGT_Bank[bankto][patchto].direct_level         = QuadtGT_Bank[bankfrom][patchfrom].direct_level;
-      QuadtGT_Bank[bankto][patchto].master_effects_level = QuadtGT_Bank[bankfrom][patchfrom].master_effects_level;
-      QuadtGT_Bank[bankto][patchto].preamp_level         = QuadtGT_Bank[bankfrom][patchfrom].preamp_level;
-      QuadtGT_Bank[bankto][patchto].pitch_level          = QuadtGT_Bank[bankfrom][patchfrom].pitch_level;
-      QuadtGT_Bank[bankto][patchto].leslie_level         = QuadtGT_Bank[bankfrom][patchfrom].leslie_level;
-      QuadtGT_Bank[bankto][patchto].ring_mod_level       = QuadtGT_Bank[bankfrom][patchfrom].ring_mod_level;
-      QuadtGT_Bank[bankto][patchto].delay_level          = QuadtGT_Bank[bankfrom][patchfrom].delay_level;
-      QuadtGT_Bank[bankto][patchto].reverb_level         = QuadtGT_Bank[bankfrom][patchfrom].reverb_level;
-      QuadtGT_Bank[bankto][patchto].mix_mod              = QuadtGT_Bank[bankfrom][patchfrom].mix_mod;
-      QuadtGT_Bank[bankto][patchto].eq_level             = QuadtGT_Bank[bankfrom][patchfrom].eq_level;
+      QuadtGT_Bank[bankto][patchto].mix.prepost_eq           = QuadtGT_Bank[bankfrom][patchfrom].mix.prepost_eq;
+      QuadtGT_Bank[bankto][patchto].mix.direct_level         = QuadtGT_Bank[bankfrom][patchfrom].mix.direct_level;
+      QuadtGT_Bank[bankto][patchto].mix.master_effects_level = QuadtGT_Bank[bankfrom][patchfrom].mix.master_effects_level;
+      QuadtGT_Bank[bankto][patchto].mix.preamp_level         = QuadtGT_Bank[bankfrom][patchfrom].mix.preamp_level;
+      QuadtGT_Bank[bankto][patchto].mix.pitch_level          = QuadtGT_Bank[bankfrom][patchfrom].mix.pitch_level;
+      QuadtGT_Bank[bankto][patchto].mix.leslie_level         = QuadtGT_Bank[bankfrom][patchfrom].mix.leslie_level;
+      QuadtGT_Bank[bankto][patchto].mix.ring_mod_level       = QuadtGT_Bank[bankfrom][patchfrom].mix.ring_mod_level;
+      QuadtGT_Bank[bankto][patchto].mix.delay_level          = QuadtGT_Bank[bankfrom][patchfrom].mix.delay_level;
+      QuadtGT_Bank[bankto][patchto].mix.reverb_level         = QuadtGT_Bank[bankfrom][patchfrom].mix.reverb_level;
+      QuadtGT_Bank[bankto][patchto].mix.mix_mod              = QuadtGT_Bank[bankfrom][patchfrom].mix.mix_mod;
+      QuadtGT_Bank[bankto][patchto].mix.eq_level             = QuadtGT_Bank[bankfrom][patchfrom].mix.eq_level;
       break;
 
     case Param_Mod:
