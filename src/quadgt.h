@@ -414,24 +414,26 @@ typedef struct
   SInt8 mod_amp[NUM_MOD];       // -99 - 99
 
   // Resonator parameters
-  UInt8 res_tune[NUM_RES];      // 0 - 60
-  UInt8 res_amp[NUM_RES];       // 0 - 99
-  UInt8 res_decay[NUM_RES];     // 0 - 99
-  UInt8 res_pitch[NUM_RES];
-  UInt8 res_decay_all;
-  UInt8 res_midi_gate;          // 0 - 1
+  struct {
+    UInt8 tune[NUM_RES];      // 0 - 60
+    UInt8 amp[NUM_RES];       // 0 - 99
+    UInt8 decay[NUM_RES];     // 0 - 99
+    UInt8 pitch[NUM_RES];
+    UInt8 decay_all;
+    UInt8 midi_gate;          // 0 - 1
+  } res;
 
   // Sampling parameters
   struct {
-  UInt8 start;            // 0 - 150
-  UInt8 length;           // 5 - 155
-  UInt8 playback_mode;    // 0 - 2
-  UInt8 pitch;
-  UInt8 rec_audio_trigger; // 0 - 1
-  UInt8 midi_trigger;      // 0 - 2
-  UInt8 midi_base_note;    // 0 - 127
-  UInt8 low_midi_note;     // 0 - 127
-  UInt8 high_midi_note;    // 0 - 127
+    UInt8 start;            // 0 - 150
+    UInt8 length;           // 5 - 155
+    UInt8 playback_mode;    // 0 - 2
+    UInt8 pitch;
+    UInt8 rec_audio_trigger; // 0 - 1
+    UInt8 midi_trigger;      // 0 - 2
+    UInt8 midi_base_note;    // 0 - 127
+    UInt8 low_midi_note;     // 0 - 127
+    UInt8 high_midi_note;    // 0 - 127
   } sample;
 
   // Ring modulator parameters

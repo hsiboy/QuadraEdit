@@ -1005,8 +1005,8 @@ void QuadGT_Redraw_Resonator(const UInt8 prog)
     MainForm->ResAmp->Visible = FALSE;
     MainForm->ResAmpVal->Visible = FALSE;
 
-    RedrawHorizBarTextS8(MainForm->ResGlobalDecay, MainForm->ResGlobalDecayVal, QuadtGT_Bank[bank][prog].res_decay_all);
-    MainForm->ResMidiGate->ItemIndex= QuadtGT_Bank[bank][prog].res_midi_gate;
+    RedrawHorizBarTextS8(MainForm->ResGlobalDecay, MainForm->ResGlobalDecayVal, QuadtGT_Bank[bank][prog].res.decay_all);
+    MainForm->ResMidiGate->ItemIndex= QuadtGT_Bank[bank][prog].res.midi_gate;
   }
   else
   {
@@ -1016,9 +1016,9 @@ void QuadGT_Redraw_Resonator(const UInt8 prog)
   if (MainForm->QuadResonator->Visible==TRUE)
   {
     resnum = (UInt8)StrToInt(MainForm->ResNumber->Text);
-    RedrawHorizBarTextS8(MainForm->ResTune, MainForm->ResTuneVal, QuadtGT_Bank[bank][prog].res_tune[resnum -1]);
-    RedrawHorizBarTextS8(MainForm->ResDecay, MainForm->ResDecayVal, QuadtGT_Bank[bank][prog].res_decay[resnum -1]);
-    RedrawHorizBarTextS8(MainForm->ResAmp, MainForm->ResAmpVal, QuadtGT_Bank[bank][prog].res_amp[resnum -1]);
+    RedrawHorizBarTextS8(MainForm->ResTune, MainForm->ResTuneVal, QuadtGT_Bank[bank][prog].res.tune[resnum -1]);
+    RedrawHorizBarTextS8(MainForm->ResDecay, MainForm->ResDecayVal, QuadtGT_Bank[bank][prog].res.decay[resnum -1]);
+    RedrawHorizBarTextS8(MainForm->ResAmp, MainForm->ResAmpVal, QuadtGT_Bank[bank][prog].res.amp[resnum -1]);
 
   }
 }
@@ -1261,13 +1261,13 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   if ((QuadtGT_Bank[bank][prog].config == CFG0_EQ_PITCH_DELAY_REVERB) &&
       (QuadtGT_Bank[bank][prog].mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
-    data[RES1_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res_tune[0] + RES_TUNE_OFFSET;
-    data[RES1_DECAY_IDX] = QuadtGT_Bank[bank][prog].res_decay[0];
-    data[RES1_AMP_IDX]   = QuadtGT_Bank[bank][prog].res_amp[0];
+    data[RES1_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res.tune[0] + RES_TUNE_OFFSET;
+    data[RES1_DECAY_IDX] = QuadtGT_Bank[bank][prog].res.decay[0];
+    data[RES1_AMP_IDX]   = QuadtGT_Bank[bank][prog].res.amp[0];
 
-    data[RES2_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res_tune[1] + RES_TUNE_OFFSET;
-    data[RES2_DECAY_IDX] = QuadtGT_Bank[bank][prog].res_decay[1];
-    data[RES2_AMP_IDX]   = QuadtGT_Bank[bank][prog].res_amp[1];
+    data[RES2_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res.tune[1] + RES_TUNE_OFFSET;
+    data[RES2_DECAY_IDX] = QuadtGT_Bank[bank][prog].res.decay[1];
+    data[RES2_AMP_IDX]   = QuadtGT_Bank[bank][prog].res.amp[1];
   }
   // Graphic Eq
   else if (QuadtGT_Bank[bank][prog].config == CFG2_GEQ_DELAY)
@@ -1312,20 +1312,20 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   if ((QuadtGT_Bank[bank][prog].config == CFG3_5BANDEQ_PITCH_DELAY) && 
       (QuadtGT_Bank[bank][prog].mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
-    data[RES1_TUNE_IDX_B]  = QuadtGT_Bank[bank][prog].res_tune[0];
-    data[RES1_DECAY_IDX_B] = QuadtGT_Bank[bank][prog].res_decay[0];
+    data[RES1_TUNE_IDX_B]  = QuadtGT_Bank[bank][prog].res.tune[0];
+    data[RES1_DECAY_IDX_B] = QuadtGT_Bank[bank][prog].res.decay[0];
 
-    data[RES2_TUNE_IDX_B]  = QuadtGT_Bank[bank][prog].res_tune[1];
-    data[RES2_DECAY_IDX_B] = QuadtGT_Bank[bank][prog].res_decay[1];
+    data[RES2_TUNE_IDX_B]  = QuadtGT_Bank[bank][prog].res.tune[1];
+    data[RES2_DECAY_IDX_B] = QuadtGT_Bank[bank][prog].res.decay[1];
 
-    data[RES3_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res_tune[2];
-    data[RES3_DECAY_IDX] = QuadtGT_Bank[bank][prog].res_decay[2];
+    data[RES3_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res.tune[2];
+    data[RES3_DECAY_IDX] = QuadtGT_Bank[bank][prog].res.decay[2];
 
-    data[RES4_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res_tune[3];
-    data[RES4_DECAY_IDX] = QuadtGT_Bank[bank][prog].res_decay[3];
+    data[RES4_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res.tune[3];
+    data[RES4_DECAY_IDX] = QuadtGT_Bank[bank][prog].res.decay[3];
 
-    data[RES5_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res_tune[4];
-    data[RES5_DECAY_IDX] = QuadtGT_Bank[bank][prog].res_decay[4];
+    data[RES5_TUNE_IDX]  = QuadtGT_Bank[bank][prog].res.tune[4];
+    data[RES5_DECAY_IDX] = QuadtGT_Bank[bank][prog].res.decay[4];
   }
   // Otherwise, assume 5 band Eq
   else
@@ -1444,7 +1444,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[PITCH_FEEDBACK_IDX] =  QuadtGT_Bank[bank][prog].pitch.pitch_feedback;
 
   data[PITCH_INPUT_IDX]  = QuadtGT_Bank[bank][prog].pitch.pitch_input & BIT0;
-  data[RES4_AMP_IDX]    |= (QuadtGT_Bank[bank][prog].res_amp[3] << 1) & BITS1to7;
+  data[RES4_AMP_IDX]    |= (QuadtGT_Bank[bank][prog].res.amp[3] << 1) & BITS1to7;
 
   data[LFO_WAVEFORM_IDX] = QuadtGT_Bank[bank][prog].pitch.lfo_waveform & BIT0;
   data[EQ_PRESET_IDX]   |= (QuadtGT_Bank[bank][prog].preset << 1) & BITS1to7;
@@ -1453,14 +1453,14 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
 
   if (QuadtGT_Bank[bank][prog].config == CFG6_RESONATOR_DELAY_REVERB) 
   {
-    data[RES_DECAY_IDX]     = QuadtGT_Bank[bank][prog].res_decay_all;
-    data[RES_MIDI_GATE_IDX] = QuadtGT_Bank[bank][prog].res_midi_gate;
+    data[RES_DECAY_IDX]     = QuadtGT_Bank[bank][prog].res.decay_all;
+    data[RES_MIDI_GATE_IDX] = QuadtGT_Bank[bank][prog].res.midi_gate;
 
-    data[RES1_PITCH_IDX] = QuadtGT_Bank[bank][prog].res_pitch[0];
-    data[RES2_PITCH_IDX] = QuadtGT_Bank[bank][prog].res_pitch[1];
-    data[RES3_PITCH_IDX] = QuadtGT_Bank[bank][prog].res_pitch[2];
-    data[RES4_PITCH_IDX] = QuadtGT_Bank[bank][prog].res_pitch[3];
-    data[RES5_PITCH_IDX] = QuadtGT_Bank[bank][prog].res_pitch[4];
+    data[RES1_PITCH_IDX] = QuadtGT_Bank[bank][prog].res.pitch[0];
+    data[RES2_PITCH_IDX] = QuadtGT_Bank[bank][prog].res.pitch[1];
+    data[RES3_PITCH_IDX] = QuadtGT_Bank[bank][prog].res.pitch[2];
+    data[RES4_PITCH_IDX] = QuadtGT_Bank[bank][prog].res.pitch[3];
+    data[RES5_PITCH_IDX] = QuadtGT_Bank[bank][prog].res.pitch[4];
   }
   else
   {
@@ -1479,7 +1479,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   data[DELAY_MODE_IDX]   = QuadtGT_Bank[bank][prog].delay_mode;
 
   data[DELAY_INPUT_IDX]  = QuadtGT_Bank[bank][prog].delay_input & BIT0;
-  data[RES5_AMP_IDX]    |= (QuadtGT_Bank[bank][prog].res_amp[4] << 1) & BITS1to7;
+  data[RES5_AMP_IDX]    |= (QuadtGT_Bank[bank][prog].res.amp[4] << 1) & BITS1to7;
 
   data[DELAY_INPUT_MIX_IDX] = QuadtGT_Bank[bank][prog].delay_input_mix;
 
@@ -1541,7 +1541,7 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    data[RES1_AMP_IDX_B] = QuadtGT_Bank[bank][prog].res_amp[0]; 
+    data[RES1_AMP_IDX_B] = QuadtGT_Bank[bank][prog].res.amp[0]; 
   }
 
   //-------------------------------------------------------------------------
@@ -1598,8 +1598,8 @@ UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    data[RES2_AMP_IDX_B] = QuadtGT_Bank[bank][prog].res_amp[1];
-    data[RES3_AMP_IDX]   = QuadtGT_Bank[bank][prog].res_amp[2];
+    data[RES2_AMP_IDX_B] = QuadtGT_Bank[bank][prog].res.amp[1];
+    data[RES3_AMP_IDX]   = QuadtGT_Bank[bank][prog].res.amp[2];
   }
 
   data[PAN_SPEED_IDX] = QuadtGT_Bank[bank][prog].pan_speed;
@@ -1679,16 +1679,16 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
       (QuadtGT_Bank[bank][prog].mode == EQMODE1_EQ_PLUS_RESONATOR))
   {
     FormDebug->Log(NULL, "Loading resontors 1 and 2");
-    QuadtGT_Bank[bank][prog].res_tune[0] = data[RES1_TUNE_IDX] - RES_TUNE_OFFSET; 
-    QuadtGT_Bank[bank][prog].res_decay[0] =data[RES1_DECAY_IDX];
-    QuadtGT_Bank[bank][prog].res_amp[0] =  data[RES1_AMP_IDX];
+    QuadtGT_Bank[bank][prog].res.tune[0] = data[RES1_TUNE_IDX] - RES_TUNE_OFFSET; 
+    QuadtGT_Bank[bank][prog].res.decay[0] =data[RES1_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res.amp[0] =  data[RES1_AMP_IDX];
                                      
-    QuadtGT_Bank[bank][prog].res_tune[1] = data[RES2_TUNE_IDX]  - RES_TUNE_OFFSET; 
-    QuadtGT_Bank[bank][prog].res_decay[1] =data[RES2_DECAY_IDX];
-    QuadtGT_Bank[bank][prog].res_amp[1] =  data[RES2_AMP_IDX];
+    QuadtGT_Bank[bank][prog].res.tune[1] = data[RES2_TUNE_IDX]  - RES_TUNE_OFFSET; 
+    QuadtGT_Bank[bank][prog].res.decay[1] =data[RES2_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res.amp[1] =  data[RES2_AMP_IDX];
 
-    FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[0]));
-    FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[1]));
+    FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[0]));
+    FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[1]));
   }
   // Graphic Eq
   else if (QuadtGT_Bank[bank][prog].config == CFG2_GEQ_DELAY)
@@ -1732,26 +1732,26 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
        (QuadtGT_Bank[bank][prog].config == CFG6_RESONATOR_DELAY_REVERB))
   {
     FormDebug->Log(NULL, "Loading resontors tune and decay");
-    QuadtGT_Bank[bank][prog].res_tune[0]  = data[RES1_TUNE_IDX_B];
-    QuadtGT_Bank[bank][prog].res_decay[0] =data[RES1_DECAY_IDX_B];
+    QuadtGT_Bank[bank][prog].res.tune[0]  = data[RES1_TUNE_IDX_B];
+    QuadtGT_Bank[bank][prog].res.decay[0] =data[RES1_DECAY_IDX_B];
                                      
-    QuadtGT_Bank[bank][prog].res_tune[1]  = data[RES2_TUNE_IDX_B];
-    QuadtGT_Bank[bank][prog].res_decay[1] =data[RES2_DECAY_IDX_B];
+    QuadtGT_Bank[bank][prog].res.tune[1]  = data[RES2_TUNE_IDX_B];
+    QuadtGT_Bank[bank][prog].res.decay[1] =data[RES2_DECAY_IDX_B];
                                      
-    QuadtGT_Bank[bank][prog].res_tune[2]  = data[RES3_TUNE_IDX];
-    QuadtGT_Bank[bank][prog].res_decay[2] =data[RES3_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res.tune[2]  = data[RES3_TUNE_IDX];
+    QuadtGT_Bank[bank][prog].res.decay[2] =data[RES3_DECAY_IDX];
                                      
-    QuadtGT_Bank[bank][prog].res_tune[3]  = data[RES4_TUNE_IDX];
-    QuadtGT_Bank[bank][prog].res_decay[3] =data[RES4_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res.tune[3]  = data[RES4_TUNE_IDX];
+    QuadtGT_Bank[bank][prog].res.decay[3] =data[RES4_DECAY_IDX];
                                      
-    QuadtGT_Bank[bank][prog].res_tune[4]  = data[RES5_TUNE_IDX];
-    QuadtGT_Bank[bank][prog].res_decay[4] =data[RES5_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res.tune[4]  = data[RES5_TUNE_IDX];
+    QuadtGT_Bank[bank][prog].res.decay[4] =data[RES5_DECAY_IDX];
 
-    FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[0]));
-    FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[1]));
-    FormDebug->Log(NULL, "Res Tune 3 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[2]));
-    FormDebug->Log(NULL, "Res Tune 4 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[3]));
-    FormDebug->Log(NULL, "Res Tune 5 "+AnsiString(QuadtGT_Bank[bank][prog].res_tune[4]));
+    FormDebug->Log(NULL, "Res Tune 1 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[0]));
+    FormDebug->Log(NULL, "Res Tune 2 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[1]));
+    FormDebug->Log(NULL, "Res Tune 3 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[2]));
+    FormDebug->Log(NULL, "Res Tune 4 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[3]));
+    FormDebug->Log(NULL, "Res Tune 5 "+AnsiString(QuadtGT_Bank[bank][prog].res.tune[4]));
   }
   // Otherwise, assume 5 band Eq
   else
@@ -1867,21 +1867,21 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   // Pitch Parameters
   //-------------------------------------------------------------------------
   QuadtGT_Bank[bank][prog].pitch.pitch_input   = data[PITCH_INPUT_IDX] & BIT0;
-  QuadtGT_Bank[bank][prog].res_amp[3] = (data[RES4_AMP_IDX] && BITS1to7) >> 1;
+  QuadtGT_Bank[bank][prog].res.amp[3] = (data[RES4_AMP_IDX] && BITS1to7) >> 1;
 
   QuadtGT_Bank[bank][prog].pitch.lfo_waveform  = data[LFO_WAVEFORM_IDX] & BIT0;
   QuadtGT_Bank[bank][prog].pitch.lfo_speed     = data[LFO_SPEED_IDX];
   if (QuadtGT_Bank[bank][prog].config == CFG6_RESONATOR_DELAY_REVERB) 
   {
-    QuadtGT_Bank[bank][prog].res_decay_all = data[RES_DECAY_IDX];
-    QuadtGT_Bank[bank][prog].res_midi_gate = data[RES_MIDI_GATE_IDX];
-    FormDebug->Log(NULL, "Midi Gate "+AnsiString(QuadtGT_Bank[bank][prog].res_midi_gate));
+    QuadtGT_Bank[bank][prog].res.decay_all = data[RES_DECAY_IDX];
+    QuadtGT_Bank[bank][prog].res.midi_gate = data[RES_MIDI_GATE_IDX];
+    FormDebug->Log(NULL, "Midi Gate "+AnsiString(QuadtGT_Bank[bank][prog].res.midi_gate));
 
-    QuadtGT_Bank[bank][prog].res_pitch[0]  = data[RES1_PITCH_IDX];
-    QuadtGT_Bank[bank][prog].res_pitch[1]  = data[RES2_PITCH_IDX];
-    QuadtGT_Bank[bank][prog].res_pitch[2]  = data[RES3_PITCH_IDX];
-    QuadtGT_Bank[bank][prog].res_pitch[3]  = data[RES4_PITCH_IDX];
-    QuadtGT_Bank[bank][prog].res_pitch[4]  = data[RES5_PITCH_IDX];
+    QuadtGT_Bank[bank][prog].res.pitch[0]  = data[RES1_PITCH_IDX];
+    QuadtGT_Bank[bank][prog].res.pitch[1]  = data[RES2_PITCH_IDX];
+    QuadtGT_Bank[bank][prog].res.pitch[2]  = data[RES3_PITCH_IDX];
+    QuadtGT_Bank[bank][prog].res.pitch[3]  = data[RES4_PITCH_IDX];
+    QuadtGT_Bank[bank][prog].res.pitch[4]  = data[RES5_PITCH_IDX];
   }
   else
   {
@@ -1949,7 +1949,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    QuadtGT_Bank[bank][prog].res_amp[0] =  data[RES1_AMP_IDX_B]; 
+    QuadtGT_Bank[bank][prog].res.amp[0] =  data[RES1_AMP_IDX_B]; 
   }
 
   QuadtGT_Bank[bank][prog].mix_mod=(data[MIX_MOD_IDX] & BITS6to7) >> 6;
@@ -1996,15 +1996,15 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data)
   }
   else
   {
-    QuadtGT_Bank[bank][prog].res_amp[1] =  data[RES2_AMP_IDX_B]; 
-    QuadtGT_Bank[bank][prog].res_amp[2] =  data[RES3_AMP_IDX]; 
+    QuadtGT_Bank[bank][prog].res.amp[1] =  data[RES2_AMP_IDX_B]; 
+    QuadtGT_Bank[bank][prog].res.amp[2] =  data[RES3_AMP_IDX]; 
   }
   QuadtGT_Bank[bank][prog].pan_speed = data[PAN_SPEED_IDX];
   QuadtGT_Bank[bank][prog].pan_depth = data[PAN_DEPTH_IDX];
   //-------------------------------------------------------------------------
   // Resonator Parameters
   //-------------------------------------------------------------------------
-  QuadtGT_Bank[bank][prog].res_amp[4] = (data[RES5_AMP_IDX] & BITS1to7) >> 1;
+  QuadtGT_Bank[bank][prog].res.amp[4] = (data[RES5_AMP_IDX] & BITS1to7) >> 1;
 
   return 0;
 }
