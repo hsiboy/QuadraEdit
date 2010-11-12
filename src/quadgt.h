@@ -333,13 +333,8 @@ typedef struct
 #pragma pack(1)
     UInt8  high_mid_q;            // 0.2 to 2.55 octaves (20-255)
     UInt8  preset;                // 0=6 (User=0 or preset 1-6)
-  } eq;
-#pragma pack(4)
-  
 
   // Graphic Eq parameters
-  struct 
-  {
     SInt8 geq_16hz;                  // -14 to 14  (0-28)
     SInt8 geq_32hz;                  // -14 to 14  (0-28)
     SInt8 geq_62hz;                  // -14 to 14  (0-28)
@@ -351,7 +346,8 @@ typedef struct
     SInt8 geq_4khz;                  // -14 to 14  (0-28)
     SInt8 geq_8khz;                  // -14 to 14  (0-28)
     SInt8 geq_16khz;                 // -14 to 14  (0-28)
-  } geq;
+  } eq;
+#pragma pack(4)
 
   // Pitch parameters
   struct {
@@ -366,13 +362,15 @@ typedef struct
   } pitch;
 
   // Delay parameters
-  UInt8  delay_mode;                         // 0 - 3  (tDelay_Mode)
-  UInt8  delay_input;                        // 0 - 1
-  SInt8  delay_input_mix;                    // -99 - 99
-  UInt16 delay_left;                         // 1 - 375/775/800/1500/1470/705/400/320/720/750 Also used for mono
-  UInt8  delay_left_feedback;                // 0 - 99, Also used for mono
-  UInt16 delay_right;                        // 1 - 375/400/750/705/320 
-  UInt8  delay_right_feedback;               // 0 - 99
+  struct {
+    UInt8  mode;                         // 0 - 3  (tDelay_Mode)
+    UInt8  input;                        // 0 - 1
+    SInt8  input_mix;                    // -99 - 99
+    UInt16 left;                         // 1 - 375/775/800/1500/1470/705/400/320/720/750 Also used for mono
+    UInt8  left_feedback;                // 0 - 99, Also used for mono
+    UInt16 right;                        // 1 - 375/400/750/705/320 
+    UInt8  right_feedback;               // 0 - 99
+  } delay;
 
   // Multi tap delay parameters
   struct {
