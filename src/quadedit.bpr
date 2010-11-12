@@ -266,7 +266,7 @@ txtform:
 # Open the project in the Borland IDE
 ide: ${DFM} runide txtform
 
-run:
+run: all
       quadedit.exe
 
 # Open the project in the Borland IDE
