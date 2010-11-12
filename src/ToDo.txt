@@ -21,7 +21,7 @@ MIDI
 - Queue up rx'd messages for processing                                      -> Done
 - Process rx'd messages in a seperate thread                                 -> Done but only 1 thread
 - Handle messages that span multiple queue entries
-- Only list devices that are both input and output
+- Only list devices that are both input and output                           -> Done
 
 QUADRAVERB
 - Check message is from a Quadraverb                                         -> Done
@@ -35,7 +35,7 @@ QUADRAVERB
 - Default values in internal data structure
 - Generate and use list of settings that change based on config
 
-- Handle resonator parameters
+- Handle resonator parameters                                                -> In progress
 - Handle sampling parameters
 
 Problems:

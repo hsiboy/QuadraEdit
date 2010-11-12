@@ -61,7 +61,7 @@ static TStringList *out_device;  // List of Output Midi Devices
 static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
                                       DWORD *instance, DWORD *p1, DWORD *p2);
 //---------------------------------------------------------------------------
-// Name        : 
+// Name        : Midi_Init
 // Description : 
 // Parameters  : 
 // Returns     : NONE.
@@ -77,7 +77,7 @@ void Midi_Init(void)
 }
 
 //---------------------------------------------------------------------------
-// Name        : 
+// Name        : Queue_Push
 // Description : 
 // Parameters  : 
 // Returns     : NONE.
@@ -124,12 +124,11 @@ void Queue_Push(tBuffer buffer)
 
 }
 
-// Pop entry from head of queue
 //---------------------------------------------------------------------------
-// Name        : 
-// Description : 
+// Name        : Queue_Pop
+// Description : Pop an entry from the head of the queue
 // Parameters  : 
-// Returns     : NONE.
+// Returns     : Item poped from queue.
 //---------------------------------------------------------------------------
 tBuffer Queue_Pop(void)
 {
