@@ -19,7 +19,7 @@ CONVERT = $(BCB)\BIN\convert.exe
 IDE = $(BCB)\BIN\bcb.exe
 
 
-DFM = about.dfm debug.dfm device.dfm error.dfm main.dfm swap.dfm copy.dfm
+DFM = about.dfm debug.dfm device.dfm error.dfm main.dfm swap.dfm copy.dfm compare.dfm
 
 # ---------------------------------------------------------------------------
 # IDE SECTION
@@ -262,6 +262,9 @@ txtform:
         @${CONVERT} device.dfm
         @${CONVERT} error.dfm
         @${CONVERT} main.dfm
+        @${CONVERT} copy.dfm
+        @${CONVERT} swap.dfm
+        @${CONVERT} compare.dfm
         @${ECHO} ${LINE}
 
 # Open the project in the Borland IDE
