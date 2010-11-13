@@ -1,6 +1,6 @@
 object FormCopy: TFormCopy
-  Left = 559
-  Top = 69
+  Left = 727
+  Top = 10
   Width = 282
   Height = 366
   Caption = 'Copy Settings'
@@ -45,14 +45,13 @@ object FormCopy: TFormCopy
       Height = 13
       Caption = 'Copy To:'
     end
-    object QuadBank: TRadioGroup
+    object Bank1: TRadioGroup
       Left = 21
       Top = 167
       Width = 90
       Height = 31
       Caption = 'Bank'
       Columns = 2
-      Enabled = False
       ItemIndex = 0
       Items.Strings = (
         '1'
@@ -87,14 +86,13 @@ object FormCopy: TFormCopy
       Wrap = True
       OnClick = UpDownPatchNumClick
     end
-    object RadioGroup1: TRadioGroup
+    object Bank2: TRadioGroup
       Left = 21
       Top = 234
       Width = 90
       Height = 31
       Caption = 'Bank'
       Columns = 2
-      Enabled = False
       ItemIndex = 0
       Items.Strings = (
         '1'
@@ -127,17 +125,17 @@ object FormCopy: TFormCopy
       Wrap = True
       OnClick = UpDownPatchNumClick
     end
-    object Swap: TButton
-      Left = 170
+    object Copy: TButton
+      Left = 168
       Top = 291
-      Width = 79
+      Width = 89
       Height = 25
       Hint = 'Perfrom the patch swap'
-      Caption = 'Swap Patches'
+      Caption = 'Copy Parameters'
       ParentShowHint = False
       ShowHint = True
       TabOrder = 6
-      OnClick = SwapClick
+      OnClick = CopyClick
     end
     object Cancel: TButton
       Left = 18
