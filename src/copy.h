@@ -20,7 +20,7 @@ __published:	// IDE-managed Components
     TLabel *Label1;
     TMaskEdit *PatchNum2;
     TUpDown *UpDownPatchNum2;
-    TButton *Swap;
+    TButton *Copy;
     TButton *Cancel;
     TLabel *Label2;
     TLabel *Label3;
@@ -28,7 +28,7 @@ __published:	// IDE-managed Components
     TRadioGroup *Bank1;
     TRadioGroup *Bank2;
     void __fastcall CancelClick(TObject *Sender);
-    void __fastcall SwapClick(TObject *Sender);
+    void __fastcall CopyClick(TObject *Sender);
     
     void __fastcall PatchNumExit(TObject *Sender);
     void __fastcall PatchNumKeyDown(TObject *Sender, WORD &Key,

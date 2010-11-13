@@ -1,6 +1,6 @@
 object MainForm: TMainForm
-  Left = 272
-  Top = 24
+  Left = 243
+  Top = 96
   Width = 1008
   Height = 650
   Caption = 'QuadEdit'
@@ -2040,14 +2040,15 @@ object MainForm: TMainForm
       TabOrder = 13
       OnClick = QuadPatchAuditionClick
     end
-    object QuadProgWrite: TButton
+    object QuadProgSelect: TButton
       Left = 48
       Top = 573
       Width = 75
       Height = 25
-      Caption = 'Prog Write'
+      Hint = 'Select the program currently being edited on the Quadraverb'
+      Caption = 'Prog Select'
       TabOrder = 14
-      OnClick = QuadProgWriteClick
+      OnClick = QuadProgSelectClick
     end
     object QuadMidiWrite: TButton
       Left = 128
@@ -3436,7 +3437,7 @@ object MainForm: TMainForm
     end
     object QuadPatchSwap: TButton
       Left = 811
-      Top = 517
+      Top = 509
       Width = 79
       Height = 25
       Hint = 'Swap two patches'
@@ -3448,12 +3449,29 @@ object MainForm: TMainForm
     end
     object QuadPatchCopy: TButton
       Left = 808
-      Top = 552
+      Top = 538
       Width = 113
       Height = 25
       Caption = 'Copy Patch Settings'
       TabOrder = 28
       OnClick = QuadPatchCopyClick
+    end
+    object FollowDevice: TCheckBox
+      Left = 456
+      Top = 504
+      Width = 273
+      Height = 17
+      Caption = 'Accept Patch Changes From Quadraverb'
+      TabOrder = 29
+    end
+    object QuadPatchCompare: TButton
+      Left = 808
+      Top = 568
+      Width = 95
+      Height = 25
+      Caption = 'Compare patches'
+      TabOrder = 30
+      OnClick = QuadPatchCompareClick
     end
   end
   object QuadBankRead: TButton
@@ -3533,7 +3551,7 @@ object MainForm: TMainForm
     Top = 570
   end
   object TimerProcess: TTimer
-    Interval = 100
+    Interval = 10
     OnTimer = TimerProcessTimer
     Left = 352
     Top = 570

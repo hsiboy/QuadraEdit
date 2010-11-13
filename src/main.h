@@ -68,7 +68,7 @@ __published:	// IDE-managed Components
     TTrackBar *PreOutLevel;
 
     TTimer *TimerProcess;
-    TButton *QuadProgWrite;
+    TButton *QuadProgSelect;
     TButton *QuadMidiWrite;
     TComboBox *ModTarget;
     TTrackBar *ModAmp;
@@ -337,6 +337,8 @@ __published:	// IDE-managed Components
     TRadioGroup *QuadBank;
     TButton *QuadPatchSwap;
     TButton *QuadPatchCopy;
+    TCheckBox *FollowDevice;
+    TButton *QuadPatchCompare;
     void __fastcall MenuHelpAboutClick(TObject *Sender);
     void __fastcall UpDownResNumClick(TObject *Sender,
           TUDBtnType Button);
@@ -352,7 +354,7 @@ __published:	// IDE-managed Components
     
     void __fastcall TimerProcessTimer(TObject *Sender);
     void __fastcall QuadBankReadClick(TObject *Sender);
-    void __fastcall QuadProgWriteClick(TObject *Sender);
+    void __fastcall QuadProgSelectClick(TObject *Sender);
     void __fastcall QuadMidiWriteClick(TObject *Sender);
     void __fastcall BarChange(TObject *Sender);
 
@@ -384,6 +386,8 @@ __published:	// IDE-managed Components
     void __fastcall QuadPatchSwapClick(TObject *Sender);
     void __fastcall QuadBankClick(TObject *Sender);
     void __fastcall QuadPatchCopyClick(TObject *Sender);
+    
+    void __fastcall QuadPatchCompareClick(TObject *Sender);
 private:	// User declarations
 public:		// User declarations
     __fastcall TMainForm(TComponent* Owner);

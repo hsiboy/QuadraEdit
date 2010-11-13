@@ -1,6 +1,6 @@
 object FormDevice: TFormDevice
-  Left = 305
-  Top = 295
+  Left = 599
+  Top = 78
   Width = 265
   Height = 165
   Caption = 'FormDevice'
@@ -21,8 +21,8 @@ object FormDevice: TFormDevice
   object LabelMidiDevError: TLabel
     Left = 8
     Top = 48
-    Width = 237
-    Height = 34
+    Width = 87
+    Height = 13
     Caption = 'LabelMidiDevError'
   end
   object ComboBoxInDevs: TComboBox

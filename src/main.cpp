@@ -23,6 +23,8 @@
 #include "quadgt.h"
 #include "swap.h"
 #include "copy.h"
+#include "copy.h"
+#include "compare.h"
 #include <stdlib.h>
 
 #define QUAD_PATCH_MIN (0)
@@ -206,14 +208,15 @@ void __fastcall TMainForm::QuadBankReadClick(TObject *Sender)
     
 }
 //---------------------------------------------------------------------------
-// Name        : QuadProgWriteClick
+// Name        : QuadProgSelectClick
 // Description : Sends a sysex command to set the program/patch number when
-//               the user clicks the "Prog Write" button
-void __fastcall TMainForm::QuadProgWriteClick(TObject *Sender)
+//               the user clicks the "Prog Select" button
+void __fastcall TMainForm::QuadProgSelectClick(TObject *Sender)
 {
   UInt32 status;
-  UInt16 prog=10;  // Harcoded to program 10 for now
+  UInt16 prog=(UInt16)StrToInt(MainForm->QuadPatchNum->Text);
 
+  FormDebug->Log(NULL, "Sending prog select: "+AnsiString(prog));
   status=Midi_Out_Edit(0, 0, prog);
 
   if (status != 0)
@@ -311,6 +314,13 @@ void __fastcall TMainForm::QuadPatchCopyClick(TObject *Sender)
                 FormCopy->Bank1->ItemIndex, StrToInt(FormCopy->PatchNum1->Text),
                 FormCopy->Bank2->ItemIndex, StrToInt(FormCopy->PatchNum2->Text));
   }
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMainForm::QuadPatchCompareClick(TObject *Sender)
+{
+  FormCompare->ShowModal();    
 }
 //---------------------------------------------------------------------------
 

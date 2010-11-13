@@ -1,50 +1,6 @@
 //---------------------------------------------------------------------------
 // Literals
 //---------------------------------------------------------------------------
-#define BIT0         (0x01)
-#define BIT1         (0x02)
-#define BIT2         (0x04)
-#define BIT3         (0x08)
-#define BIT4         (0x10)
-#define BIT5         (0x20)
-#define BIT6         (0x40)
-#define BIT7         (0x80)
-
-// Two bits
-#define BITS0to1     (0x03)
-#define BITS1to2     (0x06)
-#define BITS2to3     (0x0C)
-#define BITS3to4     (0x18)
-#define BITS4to5     (0x30)
-#define BITS5to6     (0x60)
-#define BITS6to7     (0xC0)
-
-// Three bits
-#define BITS0to2     (0x07)
-#define BITS1to3     (0x0E)
-#define BITS2to4     (0x1C)
-#define BITS3to5     (0x38)
-#define BITS4to6     (0x70)
-#define BITS5to7     (0xE0)
-
-// Four bits
-#define BITS0to3     (0x0F)
-#define BITS1to4     (0x1E)
-#define BITS2to5     (0x3C)
-#define BITS3to6     (0x78)
-#define BITS4to7     (0xF0)
-
-// Five bits
-#define BITS0to4     (0x1F)
-
-// Six bits
-#define BITS0to5     (0x3F)
-#define BITS1to6     (0x7E)
-#define BITS2to7     (0xFC)
-
-// Seven bits
-#define BITS0to6     (0x7F)
-#define BITS1to7     (0xFE)
 
 #define QUAD_PATCH_SIZE   (128)   // Number of bytes per patch in QuadGT (8 bit) format
 #define QUAD_NUM_PATCH    (100)
@@ -301,15 +257,15 @@ typedef struct
   // Preamp parameters
   struct 
   {
-    UInt8 comp;                      // Compression 0-7
-    UInt8 od;                        // Overdrive 0-7
-    UInt8 dist;                      // Distortion 0-8
-    UInt8 preamp_tone;               // Preamp tone 0-2 (Flat, Prescence, Bright)
-    UInt8 preamp_gate;               // Preamp noise gate level 0-17
-    UInt8 preamp_out_level;          // Preamp output level 0-99
-    UInt8 effect_loop;               // Effect loop on/off 0-1
-    UInt8 bass_boost;                // Bass boost on/off 0-1
-    UInt8 cab_sim;                   // Cabinet simulator 0-2 (Off, Cab 1, Cab 2)
+    UInt8 comp;          // Compression 0-7
+    UInt8 od;            // Overdrive 0-7
+    UInt8 dist;          // Distortion 0-8
+    UInt8 tone;          // Preamp tone 0-2 (Flat, Prescence, Bright)
+    UInt8 gate;          // Preamp noise gate level 0-17
+    UInt8 out_level;     // Preamp output level 0-99
+    UInt8 effect_loop;   // Effect loop on/off 0-1
+    UInt8 bass_boost;    // Bass boost on/off 0-1
+    UInt8 cab_sim;       // Cabinet simulator 0-2 (Off, Cab 1, Cab 2)
   } preamp;
 
   // Eq parameters - pack pragmas are maintain spacing used in earlier versions
@@ -335,28 +291,28 @@ typedef struct
     UInt8  preset;                // 0=6 (User=0 or preset 1-6)
 
   // Graphic Eq parameters
-    SInt8 geq_16hz;                  // -14 to 14  (0-28)
-    SInt8 geq_32hz;                  // -14 to 14  (0-28)
-    SInt8 geq_62hz;                  // -14 to 14  (0-28)
-    SInt8 geq_126hz;                 // -14 to 14  (0-28)
-    SInt8 geq_250hz;                 // -14 to 14  (0-28)
-    SInt8 geq_500hz;                 // -14 to 14  (0-28)
-    SInt8 geq_1khz;                  // -14 to 14  (0-28)
-    SInt8 geq_2khz;                  // -14 to 14  (0-28)
-    SInt8 geq_4khz;                  // -14 to 14  (0-28)
-    SInt8 geq_8khz;                  // -14 to 14  (0-28)
-    SInt8 geq_16khz;                 // -14 to 14  (0-28)
+    SInt8 graphic_16hz;           // -14 to 14  (0-28)
+    SInt8 graphic_32hz;           // -14 to 14  (0-28)
+    SInt8 graphic_62hz;           // -14 to 14  (0-28)
+    SInt8 graphic_126hz;          // -14 to 14  (0-28)
+    SInt8 graphic_250hz;          // -14 to 14  (0-28)
+    SInt8 graphic_500hz;          // -14 to 14  (0-28)
+    SInt8 graphic_1khz;           // -14 to 14  (0-28)
+    SInt8 graphic_2khz;           // -14 to 14  (0-28)
+    SInt8 graphic_4khz;           // -14 to 14  (0-28)
+    SInt8 graphic_8khz;           // -14 to 14  (0-28)
+    SInt8 graphic_16khz;          // -14 to 14  (0-28)
   } eq;
 #pragma pack(4)
 
   // Pitch parameters
   struct {
-    UInt8 pitch_mode;                          // 0 - 5 (tPitch_Mode)
-    UInt8 pitch_input;                         // 0 - 1
+    UInt8 mode;                          // 0 - 5 (tPitch_Mode)
+    UInt8 input;                         // 0 - 1
     UInt8 lfo_waveform;                        // 0 - 1
     UInt8 lfo_speed;                           // 0 - 98
     UInt8 lfo_depth;                           // 0 - 98
-    UInt8 pitch_feedback;                      // 0 - 99
+    UInt8 feedback;                      // 0 - 99
     UInt8 trigger_flange;                      // 0 - 1
     UInt8 detune_amount;                       // -99 - 99
   } pitch;
@@ -374,10 +330,10 @@ typedef struct
 
   // Multi tap delay parameters
   struct {
-    UInt8  tap_delay[8];
-    UInt8  tap_volume[8];
-    UInt8  tap_pan[8];
-    UInt8  tap_feedback[8];
+    UInt8  delay[8];
+    UInt8  volume[8];
+    UInt8  pan[8];
+    UInt8  feedback[8];
     UInt8  master_feedback;           // NOT USED, SEE MULTITAP_MASTER_FEEDBACK
   } tap;
 
@@ -484,6 +440,7 @@ const UInt8 Sysex_Edit[]={0x01};               // Command to edit a Quadraverb f
 const UInt8 Sysex_Data_Dump[]={0x02};          // Command to send a program data dump
 const UInt8 Sysex_Dump_Req[]={0x03};           // Command to request a dump
 
+const UInt8 Data_Prog_Change=0xC0;             // User has changed program on the Quadraverb
 //---------------------------------------------------------------------------
 // Public functions
 //---------------------------------------------------------------------------
@@ -494,6 +451,7 @@ UInt32 QuadGT_Convert_QuadGT_To_Internal(UInt8 prog, UInt8* data);
 UInt32 QuadGT_Convert_Data_From_Internal(UInt8 prog, UInt8* data);
 
 void QuadGT_Sysex_Process(tBuffer sysex);
+void QuadGT_Data_Process(tData data);
 
 void QuadGT_Init(void);
 void QuadGT_Redraw_Patch(const UInt8 bank, UInt8 program);
@@ -513,3 +471,5 @@ void QuadGT_Encode_16Bit(const UInt16 word, UInt8 *data);
 void QuadGT_Encode_16Bit_Split(const UInt16 word, UInt8 *msb, UInt8 *lsb);
 void QuadGT_Swap(const int bank1, const int patch1, const int bank2, const int patch2);
 void QuadGT_Copy(const int param, const int bankfrom, const int patchfrom, const int bankto, const int patchto);
+void QuadGT_Compare(const int compare_bank, const int compare_patch);
+void QuadGT_UndoCompare(void);

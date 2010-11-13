@@ -16,11 +16,19 @@
 //---------------------------------------------------------------------------
 // Type definitions
 
+// Contents of a SYSEX message
 typedef struct tBuffer
 {
     UInt8 * buffer;
     UInt32 length;
 } tBuffer;
+
+// Contents of a data message
+typedef struct tData
+{
+  DWORD              p1;
+  // Don't bother with p2 - just a timestamp
+} tData;
 
 //---------------------------------------------------------------------------
 // Constant definitions

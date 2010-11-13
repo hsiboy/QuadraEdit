@@ -18,6 +18,7 @@ USEUNIT("quadgt.cpp");
 USEUNIT("display.cpp");
 USEFORM("swap.cpp", FormSwap);
 USEFORM("copy.cpp", FormCopy);
+USEFORM("compare.cpp", FormCompare);
 //---------------------------------------------------------------------------
 WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
@@ -33,6 +34,7 @@ WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         Application->CreateForm(__classid(TFormDevice), &FormDevice);
         Application->CreateForm(__classid(TFormSwap), &FormSwap);
         Application->CreateForm(__classid(TFormCopy), &FormCopy);
+        Application->CreateForm(__classid(TFormCompare), &FormCompare);
         FormDebug->Show();
         MainForm->Init();
 

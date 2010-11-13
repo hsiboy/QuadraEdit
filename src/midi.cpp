@@ -16,23 +16,35 @@
 
 #define MIDI_IN_BUF_SIZE  (20480)  // Make this big so we don't have to deal with
                                    // Sysex messages crossing multiple buffers
-#define MIDI_IN_NUM_BUF    (1)     // TBD: Get rid of this entirely
+
+#define DATA_EMPTY (0x00000000)
 
 //---------------------------------------------------------------------------
 #pragma package(smart_init)
 
 static boolean Midi_Open=FALSE;
 
-typedef struct tQueue_Entry
+typedef struct tSysex_Queue_Entry
 {
   tBuffer payload;
-  tQueue_Entry *next_ptr;
-} tQueue_Entry;
+  tSysex_Queue_Entry *next_ptr;
+} tSysex_Queue_Entry;
 
-typedef struct tQueue
+typedef struct tSysex_Queue
 {
-  tQueue_Entry *ptr;
-} tQueue;
+  tSysex_Queue_Entry *ptr;
+} tSysex_Queue;
+
+typedef struct tData_Queue_Entry
+{
+  tData              payload;
+  tData_Queue_Entry *next_ptr;
+} tData_Queue_Entry;
+
+typedef struct tData_Queue
+{
+  tData_Queue_Entry *ptr;
+} tData_Queue;
 
 
 // Midi handles
@@ -46,9 +58,10 @@ typedef struct tMidi_In
   UInt8   Buffer[MIDI_IN_BUF_SIZE];
 } tMidi_In;
 
-static tMidi_In Midi_In[MIDI_IN_NUM_BUF];
+static tMidi_In Midi_In;
 
-static tQueue Rx_Msg_Queue;
+static tSysex_Queue Sysex_Queue;
+static tData_Queue Data_Queue;
 
 // Rx message counters
 static int rx_sysex=0;
@@ -62,13 +75,13 @@ static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
                                       DWORD *instance, DWORD *p1, DWORD *p2);
 //---------------------------------------------------------------------------
 // Name        : Midi_Init
-// Description : 
+// Description : Initialise the MIDI input/output system
 // Parameters  : 
 // Returns     : NONE.
 //---------------------------------------------------------------------------
 void Midi_Init(void)
 {
-  Rx_Msg_Queue.ptr=NULL;
+  Sysex_Queue.ptr=NULL;
 
   in_device = new(TStringList);
   out_device = new(TStringList);
@@ -77,21 +90,21 @@ void Midi_Init(void)
 }
 
 //---------------------------------------------------------------------------
-// Name        : Queue_Push
-// Description : 
+// Name        : Sysex_Queue_Push
+// Description : Push SYSEX data onto end of the queue for later processing
 // Parameters  : 
 // Returns     : NONE.
 //---------------------------------------------------------------------------
-void Queue_Push(tBuffer buffer)
+void Sysex_Queue_Push(tBuffer buffer)
 {
-  tQueue_Entry *entry;
-  tQueue_Entry *tail;
+  tSysex_Queue_Entry *entry;
+  tSysex_Queue_Entry *tail;
 
   // Create new queue entry
-  entry = (tQueue_Entry *)malloc(sizeof(tQueue_Entry));
+  entry = (tSysex_Queue_Entry *)malloc(sizeof(tSysex_Queue_Entry));
   if (entry == NULL)
   {
-    FormError->ShowErrorCode(1,"no memory left to create queue entry");
+    FormError->ShowErrorCode(1,"no memory left to create SYSEX queue entry");
     return;
   }
 
@@ -99,7 +112,7 @@ void Queue_Push(tBuffer buffer)
   entry->payload.buffer = (UInt8 *) malloc(buffer.length);
   if (entry->payload.buffer == NULL)
   {
-    FormError->ShowErrorCode(2,"no memory left to queue data");
+    FormError->ShowErrorCode(2,"no memory left to queue SYSEX data");
     free(entry);
     return;
   }
@@ -111,13 +124,13 @@ void Queue_Push(tBuffer buffer)
   entry->next_ptr=NULL;
 
   // Push entry onto tail of queue
-  if (Rx_Msg_Queue.ptr == NULL)
+  if (Sysex_Queue.ptr == NULL)
   {
-    Rx_Msg_Queue.ptr = entry;
+    Sysex_Queue.ptr = entry;
   }
   else
   {
-    tail = Rx_Msg_Queue.ptr;
+    tail = Sysex_Queue.ptr;
     while (tail->next_ptr != NULL) tail=tail->next_ptr;
     tail->next_ptr = entry;
   }
@@ -125,28 +138,28 @@ void Queue_Push(tBuffer buffer)
 }
 
 //---------------------------------------------------------------------------
-// Name        : Queue_Pop
+// Name        : Sysex_Queue_Pop
 // Description : Pop an entry from the head of the queue
 // Parameters  : 
 // Returns     : Item poped from queue.
 //---------------------------------------------------------------------------
-tBuffer Queue_Pop(void)
+tBuffer Sysex_Queue_Pop(void)
 {
-  tQueue_Entry * head;
+  tSysex_Queue_Entry * head;
   tBuffer payload;
 
   // Is queue empty?
-  if (Rx_Msg_Queue.ptr == NULL) 
+  if (Sysex_Queue.ptr == NULL) 
   {
     payload.buffer = NULL;
     payload.length = 0;
   }
   else
   {
-    head = Rx_Msg_Queue.ptr;
+    head = Sysex_Queue.ptr;
     payload = head->payload;
 
-    Rx_Msg_Queue.ptr = head->next_ptr;
+    Sysex_Queue.ptr = head->next_ptr;
 
     // Free the queue entry
     free(head);
@@ -154,6 +167,73 @@ tBuffer Queue_Pop(void)
   }
 
   // Return the payload, the caller must free payload.buffer when done
+  return(payload);
+}
+
+//---------------------------------------------------------------------------
+// Name        : Data_Queue_Push
+// Description : Push Data data onto end of the queue for later processing
+// Parameters  : 
+// Returns     : NONE.
+//---------------------------------------------------------------------------
+void Data_Queue_Push(tData data)
+{
+  tData_Queue_Entry *entry;
+  tData_Queue_Entry *tail;
+
+  // Create new queue entry
+  entry = (tData_Queue_Entry *)malloc(sizeof(tData_Queue_Entry));
+  if (entry == NULL)
+  {
+    FormError->ShowErrorCode(1,"no memory left to create Data queue entry");
+    return;
+  }
+
+  entry->payload=data;
+  entry->next_ptr=NULL;
+
+  // Push entry onto tail of queue
+  if (Data_Queue.ptr == NULL)
+  {
+    Data_Queue.ptr = entry;
+  }
+  else
+  {
+    tail = Data_Queue.ptr;
+    while (tail->next_ptr != NULL) tail=tail->next_ptr;
+    tail->next_ptr = entry;
+  }
+
+}
+
+//---------------------------------------------------------------------------
+// Name        : Data_Queue_Pop
+// Description : Pop an entry from the head of the queue
+// Parameters  : 
+// Returns     : Item poped from queue.
+//---------------------------------------------------------------------------
+tData Data_Queue_Pop(void)
+{
+  tData_Queue_Entry * head;
+  tData payload;
+
+  // Is queue empty?
+  if (Data_Queue.ptr == NULL) 
+  {
+    payload.p1 = NULL;
+  }
+  else
+  {
+    head = Data_Queue.ptr;
+    payload = head->payload;
+
+    Data_Queue.ptr = head->next_ptr;
+
+    // Free the queue entry
+    free(head);
+
+  }
+
   return(payload);
 }
 
@@ -273,20 +353,17 @@ UInt8 Midi_IO_Open(AnsiString device_name)
   {
 
     // Setup MIDI in header
-    for (i=0; i<MIDI_IN_NUM_BUF; i++)
-    {
-      Midi_In[i].Hdr.lpData = Midi_In[0].Buffer;
-      Midi_In[i].Hdr.dwBufferLength = sizeof(Midi_In[0].Buffer);
-      Midi_In[i].Hdr.dwBytesRecorded = 0;
-      Midi_In[i].Hdr.dwFlags = 0;
-      status = midiInPrepareHeader(Midi_In_Handle, &Midi_In[i].Hdr, sizeof(Midi_In[i].Hdr));
-     }
+      Midi_In.Hdr.lpData = Midi_In.Buffer;
+      Midi_In.Hdr.dwBufferLength = sizeof(Midi_In.Buffer);
+      Midi_In.Hdr.dwBytesRecorded = 0;
+      Midi_In.Hdr.dwFlags = 0;
+      status = midiInPrepareHeader(Midi_In_Handle, &Midi_In.Hdr, sizeof(Midi_In.Hdr));
    }
 
   if (status == MMSYSERR_NOERROR)
   {
     // Add a buffer to the MIDI in header
-    status=midiInAddBuffer(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
+    status=midiInAddBuffer(Midi_In_Handle, &Midi_In.Hdr, sizeof(Midi_In.Hdr));
   }
 
   if (status == MMSYSERR_NOERROR)
@@ -360,9 +437,9 @@ UInt32 Midi_Out_Dump(UInt8 program, UInt8 *data, UInt16 size)
 
 }
 //---------------------------------------------------------------------------
-// Name        : 
-// Description : 
-// Parameters  : 
+// Name        : Midi_Out_Dump_Req
+// Description : Send a dump request to an Alesis Quadraverb via Midi
+// Parameters  : Program to be requested 
 // Returns     : NONE.
 //---------------------------------------------------------------------------
 unsigned int Midi_Out_Dump_Req(UInt8 program)
@@ -409,9 +486,11 @@ unsigned int Midi_Out_Dump_Req(UInt8 program)
 }
 
 //---------------------------------------------------------------------------
-// Name        : 
-// Description : 
-// Parameters  : 
+// Name        : Midi_Out_Edit
+// Description : Output a Midi Edit command
+// Parameter 1 : function - Function code to send Midi device
+// Parameter 2 : page - Page number code to send Midi device
+// Parameter 3 : data - Data word to send Midi device
 // Returns     : NONE.
 //---------------------------------------------------------------------------
 unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
@@ -420,8 +499,10 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   UInt8 buffer[100];
   UInt8 buf_len=0;
   long int status;
-  UInt8 quadgt[10];
+  UInt8 quadgt[3];   // Two bytes of data converted to Quadraverb format
+  UInt32 len;
 
+  FormDebug->Log(NULL, "Sending Midi Edit func: "+AnsiString(function) + " page: " + AnsiString(page) + " data: " + AnsiString(data));
   // Build message in buffer
   memcpy(buffer+buf_len, Sysex_Start, sizeof(Sysex_Start));
   buf_len+=sizeof(Sysex_Start);
@@ -441,11 +522,15 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
   buffer[buf_len] = page;
   buf_len+=1;
 
-  //QuadGT_Encode_16Bit(data, quadgt);
-  //QuadGT_Encode_To_Sysex(quadgt,2,&buffer[buf_len],3);
-  *(buffer+buf_len+0)=10>>1;
-  *(buffer+buf_len+1)=0;
-  *(buffer+buf_len+2)=0;
+  // TBD: Converting program number to 3 bytes of 7bit Sysex data is not working
+  QuadGT_Encode_16Bit(data, quadgt);
+  FormDebug->Log(NULL, "Encode 16bit: "+AnsiString(data) + " becomes: " + AnsiString(quadgt[0]) + " " + AnsiString(quadgt[1]) );
+  len=QuadGT_Encode_To_Sysex(quadgt,2,&buffer[buf_len],3);
+  FormDebug->Log(NULL, "Result: "+AnsiString(len) + " bytes");
+  //*(buffer+buf_len+0)=10>>1;   // DEBUG: Force to program 10, manually converted to 3 bytes of 7bit SYSEX data
+  //*(buffer+buf_len+1)=0;
+  //*(buffer+buf_len+2)=0;
+  FormDebug->Log(NULL, "Sysex: "+AnsiString(*(buffer+buf_len+0)) + " " +AnsiString(*(buffer+buf_len+1)) + " " +AnsiString(*(buffer+buf_len+2)) );
   buf_len+=3;
 
   memcpy(buffer+buf_len, Sysex_End, sizeof(Sysex_End));
@@ -468,8 +553,8 @@ unsigned int Midi_Out_Edit(UInt8 function, UInt8 page, UInt16 data)
 
 }
 //---------------------------------------------------------------------------
-// Name        : 
-// Description : 
+// Name        : Midi_Out_ShortMsg`
+// Description : Output a Midi short message
 // Parameters  : 
 // Returns     : NONE.
 //---------------------------------------------------------------------------
@@ -482,15 +567,17 @@ void Midi_Out_ShortMsg(const unsigned long message)
 // Description : Call back routine to process data received from Midi In.
 //---------------------------------------------------------------------------
 static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
-                                      DWORD *instance, DWORD *p1, DWORD *p2)
+                                      DWORD *instance, DWORD *p1, DWORD *p2)  // TBD: These aren't pointers!
 {
   MIDIHDR *header_ptr;
   UInt32 status;
   tBuffer entry;
+  tData data;
 
   switch (msg)
   {
     case MIM_LONGDATA:
+      FormDebug->Log(NULL,"Rx MIDI Sysex");
       // Handle SYSEX data input
       header_ptr = (MIDIHDR *)p1;
       rx_sysex++;
@@ -499,7 +586,7 @@ static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
       {
         entry.buffer=header_ptr->lpData;
         entry.length=header_ptr->dwBytesRecorded;
-        Queue_Push(entry);
+        Sysex_Queue_Push(entry);
 
       }
 
@@ -513,11 +600,24 @@ static void CALLBACK Midi_In_Callback(HMIDIIN handle, UINT msg,
 
     case MIM_DATA:
       rx_msg++;
+      if (Midi_Open == TRUE)
+      {
+        data.p1=(DWORD)p1;
+        Data_Queue_Push(data);
+      }
+
       break;
 
     case MIM_ERROR:
+      FormDebug->Log(NULL,"Rx MIDI Error - ignored");
+      break;
+
     case MIM_CLOSE:
+      FormDebug->Log(NULL,"Rx MIDI close - ignored");
+      break;
+
     default:
+      FormDebug->Log(NULL,"Rx MIDI other - ignored");
       rx_other++;
       break;
   }
@@ -548,7 +648,7 @@ unsigned int Midi_IO_Close(void)
 
     midiOutClose(Midi_Out_Handle);
 
-    midiInUnprepareHeader(Midi_In_Handle, &Midi_In[0].Hdr, sizeof(Midi_In[0].Hdr));
+    midiInUnprepareHeader(Midi_In_Handle, &Midi_In.Hdr, sizeof(Midi_In.Hdr));
 
     status=midiInStop(Midi_In_Handle);
     if (status != MMSYSERR_NOERROR) return(status);
@@ -566,19 +666,30 @@ unsigned int Midi_IO_Close(void)
 
 //---------------------------------------------------------------------------
 // Name        : Midi_Sysex_Process
-// Description : Process the Sysex data received
+// Description : Process any Midi Sysex messages received and placed in the
+//               queue.
+// Note        : Called from a timer.
 //---------------------------------------------------------------------------
 void Midi_Sysex_Process(void)
 {
    tBuffer sysex;
+   tData data;
    UInt8 code,prog;
    UInt8 quadgt[QUAD_PATCH_SIZE];
 
-   sysex = Queue_Pop();
+   // Process Sysex messages
+   sysex = Sysex_Queue_Pop();
    if (sysex.buffer != NULL)
    {
      QuadGT_Sysex_Process(sysex);
      free(sysex.buffer);
+   }
+
+   // Process Data messages
+   data = Data_Queue_Pop();
+   if (data.p1 != NULL)
+   {
+     QuadGT_Data_Process(data);
    }
 }
 

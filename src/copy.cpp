@@ -21,7 +21,7 @@ void __fastcall TFormCopy::CancelClick(TObject *Sender)
   ModalResult=0;
 }
 //---------------------------------------------------------------------------
-void __fastcall TFormCopy::SwapClick(TObject *Sender)
+void __fastcall TFormCopy::CopyClick(TObject *Sender)
 {
   ModalResult=1;
 }
